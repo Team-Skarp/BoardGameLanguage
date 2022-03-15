@@ -1,0 +1,13 @@
+<project name="math-language" basedir="">
+
+    <taskdef description="Translate a JFlex specification into Scanner.java" name="jflex" classname="JFlex.anttask.JFlexTask" classpath="tools/JFlex.jar" />
+
+    <target name="genScanner.depend">
+        <uptodate property="genScanner.upToDate" targetfile="Scanner.java" srcfile="/lex/scanner.jflex" />
+    </target>
+
+    <target name="genScanner" depends="genScanner.depend" unless="genScanner.upToDate">
+        <jflex file="lex/scanner.jflex" destdir="src" nobak="true" />
+    </target>
+
+</project>

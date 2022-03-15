@@ -25,17 +25,12 @@ It contains two datatypes floating point numbers and integers
 
 # Setup
 
-To recompile the Yylex scanner class run the following command:
+To recompile the Scanner class run the ant ```genScanner``` task
 
-```terminal
-java -jar Tools/JFlex.jar scanner.jflex 
-```
-https://jflex.de/manual.html#running-jflex
-
-Then the scanner can be run on input files using the command:
+The scanner can be run on input files using the command:
 
 ```
-java Yylex.java input
+java Scanner.java input
 ```
 
 
