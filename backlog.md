@@ -1,5 +1,5 @@
 ## Task list
 
-- [ ] Make the scanner for our tokens
-- 
-
+- [x] Make the scanner for our tokens
+- Integrate antlr4 into terminal script
+ 

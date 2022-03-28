@@ -22,16 +22,25 @@ It contains two datatypes floating point numbers and integers
 | MOD         | `\%`                                          |
 | FNUM        | <code>^(0&#124;([1-9][0-9]*))?\.[0-9]+</code> |
 | INUM        | `^[0-9]+`                                     |
+| LPAREN      | `\(`                                          |
+| RPAREN      | `\)`                                          |
+
 
 # Setup
 
-To recompile the Scanner class run the ant ```genScanner``` task
+To run ANTLR4 on our grammer use the following commands inside intelliJ
+terminal:
 
-The scanner can be run on input files using the command:
+```console
+$ export CLASSPATH="tools/antlr-4.9-complete.jar:$CLASSPATH"
+```
+```
+$ alias antlr4='java -Xmx500M -cp "tools/antlr-4.9-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
+$ alias grun='java -Xmx500M -cp "tools/antlr-4.9-complete.jar:$CLASSPATH" org.antlr.v4.gui.TestRig'
+```
 
-```
-java Scanner.java input
-```
+## ANTLR4 help
+https://github.com/antlr/antlr4/blob/master/doc/getting-started.md
 
 
 
