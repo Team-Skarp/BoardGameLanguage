@@ -1,4 +1,4 @@
-package arithm;
+package bogac;
 import arithm.autogen.*;
 import org.antlr.v4.runtime.*;
 
@@ -7,11 +7,11 @@ import java.io.File;
 public class ParserTest {
 
     /*
-    *  Simple use of auto-testing the grammer on mulitple input files
-    */
+     *  Simple use of auto-testing the grammer on mulitple input files
+     */
     public static void main(String[] args) throws Exception {
 
-        final               File testfolder = new File("src/test/resources/testfiles/arithm");
+        final               File testfolder = new File("src/test/resources/testfiles/bogac");
         CharStream          input;
         ArithmeticLexer     lexer;
         CommonTokenStream   tokens;
@@ -22,7 +22,7 @@ public class ParserTest {
             lexer = new ArithmeticLexer(input);
             tokens = new CommonTokenStream(lexer);
             parser = new ArithmeticParser(tokens);
-            
+
             try {
                 parser.prog(); // parse the input stream!
 
