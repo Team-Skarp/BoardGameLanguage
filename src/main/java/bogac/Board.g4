@@ -1,203 +1,214 @@
 grammar Board;
 
 //Block structures
-        SETUPBLC  : 'SETUP';
-        RULESBLC  : 'RULES';
-        GMLOOPBLC : 'GMLOOP';
+SETUPBLC  : 'SETUP';
+RULESBLC  : 'RULES';
+GMLOOPBLC : 'GMLOOP';
 
 //Declarations
-        INTDCL      : 'int';
-        BOOLDCL     : 'bool';
-        STRINGDCL   : 'str' | 'string';
-        DESIGNDCL   : 'design';
+INTDCL      : 'int';
+BOOLDCL     : 'bool';
+STRDCL      : 'str';
+DESIGNDCL   : 'design';
 
 //Primitive types
-        INT     : [0-9]+;
-        BOOL    : 'True' | 'False';
-        STRING  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
-
+INTVAL      : [0-9]+;
+BOOLVAL     : 'True' | 'False';
+STRVAL      : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
 
 //Operators
-        MOD     : '%';
-        PLUS    : '+';
-        MINUS   : '-';
-        MULT    : '*';
-        DIV     : '/';
-        EXP     : '^';
+MOD     : '%';
+PLUS    : '+';
+MINUS   : '-';
+MULT    : '*';
+DIV     : '/';
+EXP     : '^';
 
 
-        ASSIGN  : '=';
-        GTH     : '>';
-        LTH     : '<';
-        GTHEQL  : '>=';
-        LTHEQL  : '<=';
-        EQL     : '==';
-        NEQL    : '!=';
-        NOT     : 'not'|'!';
-        AND     : 'and'|'&&';
-        OR      : 'or'|'||';
+ASSIGN  : '=';
+GTH     : '>';
+LTH     : '<';
+GTHEQL  : '>=';
+LTHEQL  : '<=';
+EQL     : '==';
+NEQL    : '!=';
+NOT     : 'not'|'!';
+AND     : 'and'|'&&';
+OR      : 'or'|'||';
 
 
 
 //Control structures
-        IF      : 'if';
-        ELSEIF  : 'elseif';
-        ELSE    : 'else';
-        RETURN  : 'return';
-        FOR     : 'for';
-        FOREACH : 'foreach';
-        WHILE   : 'while';
+IF      : 'if';
+ELSEIF  : 'elseif';
+ELSE    : 'else';
+RETURN  : 'return';
+FOR     : 'for';
+FOREACH : 'foreach';
+WHILE   : 'while';
 
 //Special keywords
-        FROM        : 'from';
-        SPECIAL     : 'special';
-        UNI_DIR     : 'uni';
-        BI_DIR      : 'bi';
-        STATIC_DIR  : 'static';
+FROM        : 'from';
+SPECIAL     : 'special';
+UNI_DIR     : 'uni';
+BI_DIR      : 'bi';
+STATIC_DIR  : 'static';
 
-        CHOICE  : 'choice';
-        ACTION  : 'action';
-        PRINT   : 'print';
+CHOICE  : 'choice';
+ACTION  : 'action';
+PRINT   : 'print';
 
 //Delimiters
-        LPAREN      : '(';
-        RPAREN      : ')';
-        LBRACE      : '{';
-        RBRACE      : '}';
-        COMMA       : ',';
+LPAREN      : '(';
+RPAREN      : ')';
+LBRACE      : '{';
+RBRACE      : '}';
+COMMA       : ',';
 
-        NEWLINE : '\n'      -> skip;
-        WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
-        EOL     : ';';
+NEWLINE : '\n'      -> skip;
+WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
+EOL     : ';';
 
-        game
-        : setup rules gameloop
-        ;
+game
+    : setup rules gameloop
+    ;
 
-        setup
-        : SETUPBLC block
-        ;
+setup
+    : SETUPBLC block
+    ;
 
-        rules
-        : EOF
-        ;
+rules
+    : EOF
+    ;
 
-        gameloop
-        : EOF
-        ;
+gameloop
+    : EOF
+    ;
 
-        statements
-        : ifstmnt
-        | EOF
-        ;
+statements
+    : ifstmnt
+    | EOF
+    ;
 
-        block
-        : LBRACE (declarations|statements|block)* RBRACE
-        ;
+block
+    : LBRACE (declarations|statements|block)* RBRACE
+    ;
 
-        //declarations
-        declarations
-        : dcltype EOL
-        ;
+//declarations
+declarations
+    : INTDCL iAssign
+    | BOOLDCL bAssign
+    | STRDCL sAssign
+    | DESIGNDCL dAssign
+    ;
 
-        dcltype
-        : INTDCL intasign
-        | BOOLDCL boolasign
-        | STRINGDCL stringasign
-        | DESIGNDCL
-        ;
+dAssign
+    : IDENTIFIER (FROM IDENTIFIER)? dBlock
+    ;
 
-        intasign
-        : IDENTIFIER ASSIGN aexpr COMMA intasign
-        | IDENTIFIER ASSIGN aexpr
-        ;
+dBlock
+    : LBRACE (fieldRow)* RBRACE
+    ;
 
-        boolasign
-        : IDENTIFIER ASSIGN bexpr COMMA boolasign
-        | IDENTIFIER ASSIGN bexpr
-        ;
+fieldRow
+    : fieldType IDENTIFIER EOL
+    ;
 
-        stringasign
-        : IDENTIFIER ASSIGN STRING COMMA stringasign
-        | IDENTIFIER ASSIGN STRING
-        ;
+fieldType
+    : INTDCL
+    | BOOLDCL
+    | STRDCL
+    //| IDENTIFIER    //This identifier needs to be declared before it can be used here
+    ;
 
-        //arithmetic expression
-        aexpr
-        : additive+
-        ;
-        additive
-        : additive PLUS multiplicative
-        | additive MINUS multiplicative
-        | multiplicative
-        ;
+iAssign
+    : IDENTIFIER ASSIGN aExpr COMMA iAssign
+    | IDENTIFIER ASSIGN aExpr
+    ;
 
-        multiplicative
-        : multiplicative MULT pow
-        | multiplicative DIV pow
-        | multiplicative MOD pow
-        | pow
-        ;
+bAssign
+    : IDENTIFIER ASSIGN bExpr COMMA bAssign
+    | IDENTIFIER ASSIGN bExpr
+    ;
 
-        pow
-        : pow EXP aatom
-        | aatom
-        ;
+sAssign
+    : IDENTIFIER ASSIGN STRVAL COMMA sAssign
+    | IDENTIFIER ASSIGN STRVAL
+    ;
 
-        aatom
-        : INT
-        | LPAREN aexpr RPAREN
-        ;
+//arithmetic expression
+aExpr
+    : additive+
+    ;
 
-        //boolean expressions
-        bexpr
-        : logor+
-        ;
+additive
+    : additive PLUS multiplicative
+    | additive MINUS multiplicative
+    | multiplicative
+    ;
 
-        logor
-        : logor OR logand
-        | logand
-        ;
+multiplicative
+    : multiplicative MULT pow
+    | multiplicative DIV pow
+    | multiplicative MOD pow
+    | pow
+    ;
 
-        logand
-        : logand AND equality
-        | equality
-        ;
+pow
+    : pow EXP aatom
+    | aatom
+    ;
 
-        equality
-        : equality EQL relational
-        | equality NEQL relational
-        | relational
-        ;
+aatom
+    : INTVAL
+    | LPAREN aExpr RPAREN
+    ;
 
-        relational
-        : relational GTH aexpr
-        | relational LTH aexpr
-        | relational GTHEQL aexpr
-        | relational LTHEQL aexpr
-        | aexpr
-        | batom
-        ;
+//boolean expressions
+bExpr
+    : logor+
+    ;
 
-        not
-        : NOT
-        ;
+logor
+    : logor OR logand
+    | logand
+    ;
 
-        batom
-        : BOOL
-        | not batom
-        | LPAREN bexpr RPAREN
-        ;
+logand
+    : logand AND equality
+    | equality
+    ;
 
-        ifstmnt
-        : IF LPAREN bexpr RPAREN block
-        | IF LPAREN bexpr RPAREN block elsestmnt
-        ;
-        elsestmnt
-        : ELSE block
-        | ELSE ifstmnt
-        ;
+equality
+    : equality EQL relational
+    | equality NEQL relational
+    | relational
+    ;
 
-        //die at the bottom you piece of shit identifier
-        IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
+relational
+    : relational GTH aExpr
+    | relational LTH aExpr
+    | relational GTHEQL aExpr
+    | relational LTHEQL aExpr
+    | aExpr
+    | batom
+    ;
+
+batom
+    : BOOLVAL
+    | NOT batom
+    | LPAREN bExpr RPAREN
+    ;
+
+ifstmnt
+    : IF LPAREN bExpr RPAREN block
+    | IF LPAREN bExpr RPAREN block elsestmnt
+    ;
+elsestmnt
+    : ELSE block
+    | ELSE ifstmnt
+    ;
+
+//die at the bottom you piece of shit identifier
+IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
 
