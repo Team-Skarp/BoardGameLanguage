@@ -47,6 +47,7 @@ grammar Board;
         FOR     : 'for';
         FOREACH : 'foreach';
         WHILE   : 'while';
+        IN      : 'in';
 
 //Special keywords
         FROM        : 'from';
@@ -88,6 +89,8 @@ grammar Board;
 
         statements
         : ifstmnt
+        | whilestmnt
+        | foreach
         | EOF
         ;
 
@@ -193,9 +196,18 @@ grammar Board;
         : IF LPAREN bexpr RPAREN block
         | IF LPAREN bexpr RPAREN block elsestmnt
         ;
+
         elsestmnt
         : ELSE block
         | ELSE ifstmnt
+        ;
+
+        whilestmnt
+        : WHILE LPAREN bexpr RPAREN block
+        ;
+
+        foreach
+        : FOREACH IDENTIFIER IN IDENTIFIER block
         ;
 
         //die at the bottom you piece of shit identifier
