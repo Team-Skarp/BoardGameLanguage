@@ -36,8 +36,6 @@ NOT     : 'not'|'!';
 AND     : 'and'|'&&';
 OR      : 'or'|'||';
 
-
-
 //Control structures
 IF      : 'if';
 ELSEIF  : 'elseif';
@@ -49,6 +47,10 @@ WHILE   : 'while';
 
 //Special keywords
 FROM        : 'from';
+TILE_EVENT  : 'event';
+ON_LAND     : 'onLand';
+ON_LEAVE    : 'onLeave';
+ON_VISIT    : 'onVisit';
 SPECIAL     : 'special';
 UNI_DIR     : 'uni';
 BI_DIR      : 'bi';
@@ -78,11 +80,29 @@ setup
     ;
 
 rules
-    : EOF
+    : RULESBLC LBRACE action choice special RBRACE
     ;
 
 gameloop
     : EOF
+    ;
+
+special
+    : IDENTIFIER event LPAREN IDENTIFIER ',' IDENTIFIER RPAREN block
+    ;
+
+choice
+    : IDENTIFIER LPAREN IDENTIFIER RPAREN block
+    ;
+
+action
+    : IDENTIFIER LPAREN IDENTIFIER RPAREN block
+    ;
+
+event
+    : ON_LAND
+    | ON_LEAVE
+    | ON_VISIT
     ;
 
 statements
@@ -211,4 +231,3 @@ elsestmnt
 
 //die at the bottom you piece of shit identifier
 IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
-
