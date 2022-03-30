@@ -47,7 +47,7 @@ WHILE   : 'while';
 
 //Special keywords
 FROM        : 'from';
-TILE_EVENT  : 'event';
+TILE_EVENT  : 'eventType';
 ON_LAND     : 'onLand';
 ON_LEAVE    : 'onLeave';
 ON_VISIT    : 'onVisit';
@@ -88,21 +88,21 @@ gameloop
     ;
 
 special
-    : IDENTIFIER event LPAREN IDENTIFIER ',' IDENTIFIER RPAREN block
+    : SPECIAL IDENTIFIER eventType LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN block
     ;
 
-choice
-    : IDENTIFIER LPAREN IDENTIFIER RPAREN block
-    ;
-
-action
-    : IDENTIFIER LPAREN IDENTIFIER RPAREN block
-    ;
-
-event
+eventType
     : ON_LAND
     | ON_LEAVE
     | ON_VISIT
+    ;
+
+choice
+    : CHOICE IDENTIFIER LPAREN IDENTIFIER RPAREN block
+    ;
+
+action
+    : ACTION IDENTIFIER LPAREN IDENTIFIER RPAREN block
     ;
 
 statements
