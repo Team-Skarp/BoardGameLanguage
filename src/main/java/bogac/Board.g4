@@ -8,14 +8,15 @@ GMLOOPBLC : 'GMLOOP';
 //Declarations
 INTDCL      : 'int';
 BOOLDCL     : 'bool';
-STRDCL      : 'str';
-DESIGNDCL   : 'design';
+STRINGDCL      : 'str';
+DESIGNDCL   : 'design' | 'string';
 LISTDCL     : 'list';
 
 //Primitive types
-INTVAL      : [0-9]+;
-BOOLVAL     : 'True' | 'False';
-STRVAL      : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
+INT     : [0-9]+;
+BOOL    : 'True' | 'False';
+STRING  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
+
 
 //Operators
 MOD     : '%';
@@ -46,7 +47,6 @@ RETURN  : 'return';
 WHILE   : 'while';
 
 //Special keywords
-BI_DIR      : 'bi';
 FROM        : 'from';
 TILE_EVENT  : 'eventType';
 IN          : 'in';
@@ -55,6 +55,7 @@ ON_LEAVE    : 'onLeave';
 ON_VISIT    : 'onVisit';
 SPECIAL     : 'special';
 UNI_DIR     : 'uni';
+BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
 
 CHOICE  : 'choice';
@@ -109,15 +110,15 @@ action
     : ACTION IDENTIFIER LPAREN IDENTIFIER RPAREN block
     ;
 
-block
-    : LBRACE (declarations|statements|block|lAssign)* RBRACE
-    ;
-
 //declarations
 declarations
+    : dcltype EOL
+    ;
+
+dcltype
     : INTDCL iAssign EOL
     | BOOLDCL bAssign EOL
-    | STRDCL sAssign EOL
+    | STRINGDCL sAssign EOL
     | DESIGNDCL dAssign
     | LISTDCL lAssign
     ;
@@ -131,7 +132,11 @@ statements
 
 lAssign
     : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
-    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INTVAL RSBRACE
+    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
+    ;
+
+block
+    : LBRACE (declarations|statements|block|lAssign)* RBRACE
     ;
 
 dAssign
@@ -149,7 +154,7 @@ fieldRow
 fieldType
     : INTDCL
     | BOOLDCL
-    | STRDCL
+    | STRINGDCL
     //| IDENTIFIER    //This identifier needs to be declared before it can be used here
     ;
 
@@ -164,8 +169,8 @@ bAssign
     ;
 
 sAssign
-    : IDENTIFIER ASSIGN STRVAL COMMA sAssign
-    | IDENTIFIER ASSIGN STRVAL
+    : IDENTIFIER ASSIGN STRING COMMA sAssign
+    | IDENTIFIER ASSIGN STRING
     ;
 
 //arithmetic expression
@@ -192,7 +197,7 @@ pow
     ;
 
 aatom
-    : INTVAL
+    : INT
     | LPAREN aExpr RPAREN
     ;
 
@@ -231,7 +236,7 @@ not
     ;
 
 batom
-    : BOOLVAL
+    : BOOL
     | NOT batom
     | LPAREN bexpr RPAREN
     ;
@@ -240,6 +245,7 @@ ifstmnt
     : IF LPAREN bexpr RPAREN block
     | IF LPAREN bexpr RPAREN block elsestmnt
     ;
+
 elsestmnt
     : ELSE block
     | ELSE ifstmnt
