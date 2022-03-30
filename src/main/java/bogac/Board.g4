@@ -10,6 +10,7 @@ INTDCL      : 'int';
 BOOLDCL     : 'bool';
 STRDCL      : 'str';
 DESIGNDCL   : 'design';
+LISTDCL     : 'list';
 
 //Primitive types
 INTVAL      : [0-9]+;
@@ -23,7 +24,6 @@ MINUS   : '-';
 MULT    : '*';
 DIV     : '/';
 EXP     : '^';
-
 
 ASSIGN  : '=';
 GTH     : '>';
@@ -40,20 +40,21 @@ OR      : 'or'|'||';
 IF      : 'if';
 ELSEIF  : 'elseif';
 ELSE    : 'else';
-RETURN  : 'return';
 FOR     : 'for';
 FOREACH : 'foreach';
+RETURN  : 'return';
 WHILE   : 'while';
 
 //Special keywords
+BI_DIR      : 'bi';
 FROM        : 'from';
 TILE_EVENT  : 'eventType';
+IN          : 'in';
 ON_LAND     : 'onLand';
 ON_LEAVE    : 'onLeave';
 ON_VISIT    : 'onVisit';
 SPECIAL     : 'special';
 UNI_DIR     : 'uni';
-BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
 
 CHOICE  : 'choice';
@@ -63,9 +64,12 @@ PRINT   : 'print';
 //Delimiters
 LPAREN      : '(';
 RPAREN      : ')';
+LSBRACE     : '[';
+RSBRACE     : ']';
 LBRACE      : '{';
 RBRACE      : '}';
 COMMA       : ',';
+COLON       : ':';
 
 NEWLINE : '\n'      -> skip;
 WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
@@ -105,21 +109,29 @@ action
     : ACTION IDENTIFIER LPAREN IDENTIFIER RPAREN block
     ;
 
-statements
-    : ifstmnt
-    | EOF
-    ;
-
 block
-    : LBRACE (declarations|statements|block)* RBRACE
+    : LBRACE (declarations|statements|block|lAssign)* RBRACE
     ;
 
 //declarations
 declarations
-    : INTDCL iAssign
-    | BOOLDCL bAssign
-    | STRDCL sAssign
+    : INTDCL iAssign EOL
+    | BOOLDCL bAssign EOL
+    | STRDCL sAssign EOL
     | DESIGNDCL dAssign
+    | LISTDCL lAssign
+    ;
+
+statements
+    : ifstmnt
+    | whilestmnt
+    | foreach
+    | EOF
+    ;
+
+lAssign
+    : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
+    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INTVAL RSBRACE
     ;
 
 dAssign
@@ -147,8 +159,8 @@ iAssign
     ;
 
 bAssign
-    : IDENTIFIER ASSIGN bExpr COMMA bAssign
-    | IDENTIFIER ASSIGN bExpr
+    : IDENTIFIER ASSIGN bexpr COMMA bAssign
+    | IDENTIFIER ASSIGN bexpr
     ;
 
 sAssign
@@ -185,7 +197,7 @@ aatom
     ;
 
 //boolean expressions
-bExpr
+bexpr
     : logor+
     ;
 
@@ -214,19 +226,31 @@ relational
     | batom
     ;
 
+not
+    : NOT
+    ;
+
 batom
     : BOOLVAL
     | NOT batom
-    | LPAREN bExpr RPAREN
+    | LPAREN bexpr RPAREN
     ;
 
 ifstmnt
-    : IF LPAREN bExpr RPAREN block
-    | IF LPAREN bExpr RPAREN block elsestmnt
+    : IF LPAREN bexpr RPAREN block
+    | IF LPAREN bexpr RPAREN block elsestmnt
     ;
 elsestmnt
     : ELSE block
     | ELSE ifstmnt
+    ;
+
+whilestmnt
+    : WHILE LPAREN bexpr RPAREN block
+    ;
+
+foreach
+    : FOREACH IDENTIFIER IN IDENTIFIER block
     ;
 
 //die at the bottom you piece of shit identifier

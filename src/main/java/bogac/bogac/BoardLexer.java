@@ -1,5 +1,5 @@
 // Generated from C:/programs/semester4/Math-language/src/main/java/bogac\Board.g4 by ANTLR 4.9.2
-package bogac;
+package bogac.bogac;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

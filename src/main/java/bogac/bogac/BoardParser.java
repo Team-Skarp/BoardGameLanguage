@@ -1,5 +1,6 @@
 // Generated from C:/programs/semester4/Math-language/src/main/java/bogac\Board.g4 by ANTLR 4.9.2
-package bogac;
+package bogac.bogac;
+import bogac.bogac.BoardVisitor;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -126,7 +127,7 @@ public class BoardParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_game; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof BoardVisitor ) return ((BoardVisitor<? extends T>)visitor).visitGame(this);
+			if ( visitor instanceof BoardVisitor) return ((BoardVisitor<? extends T>)visitor).visitGame(this);
 			else return visitor.visitChildren(this);
 		}
 	}
