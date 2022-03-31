@@ -1,3 +1,7 @@
+/*
+    @Author Jakob Saadbye, Hans Heje, Ming Hui
+*/
+
 grammar Board;
 
 //Block structures
@@ -5,12 +9,18 @@ SETUPBLC  : 'SETUP';
 RULESBLC  : 'RULES';
 GMLOOPBLC : 'GMLOOP';
 
-//Declarations
+//Primitive type declarations
 INTDCL      : 'int';
 BOOLDCL     : 'bool';
-STRINGDCL      : 'str';
-DESIGNDCL   : 'design' | 'string';
-LISTDCL     : 'list';
+STRDCL      : 'str';
+
+
+//Design declerations
+DESIGNDCL   : 'design';
+
+//Special decleration
+ACTIONDCL   : 'action';
+CHOICEDCL   : 'choice';
 
 //Primitive types
 INT     : [0-9]+;
@@ -48,18 +58,13 @@ WHILE   : 'while';
 
 //Special keywords
 FROM        : 'from';
-TILE_EVENT  : 'eventType';
+TILE_EVENT  : 'onLand' | 'onLeave' | 'onVisit';
 IN          : 'in';
-ON_LAND     : 'onLand';
-ON_LEAVE    : 'onLeave';
-ON_VISIT    : 'onVisit';
 SPECIAL     : 'special';
 UNI_DIR     : 'uni';
 BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
 
-CHOICE  : 'choice';
-ACTION  : 'action';
 PRINT   : 'print';
 
 //Delimiters
@@ -81,70 +86,83 @@ game
     ;
 
 setup
-    : SETUPBLC block
+    : SETUPBLC setupBlock
     ;
 
 rules
-    : RULESBLC LBRACE action choice special RBRACE
+    : EOF
     ;
 
 gameloop
     : EOF
     ;
 
-special
-    : SPECIAL IDENTIFIER eventType LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN block
+setupBlock
+    : LBRACE (normalDeclaration | designDeclaraion | statements | setupBlock )* RBRACE
+    ;
+normalBlock
+    : LBRACE (normalDeclaration | statements | normalBlock )* RBRACE
     ;
 
-eventType
-    : ON_LAND
-    | ON_LEAVE
-    | ON_VISIT
+//Primitive type decleration
+normalDeclaration
+    : integerDeclaration EOL
+    | booleanDeclaration EOL
+    | stringDeclaration EOL
+    | listDeclaration EOL
+    | actionDeclaration
+    | specialDeclaration
+    | choiceDeclaration
     ;
 
-choice
-    : CHOICE IDENTIFIER LPAREN IDENTIFIER RPAREN block
+//Special and choice declarations should only be found in Rules block NOT IMPLEMENTED
+specialDeclaration
+    : SPECIAL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN normalBlock
     ;
 
-action
-    : ACTION IDENTIFIER LPAREN IDENTIFIER RPAREN block
+choiceDeclaration
+    : CHOICEDCL IDENTIFIER LPAREN IDENTIFIER RPAREN normalBlock //Should have a special choice block
     ;
 
-//declarations
-declarations
-    : dcltype EOL
+actionDeclaration
+    : ACTIONDCL IDENTIFIER LPAREN formalParameters RPAREN (COLON primitiveType)? normalBlock
     ;
 
-dcltype
-    : INTDCL iAssign EOL
-    | BOOLDCL bAssign EOL
-    | STRINGDCL sAssign EOL
-    | DESIGNDCL dAssign
-    | LISTDCL lAssign
+//Design declerations should only appear in SETUP block
+designDeclaraion
+    : DESIGNDCL IDENTIFIER (FROM IDENTIFIER)? designBody
     ;
 
-statements
-    : ifstmnt
-    | whilestmnt
-    | foreach
-    | EOF
-    ;
-
-lAssign
+listDeclaration
     : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
     | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
     ;
 
-block
-    : LBRACE (declarations|statements|block|lAssign)* RBRACE
+
+integerDeclaration
+    : INTDCL IDENTIFIER ASSIGN aExpr COMMA integerDeclaration
+    | INTDCL IDENTIFIER ASSIGN aExpr
     ;
 
-dAssign
-    : IDENTIFIER (FROM IDENTIFIER)? dBlock
+booleanDeclaration
+    : BOOLDCL IDENTIFIER ASSIGN bexpr COMMA booleanDeclaration
+    | BOOLDCL IDENTIFIER ASSIGN bexpr
     ;
 
-dBlock
+stringDeclaration
+    : STRDCL IDENTIFIER ASSIGN STRING COMMA stringDeclaration
+    | STRDCL IDENTIFIER ASSIGN STRING
+    ;
+
+// Special body's
+designBody
     : LBRACE (fieldRow)* RBRACE
+    ;
+
+
+//Primitive types
+primitiveType
+    : INTDCL | BOOLDCL | STRDCL
     ;
 
 fieldRow
@@ -154,23 +172,22 @@ fieldRow
 fieldType
     : INTDCL
     | BOOLDCL
-    | STRINGDCL
+    | STRDCL
     //| IDENTIFIER    //This identifier needs to be declared before it can be used here
     ;
 
-iAssign
-    : IDENTIFIER ASSIGN aExpr COMMA iAssign
-    | IDENTIFIER ASSIGN aExpr
+
+formalParameters
+    : primitiveType COLON IDENTIFIER
+    | primitiveType COLON IDENTIFIER COMMA formalParameters
     ;
 
-bAssign
-    : IDENTIFIER ASSIGN bexpr COMMA bAssign
-    | IDENTIFIER ASSIGN bexpr
-    ;
 
-sAssign
-    : IDENTIFIER ASSIGN STRING COMMA sAssign
-    | IDENTIFIER ASSIGN STRING
+statements
+    : ifstmnt
+    | whilestmnt
+    | foreach
+    | EOF
     ;
 
 //arithmetic expression
@@ -242,21 +259,21 @@ batom
     ;
 
 ifstmnt
-    : IF LPAREN bexpr RPAREN block
-    | IF LPAREN bexpr RPAREN block elsestmnt
+    : IF LPAREN bexpr RPAREN normalBlock
+    | IF LPAREN bexpr RPAREN normalBlock elsestmnt
     ;
 
 elsestmnt
-    : ELSE block
+    : ELSE normalBlock
     | ELSE ifstmnt
     ;
 
 whilestmnt
-    : WHILE LPAREN bexpr RPAREN block
+    : WHILE LPAREN bexpr RPAREN normalBlock
     ;
 
 foreach
-    : FOREACH IDENTIFIER IN IDENTIFIER block
+    : FOREACH IDENTIFIER IN IDENTIFIER normalBlock
     ;
 
 //die at the bottom you piece of shit identifier

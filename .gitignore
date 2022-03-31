@@ -1,0 +1,8 @@
+#Autogen from ANTLR
+/src/main/java/bogac/autogen
+
+.idea
+.classpath
+.project
+.settings/
+target/
