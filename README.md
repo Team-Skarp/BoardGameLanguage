@@ -26,5 +26,5 @@ Leave 'location of imported grammer' and 'grammer file enconding' as blank
 The package/namespace should be
 
 ```
-autogen
+antlr
 ```

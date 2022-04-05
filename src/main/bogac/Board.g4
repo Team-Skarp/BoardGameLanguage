@@ -24,7 +24,7 @@ ACTIONDCL   : 'action';
 CHOICEDCL   : 'choice';
 
 //Primitive types
-INT     : [0-9]+;
+INT     : ('-')?[0-9]+;
 BOOL    : 'True' | 'False';
 STRING  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
 
