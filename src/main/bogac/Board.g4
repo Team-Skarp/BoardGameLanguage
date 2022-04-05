@@ -244,13 +244,18 @@ relational
     | relational GTHEQL arithmeticExpression
     | relational LTHEQL arithmeticExpression
     | arithmeticExpression
+    | negation
+    ;
+
+negation
+    : NOT booleanAtom
     | booleanAtom
     ;
 
+//!True > 5
 booleanAtom
     : BOOL
     | IDENTIFIER
-    | NOT booleanAtom
     | LPAREN booleanExpression RPAREN
     ;
 

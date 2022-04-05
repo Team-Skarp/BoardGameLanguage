@@ -100,4 +100,109 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         System.out.println(TAB.repeat(indent) + String.valueOf(n.value));
         return null;
     }
+
+    @Override
+    public Void visit(EqualNode n) {
+        System.out.println(TAB.repeat(indent) + "==");
+
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(NotEqualNode n) {
+        System.out.println(TAB.repeat(indent) + "!=");
+
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(LessThanNode n) {
+        System.out.println(TAB.repeat(indent) + "<");
+
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(GreaterThanNode n) {
+        System.out.println(TAB.repeat(indent) + ">");
+
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(GreaterThanEqualsNode n) {
+        System.out.println(TAB.repeat(indent) + ">=");
+
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(LessThanEqualsNode n) {
+        System.out.println(TAB.repeat(indent) + "<=");
+
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(BooleanNode n) {
+
+        System.out.println(TAB.repeat(indent) + n.value);
+        return null;
+    }
+
+    @Override
+    public Void visit(NegationNode n) {
+        System.out.println(TAB.repeat(indent) + "!");
+        indent++;
+        n.child.accept(this);
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(OrNode n) {
+        System.out.println(TAB.repeat(indent) + "or");
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(AndNode n) {
+        System.out.println(TAB.repeat(indent) + "and");
+        indent++;
+        n.left.accept(this);
+        n.right.accept(this);
+        indent--;
+
+        return null;
+    }
 }

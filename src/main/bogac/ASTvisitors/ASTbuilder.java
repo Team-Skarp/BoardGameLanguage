@@ -120,11 +120,17 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitArithmeticExpression(BoardParser.ArithmeticExpressionContext ctx) {
+        if (ctx.additive() != null){
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
     @Override
     public ASTNode visitBooleanExpression(BoardParser.BooleanExpressionContext ctx) {
+        if (ctx.logor() != null){
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
@@ -193,32 +199,93 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.IDENTIFIER() != null) {
             return new IdNode(ctx.IDENTIFIER().getText(), "ID");
+        }else if(ctx.arithmeticExpression() != null){
+            return ctx.getChild(1).accept(this);
         }
         return null;
     }
 
     @Override
     public ASTNode visitLogor(BoardParser.LogorContext ctx) {
+        if (ctx.OR() != null) {
+            return new OrNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+        }
+        else if (ctx.logand() != null) {
+
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
     @Override
     public ASTNode visitLogand(BoardParser.LogandContext ctx) {
+        if (ctx.AND() != null) {
+            return new AndNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+        }
+        else if (ctx.equality() != null) {
+
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
     @Override
     public ASTNode visitEquality(BoardParser.EqualityContext ctx) {
+        if (ctx.EQL() != null){
+            return new EqualNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+        }
+        else if (ctx.NEQL() != null){
+            return new NotEqualNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+        }
+        else if (ctx.relational() != null){
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
     @Override
     public ASTNode visitRelational(BoardParser.RelationalContext ctx) {
+        if (ctx.GTHEQL() != null){
+            return new GreaterThanEqualsNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+        }
+        else if (ctx.LTHEQL() != null){
+            return new LessThanEqualsNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+        }
+        else if (ctx.GTH() != null){
+            return new GreaterThanNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+        }
+        else if (ctx.LTH() != null){
+            return new LessThanNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+        }
+        else if (ctx.arithmeticExpression() != null){
+            return ctx.getChild(0).accept(this);
+        }
+        else if (ctx.negation() != null){
+            return ctx.getChild(0).accept(this);
+        }
+        return null;
+    }
+
+    @Override
+    public ASTNode visitNegation(BoardParser.NegationContext ctx) {
+        if(ctx.NOT() != null){
+            return new NegationNode(ctx.getChild(1).accept(this));
+        }else if (ctx.booleanAtom() != null){
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
     @Override
     public ASTNode visitBooleanAtom(BoardParser.BooleanAtomContext ctx) {
+        if (ctx.BOOL() != null){
+            return new BooleanNode(Boolean.parseBoolean(ctx.BOOL().getText()));
+        }else if (ctx.IDENTIFIER() != null) {
+            return new IdNode(ctx.IDENTIFIER().getText(), "ID");
+        }else if(ctx.booleanExpression() != null){
+            return ctx.getChild(1).accept(this);
+        }
+
         return null;
     }
 
