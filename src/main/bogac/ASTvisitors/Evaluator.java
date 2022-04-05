@@ -2,7 +2,7 @@ package ASTvisitors;
 
 import ASTnodes.*;
 
-public class ArithmeticEvaluator implements ASTvisitor<Integer> {
+public class Evaluator implements ASTvisitor<Object> {
 
     @Override
     public Integer visit(AssignNode n) {
@@ -69,54 +69,72 @@ public class ArithmeticEvaluator implements ASTvisitor<Integer> {
     }
 
     @Override
-    public Integer visit(EqualNode n) {
-        return null;
+    public Boolean visit(EqualNode n) {
+        Object l_result = n.left.accept(this);
+        Object r_result = n.right.accept(this);
+        return l_result == r_result;
     }
 
     @Override
-    public Integer visit(NotEqualNode n) {
-        return null;
+    public Boolean visit(NotEqualNode n) {
+        Object l_result = n.left.accept(this);
+        Object r_result = n.right.accept(this);
+        return l_result != r_result;
     }
 
     @Override
-    public Integer visit(LessThanNode n) {
-        return null;
+    public Boolean visit(LessThanNode n) {
+        int l_result = (int) n.left.accept(this);
+        int r_result = (int) n.right.accept(this);
+        return l_result < r_result;
     }
 
     @Override
-    public Integer visit(GreaterThanNode n) {
-        return null;
+    public Boolean visit(GreaterThanNode n) {
+        int l_result = (int) n.left.accept(this);
+        int r_result = (int) n.right.accept(this);
+        return l_result > r_result;
     }
 
     @Override
-    public Integer visit(GreaterThanEqualsNode n) {
-        return null;
+    public Boolean visit(GreaterThanEqualsNode n) {
+        int l_result = (int) n.left.accept(this);
+        int r_result = (int) n.right.accept(this);
+        return l_result >= r_result;
     }
 
     @Override
-    public Integer visit(LessThanEqualsNode n) {
-        return null;
+    public Boolean visit(LessThanEqualsNode n) {
+        int l_result = (int) n.left.accept(this);
+        int r_result = (int) n.right.accept(this);
+        return l_result <= r_result;
     }
 
     @Override
-    public Integer visit(BooleanNode n) {
-        return null;
+    public Boolean visit(BooleanNode n) {
+        return n.value;
     }
 
     @Override
-    public Integer visit(NegationNode n) {
-        return null;
+    public Boolean visit(NegationNode n) {
+        boolean result = (boolean) n.child.accept(this);
+        return !result;
     }
 
     @Override
-    public Integer visit(OrNode n) {
-        return null;
+    public Boolean visit(OrNode n) {
+        boolean l_result = (boolean) n.left.accept(this);
+        boolean r_result = (boolean) n.right.accept(this);
+        return l_result || r_result;
     }
 
     @Override
-    public Integer visit(AndNode n) {
-        return null;
+    public Boolean visit(AndNode n) {
+        boolean l_result = (boolean) n.left.accept(this);
+        boolean r_result = (boolean) n.right.accept(this);
+        return l_result && r_result;
     }
+
 
 
 }
