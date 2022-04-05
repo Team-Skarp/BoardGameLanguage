@@ -12,7 +12,7 @@ public class GreaterThanEqualsNode implements ASTNode {
     }
 
     @Override
-    public void accept(ASTvisitor v) {
-        v.visit(this);
+    public Object accept(ASTvisitor v) {
+        return v.visit(this);
     }
 }

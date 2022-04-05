@@ -3,7 +3,7 @@ package ASTnodes;
 import ASTvisitors.ASTvisitor;
 import antlr.BoardVisitor;
 
-public interface ASTNode {
+public interface ASTNode<T> {
 
-    void accept(ASTvisitor v);
+    T accept(ASTvisitor v);
 }
