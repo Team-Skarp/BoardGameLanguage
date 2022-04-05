@@ -8,7 +8,7 @@ GMLOOPBLC : 'GMLOOP';
 //Declarations
 INTDCL      : 'int';
 BOOLDCL     : 'bool';
-STRINGDCL      : 'str';
+STRINGDCL   : 'str';
 DESIGNDCL   : 'design' | 'string';
 LISTDCL     : 'list';
 
@@ -130,13 +130,8 @@ statements
     | EOF
     ;
 
-lAssign
-    : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
-    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
-    ;
-
 block
-    : LBRACE (declarations|statements|block|lAssign)* RBRACE
+    : LBRACE (declarations|statements|block|lAssign|print)* RBRACE
     ;
 
 dAssign
@@ -156,6 +151,11 @@ fieldType
     | BOOLDCL
     | STRINGDCL
     //| IDENTIFIER    //This identifier needs to be declared before it can be used here
+    ;
+
+lAssign
+    : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
+    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
     ;
 
 iAssign
@@ -257,6 +257,10 @@ whilestmnt
 
 foreach
     : FOREACH IDENTIFIER IN IDENTIFIER block
+    ;
+
+print
+    : PRINT LPAREN (block|COMMA|STRING|INT)* RPAREN EOL
     ;
 
 //die at the bottom you piece of shit identifier
