@@ -1,0 +1,14 @@
+#Autogen from ANTLR
+/src/main/bogac/antlr
+
+**/.DS_Store
+
+.idea
+
+.classpath
+
+.project
+
+.settings/
+
+target/

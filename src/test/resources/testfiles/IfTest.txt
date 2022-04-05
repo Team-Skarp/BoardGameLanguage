@@ -1,0 +1,4 @@
+SETUP {
+
+    if (a > b) {int a = 3;}
+}
