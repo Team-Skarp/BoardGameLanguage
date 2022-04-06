@@ -100,10 +100,10 @@ gameloop
     ;
 
 setupBlock
-    : LBRACE (normalDeclaration | designDeclaraion | statements | setupBlock )* RBRACE
+    : LBRACE (normalDeclaration | designDeclaration | statements | setupBlock )* RBRACE
     ;
 normalBlock
-    : LBRACE (normalDeclaration | statements | normalBlock )* RBRACE
+    : LBRACE (normalDeclaration | statements )* RBRACE
     ;
 
 //Primitive type decleration
@@ -131,7 +131,7 @@ actionDeclaration
     ;
 
 //Design declerations should only appear in SETUP block
-designDeclaraion
+designDeclaration
     : DESIGNDCL IDENTIFIER (FROM IDENTIFIER)? designBody
     ;
 
@@ -186,8 +186,8 @@ formalParameters
     ;
 
 statements
-    : ifstmnt
-    | whilestmnt
+    : ifStatement
+    | whileStatement
     | foreach
     ;
 
@@ -259,17 +259,17 @@ booleanAtom
     | LPAREN booleanExpression RPAREN
     ;
 
-ifstmnt
+ifStatement
     : IF LPAREN booleanExpression RPAREN normalBlock
-    | IF LPAREN booleanExpression RPAREN normalBlock elsestmnt
+    | IF LPAREN booleanExpression RPAREN normalBlock elseStatement
     ;
 
-elsestmnt
+elseStatement
     : ELSE normalBlock
-    | ELSE ifstmnt
+    | ELSE ifStatement
     ;
 
-whilestmnt
+whileStatement
     : WHILE LPAREN booleanExpression RPAREN normalBlock
     ;
 

@@ -26,4 +26,6 @@ public interface ASTvisitor<T> {
     T visit(NegationNode n);
     T visit(OrNode n);
     T visit(AndNode n);
+    T visit(ArithmeticNode n);
+    T visit(IntDeclarationNode n);
 }
