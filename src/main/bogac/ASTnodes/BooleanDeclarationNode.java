@@ -1,26 +1,27 @@
 package ASTnodes;
+
 import ASTvisitors.ASTvisitor;
 
-public class IntDeclarationNode implements ASTNode {
+public class BooleanDeclarationNode implements ASTNode {
     public String typeChild;
     public String identifierChild;
     public String assignChild;
-    public ASTNode arithmeticExpressionChild;
+    public ASTNode booleanExpressionChild;
 
-    public IntDeclarationNode(String typeChild, String identifierChild, String assignChild, ASTNode arithmeticExpressionChild) {
+    public BooleanDeclarationNode(String typeChild, String identifierChild, String assignChild, ASTNode booleanExpressionChild) {
         this.typeChild = typeChild;
         this.identifierChild = identifierChild;
         this.assignChild = assignChild;
-        this.arithmeticExpressionChild = arithmeticExpressionChild;
+        this.booleanExpressionChild = booleanExpressionChild;
     }
 
-    public IntDeclarationNode(String typeChild, String identifierChild) {
+    public BooleanDeclarationNode(String typeChild, String identifierChild) {
         this.typeChild = typeChild;
         this.identifierChild = identifierChild;
     }
 
     @Override
     public Object accept(ASTvisitor v) {
-        return v.visit(this);
+        return null;
     }
 }

@@ -79,6 +79,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+<<<<<<< Updated upstream
     public ASTNode visitAssignmentStatement(BoardParser.AssignmentStatementContext ctx) {
         return null;
     }
@@ -110,6 +111,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionAssignment(BoardParser.ActionAssignmentContext ctx) {
+=======
+    public ASTNode visitDesignDeclaration(BoardParser.DesignDeclarationContext ctx) {
+>>>>>>> Stashed changes
         return null;
     }
 
@@ -126,17 +130,52 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                     ctx.IDENTIFIER().getText(),
                     ctx.ASSIGN().getText(),
                     ctx.getChild(3).accept(this));
+        } else if (ctx.INTDCL() != null && ctx.IDENTIFIER() != null){
+            return new IntDeclarationNode(
+                    ctx.INTDCL().getText(),
+                    ctx.IDENTIFIER().getText());
         }
         return null;
     }
 
     @Override
     public ASTNode visitBooleanDeclaration(BoardParser.BooleanDeclarationContext ctx) {
+        if (ctx.booleanExpression() != null) {
+            return new BooleanDeclarationNode(
+                    ctx.BOOLDCL().getText(),
+                    ctx.IDENTIFIER().getText(),
+                    ctx.ASSIGN().getText(),
+                    ctx.getChild(3).accept(this));
+        } else if (ctx.BOOLDCL() != null && ctx.IDENTIFIER() != null) {
+            return new BooleanDeclarationNode(
+                    ctx.BOOLDCL().getText(),
+                    ctx.IDENTIFIER().getText());
+        }
         return null;
     }
 
     @Override
     public ASTNode visitStringDeclaration(BoardParser.StringDeclarationContext ctx) {
+
+        // Check if string exists
+        if (ctx.STRING() != null) {
+            return new StringDeclarationNode(
+                    ctx.STRDCL().getText(),
+                    ctx.IDENTIFIER().getText(),
+                    ctx.ASSIGN().getText(),
+                    ctx.STRING().getText()
+            );
+        }
+
+        // Check if only strdcl and identifier exists
+        else if (ctx.STRDCL() != null && ctx.IDENTIFIER() != null) {
+            return new StringDeclarationNode(
+                    ctx.STRDCL().getText(),
+                    ctx.IDENTIFIER().getText()
+            );
+        }
+
+        // Guard return null
         return null;
     }
 

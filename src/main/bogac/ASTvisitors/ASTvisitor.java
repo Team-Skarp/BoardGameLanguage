@@ -28,4 +28,6 @@ public interface ASTvisitor<T> {
     T visit(AndNode n);
     T visit(ArithmeticNode n);
     T visit(IntDeclarationNode n);
+    T visit(BooleanDeclarationNode n);
+    T visit(StringDeclarationNode n);
 }

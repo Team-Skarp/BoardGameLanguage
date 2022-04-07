@@ -146,4 +146,14 @@ public class Evaluator implements ASTvisitor<Object> {
         return expr;
     }
 
+    @Override
+    public Object visit(BooleanDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(StringDeclarationNode n) {
+        return null;
+    }
+
 }

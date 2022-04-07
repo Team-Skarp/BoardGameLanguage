@@ -7,7 +7,7 @@ grammar Board;
 //Block structures
 SETUPBLC  : 'SETUP';
 RULESBLC  : 'RULES';
-GMLOOPBLC : 'GMLOOP';
+GMLOOPBLC : 'GAMELOOP';
 
 //Primitive type declarations
 INTDCL      : 'int';
@@ -105,6 +105,13 @@ setupBlock
     : LBRACE (normalDeclaration | designDeclaration | statements | setupBlock | assignmentStatement)* RBRACE
     ;
 
+<<<<<<< Updated upstream
+=======
+rulesBlock
+    : LBRACE (normalDeclaration)* RBRACE
+    ;
+
+>>>>>>> Stashed changes
 normalBlock
     : LBRACE (normalDeclaration | statements | normalBlock | assignmentStatement)* RBRACE
     ;
@@ -139,14 +146,17 @@ integerDeclaration
     | INTDCL IDENTIFIER
     ;
 
+
 booleanDeclaration
     : BOOLDCL IDENTIFIER ASSIGN booleanExpression COMMA booleanDeclaration
     | BOOLDCL IDENTIFIER ASSIGN booleanExpression
+    | BOOLDCL IDENTIFIER
     ;
 
 stringDeclaration
     : STRDCL IDENTIFIER ASSIGN STRING COMMA stringDeclaration
     | STRDCL IDENTIFIER ASSIGN STRING
+    | STRDCL IDENTIFIER
     ;
 
 listDeclaration
