@@ -105,13 +105,6 @@ setupBlock
     : LBRACE (normalDeclaration | designDeclaration | statements | setupBlock | assignmentStatement)* RBRACE
     ;
 
-<<<<<<< Updated upstream
-=======
-rulesBlock
-    : LBRACE (normalDeclaration)* RBRACE
-    ;
-
->>>>>>> Stashed changes
 normalBlock
     : LBRACE (normalDeclaration | statements | normalBlock | assignmentStatement)* RBRACE
     ;
@@ -165,7 +158,7 @@ listDeclaration
     ;
 
 
-//Special and choice declarations should only be found in Rules block NOT IMPLEMENTED
+//Special and choice declarations should only be found in Rules block
 specialDeclaration
     : SPECIAL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
     ;
