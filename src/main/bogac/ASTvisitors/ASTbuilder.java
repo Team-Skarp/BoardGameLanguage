@@ -49,6 +49,21 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitRulesBlock(BoardParser.RulesBlockContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitUniqueDeclaration(BoardParser.UniqueDeclarationContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitDesignDeclaration(BoardParser.DesignDeclarationContext ctx) {
+        return null;
+    }
+
+    @Override
     public ASTNode visitSpecialDeclaration(BoardParser.SpecialDeclarationContext ctx) {
         return null;
     }
@@ -64,7 +79,37 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitDesignDeclaraion(BoardParser.DesignDeclaraionContext ctx) {
+    public ASTNode visitAssignmentStatement(BoardParser.AssignmentStatementContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitBooleanAssigment(BoardParser.BooleanAssigmentContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitStringAssigment(BoardParser.StringAssigmentContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitDotAssignment(BoardParser.DotAssignmentContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitChoiceAssignment(BoardParser.ChoiceAssignmentContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitActionAssignment(BoardParser.ActionAssignmentContext ctx) {
         return null;
     }
 
@@ -110,10 +155,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return null;
     }
 
-    @Override
+    /*@Override
     public ASTNode visitFieldType(BoardParser.FieldTypeContext ctx) {
         return null;
-    }
+    }*/
 
     @Override
     public ASTNode visitFormalParameters(BoardParser.FormalParametersContext ctx) {
@@ -297,22 +342,27 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitIfstmnt(BoardParser.IfstmntContext ctx) {
+    public ASTNode visitIfStatement(BoardParser.IfStatementContext ctx) {
         return null;
     }
 
     @Override
-    public ASTNode visitElsestmnt(BoardParser.ElsestmntContext ctx) {
+    public ASTNode visitElseStatement(BoardParser.ElseStatementContext ctx) {
         return null;
     }
 
     @Override
-    public ASTNode visitWhilestmnt(BoardParser.WhilestmntContext ctx) {
+    public ASTNode visitWhileStatement(BoardParser.WhileStatementContext ctx) {
         return null;
     }
 
     @Override
     public ASTNode visitForeach(BoardParser.ForeachContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitPrint(BoardParser.PrintContext ctx) {
         return null;
     }
 
