@@ -75,6 +75,13 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntegerDeclaration(BoardParser.IntegerDeclarationContext ctx) {
+        if (ctx.arithmeticExpression() != null) {
+            return new IntDeclarationNode(
+                    ctx.INTDCL().getText(),
+                    ctx.IDENTIFIER().getText(),
+                    ctx.ASSIGN().getText(),
+                    ctx.getChild(3).accept(this));
+        }
         return null;
     }
 

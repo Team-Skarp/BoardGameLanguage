@@ -233,8 +233,8 @@ formalParameters
     ;
 
 statements
-    : ifstmnt
-    | whilestmnt
+    : ifStatement
+    | whileStatement
     | foreach
     ;
 
@@ -306,17 +306,17 @@ booleanAtom
     | LPAREN booleanExpression RPAREN
     ;
 
-ifstmnt
+ifStatement
     : IF LPAREN booleanExpression RPAREN normalBlock
-    | IF LPAREN booleanExpression RPAREN normalBlock elsestmnt
+    | IF LPAREN booleanExpression RPAREN normalBlock elseStatement
     ;
 
-elsestmnt
+elseStatement
     : ELSE normalBlock
-    | ELSE ifstmnt
+    | ELSE ifStatement
     ;
 
-whilestmnt
+whileStatement
     : WHILE LPAREN booleanExpression RPAREN normalBlock
     ;
 

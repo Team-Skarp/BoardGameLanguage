@@ -205,4 +205,21 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
         return null;
     }
+
+    @Override
+    public Void visit(ArithmeticNode n) {
+        return null;
+    }
+
+    @Override
+    public Void visit(IntDeclarationNode n) {
+        indent++;
+        System.out.print(n.typeChild+" ");;
+        System.out.print(n.identifierChild+" ");;
+        System.out.println(n.assignChild);;
+        n.arithmeticExpressionChild.accept(this);
+        indent--;
+        return null;
+    }
+
 }

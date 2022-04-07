@@ -19,15 +19,17 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("(SPO == False) == True");
+        input = CharStreams.fromString("int x = 2+2;");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        BoardParser.BooleanExpressionContext cst = parser.booleanExpression();
-        ASTNode ast = new ASTbuilder().visitBooleanExpression(cst);
+        //BoardParser.ArithmeticExpressionContext cst = parser.arithmeticExpression();
+        //ASTNode ast = new ASTbuilder().visitArithmeticExpression(cst);
 
+              BoardParser.IntegerDeclarationContext cst = parser.integerDeclaration();
+              ASTNode ast = new ASTbuilder().visitIntegerDeclaration(cst);
         PrettyPrinter pp = new PrettyPrinter();
         ast.accept(pp);
     }
