@@ -5,6 +5,7 @@ import ASTvisitors.ASTvisitor;
 public class IntegerDeclarationNode implements ASTNode {
 
     public final IdNode    id;
+    //TODO: Implement type
 
     public IntegerDeclarationNode(IdNode identifier) {
         this.id = identifier;

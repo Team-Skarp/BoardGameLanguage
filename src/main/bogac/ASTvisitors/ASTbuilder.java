@@ -80,6 +80,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitSetupDeclaration(BoardParser.SetupDeclarationContext ctx) {
+        return null;
+    }
+
+    @Override
     public ASTNode visitRulesBlock(BoardParser.RulesBlockContext ctx) {
         return null;
     }
@@ -146,6 +151,16 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitListDeclaration(BoardParser.ListDeclarationContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitPathDeclaration(BoardParser.PathDeclarationContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitGridDeclaration(BoardParser.GridDeclarationContext ctx) {
         return null;
     }
 
@@ -222,11 +237,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitFieldRow(BoardParser.FieldRowContext ctx) {
         return null;
     }
-
-    /*@Override
-    public ASTNode visitFieldType(BoardParser.FieldTypeContext ctx) {
-        return null;
-    }*/
 
     @Override
     public ASTNode visitFormalParameters(BoardParser.FormalParametersContext ctx) {

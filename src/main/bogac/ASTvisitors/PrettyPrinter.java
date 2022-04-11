@@ -208,6 +208,8 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(BlockNode n) {
+        return null;
+    }
 
     @Override
     public Void visit(ArithmeticNode n) {
@@ -217,12 +219,6 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     @Override
     public Void visit(IntegerDeclarationNode n) {
         System.out.println(TAB.repeat(indent));
-        indent++;
-        System.out.print(n.typeChild+" ");
-        System.out.print(n.identifierChild+" ");
-        System.out.println(n.assignChild);
-        n.arithmeticExpressionChild.accept(this);
-        indent--;
         return null;
     }
 

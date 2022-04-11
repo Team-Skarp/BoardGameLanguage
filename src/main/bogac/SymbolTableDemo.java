@@ -17,7 +17,7 @@ public class SymbolTableDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("SETUP {{int a; int a;} {int a;} {int a;} {int a;}}");
+        input = CharStreams.fromString("SETUP {{int a;} {int a;} {int a;} {int a;}}");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);

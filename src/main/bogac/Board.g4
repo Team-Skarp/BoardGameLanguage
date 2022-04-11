@@ -243,13 +243,6 @@ primitiveType
     : INTDCL | BOOLDCL | STRDCL
     ;
 
-/*fieldType
-    : INTDCL
-    | BOOLDCL
-    | STRDCL
-    //| IDENTIFIER    //This identifier needs to be declared before it can be used here
-    ;*/
-
 formalParameters
     : primitiveType COLON IDENTIFIER
     | primitiveType COLON IDENTIFIER COMMA formalParameters

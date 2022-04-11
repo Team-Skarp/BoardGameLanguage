@@ -135,4 +135,19 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         sb.enterSymbol(n.id.value, n.id.type);
         return sb;
     }
+
+    @Override
+    public SymbolTable visit(ArithmeticNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(BooleanDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(StringDeclarationNode n) {
+        return null;
+    }
 }
