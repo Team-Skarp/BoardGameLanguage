@@ -7,7 +7,7 @@ grammar Board;
 //Block structures
 SETUPBLC  : 'SETUP';
 RULESBLC  : 'RULES';
-GMLOOPBLC : 'GMLOOP';
+GMLOOPBLC : 'GAMELOOP';
 
 //Primitive type declarations
 INTDCL      : 'int';
@@ -22,6 +22,8 @@ DESIGNDCL   : 'design';
 //Special decleration
 ACTIONDCL   : 'action';
 CHOICEDCL   : 'choice';
+PATHDCL     : 'path';
+GRIDDCL     : 'grid';
 
 //Primitive types
 INT     : ('-')?[0-9]+;
@@ -82,6 +84,7 @@ IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
 NEWLINE : '\n'      -> skip;
 WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
 EOL     : ';';
+DOT     : '.';
 
 game
     : setup rules gameloop
@@ -92,18 +95,20 @@ setup
     ;
 
 rules
-    : EOF
+    : RULESBLC rulesBlock
     ;
 
 gameloop
     : EOF
+    | print
     ;
 
 setupBlock
-    : LBRACE (normalDeclaration | designDeclaraion | statements | setupBlock )* RBRACE
+    : LBRACE (normalDeclaration | setupDeclaration | statements | setupBlock | assignmentStatement )* RBRACE
     ;
+
 normalBlock
-    : LBRACE (normalDeclaration | statements | normalBlock )* RBRACE
+    : LBRACE (normalDeclaration | statements | normalBlock | assignmentStatement)* RBRACE
     ;
 
 //Primitive type decleration
@@ -112,34 +117,30 @@ normalDeclaration
     | booleanDeclaration EOL
     | stringDeclaration EOL
     | listDeclaration EOL
+    | IDENTIFIER (IDENTIFIER|COMMA)* EOL
+    ;
+
+// Setup special Declerations
+setupDeclaration
+    : pathDeclaration EOL
+    | gridDeclaration EOL
+    | designDeclaration EOL
+    ;
+
+rulesBlock
+    : LBRACE (uniqueDeclaration | statements | rulesBlock | assignmentStatement)* RBRACE
+    ;
+
+uniqueDeclaration
+    : specialDeclaration
     | actionDeclaration
-    | specialDeclaration
     | choiceDeclaration
     ;
 
-//Special and choice declarations should only be found in Rules block NOT IMPLEMENTED
-specialDeclaration
-    : SPECIAL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN normalBlock
-    ;
-
-choiceDeclaration
-    : CHOICEDCL IDENTIFIER LPAREN IDENTIFIER RPAREN normalBlock //Should have a special choice block
-    ;
-
-actionDeclaration
-    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON primitiveType)? normalBlock
-    ;
-
 //Design declerations should only appear in SETUP block
-designDeclaraion
+designDeclaration
     : DESIGNDCL IDENTIFIER (FROM IDENTIFIER)? designBody
     ;
-
-listDeclaration
-    : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
-    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
-    ;
-
 
 integerDeclaration
     : IDENTIFIER ASSIGN arithmeticExpression COMMA integerDeclaration
@@ -148,38 +149,106 @@ integerDeclaration
     | IDENTIFIER
     ;
 
+
 booleanDeclaration
     : BOOLDCL IDENTIFIER ASSIGN booleanExpression COMMA booleanDeclaration
     | BOOLDCL IDENTIFIER ASSIGN booleanExpression
+    | BOOLDCL IDENTIFIER
     ;
 
 stringDeclaration
     : STRDCL IDENTIFIER ASSIGN STRING COMMA stringDeclaration
     | STRDCL IDENTIFIER ASSIGN STRING
+    | STRDCL IDENTIFIER
     ;
+
+listDeclaration
+    : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
+    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
+    ;
+
+pathDeclaration
+    : PATHDCL IDENTIFIER LSBRACE INT RSBRACE EOL (UNI_DIR | BI_DIR | STATIC_DIR)?
+    | PATHDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE (UNI_DIR | BI_DIR | STATIC_DIR)?
+    ;
+
+gridDeclaration
+    : GRIDDCL IDENTIFIER LSBRACE INT COMMA INT RSBRACE
+    | GRIDDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT COMMA INT RSBRACE
+    ;
+
+
+//Special and choice declarations should only be found in Rules block
+specialDeclaration
+    : SPECIAL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
+    ;
+
+choiceDeclaration
+    : CHOICEDCL IDENTIFIER LPAREN IDENTIFIER IDENTIFIER RPAREN (COLON primitiveType)? rulesBlock //Should have a special choice block
+    ;
+
+actionDeclaration
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON primitiveType)? rulesBlock
+    ;
+
+assignmentStatement
+    : intAssigment EOL
+    | booleanAssigment EOL
+    | stringAssigment EOL
+    | dotAssignment EOL
+    | actionAssignment EOL
+    | choiceAssignment
+    ;
+
+intAssigment
+    : IDENTIFIER ASSIGN arithmeticExpression*
+    ;
+
+booleanAssigment
+    : IDENTIFIER ASSIGN booleanExpression
+    ;
+
+stringAssigment
+    : IDENTIFIER ASSIGN STRING
+    ;
+
+dotAssignment
+    : IDENTIFIER DOT IDENTIFIER ASSIGN (STRING|INT|BOOL|IDENTIFIER)*
+    ;
+
+choiceAssignment
+    : (INT COLON)* LBRACE IDENTIFIER LPAREN (INT)* RPAREN RBRACE COMMA
+    | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
+    | IDENTIFIER COLON LBRACE print RBRACE EOL
+    ;
+
+actionAssignment
+    : IDENTIFIER DOT IDENTIFIER LPAREN IDENTIFIER RPAREN
+    | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
+    ;
+
 
 // Special body's
 designBody
     : LBRACE (fieldRow)* RBRACE
     ;
 
+fieldRow
+    : primitiveType IDENTIFIER EOL
+    | primitiveType IDENTIFIER LPAREN IDENTIFIER IDENTIFIER RPAREN EOL
+    ;
 
 //Primitive types
 primitiveType
     : INTDCL | BOOLDCL | STRDCL
     ;
 
-fieldRow
-    : fieldType IDENTIFIER EOL
-    ;
-
-fieldType
+/*fieldType
     : INTDCL
     | BOOLDCL
     | STRDCL
     //| IDENTIFIER    //This identifier needs to be declared before it can be used here
-    ;
-
+    ;*/
 
 formalParameters
     : primitiveType COLON IDENTIFIER
@@ -187,8 +256,8 @@ formalParameters
     ;
 
 statements
-    : ifstmnt
-    | whilestmnt
+    : ifStatement
+    | whileStatement
     | foreach
     ;
 
@@ -260,20 +329,24 @@ booleanAtom
     | LPAREN booleanExpression RPAREN
     ;
 
-ifstmnt
+ifStatement
     : IF LPAREN booleanExpression RPAREN normalBlock
-    | IF LPAREN booleanExpression RPAREN normalBlock elsestmnt
+    | IF LPAREN booleanExpression RPAREN normalBlock elseStatement
     ;
 
-elsestmnt
+elseStatement
     : ELSE normalBlock
-    | ELSE ifstmnt
+    | ELSE ifStatement
     ;
 
-whilestmnt
+whileStatement
     : WHILE LPAREN booleanExpression RPAREN normalBlock
     ;
 
 foreach
     : FOREACH IDENTIFIER IN IDENTIFIER normalBlock
+    ;
+
+print
+    : PRINT LPAREN (STRING | INT | arithmeticExpression | IDENTIFIER)* RPAREN
     ;

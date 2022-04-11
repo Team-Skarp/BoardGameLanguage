@@ -16,14 +16,14 @@ public class LanguageEvaluator {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("5>3 and False");
+        input = CharStreams.fromString("int x = 2+2;");
 
         lexer   = new BoardLexer(input);
         tokens  = new CommonTokenStream(lexer);
         parser  = new BoardParser(tokens);
 
-        BoardParser.BooleanExpressionContext cst = parser.booleanExpression();
-        ASTNode ast = new ASTbuilder().visitBooleanExpression(cst);
+        BoardParser.IntegerDeclarationContext cst = parser.integerDeclaration();
+        ASTNode ast = new ASTbuilder().visitIntegerDeclaration(cst);
 
         Evaluator evaluator = new Evaluator();
         Object result = ast.accept(evaluator);

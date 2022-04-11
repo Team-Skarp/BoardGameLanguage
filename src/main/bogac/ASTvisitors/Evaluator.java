@@ -150,5 +150,20 @@ public class Evaluator implements ASTvisitor<Object> {
         return null;
     }
 
+    @Override //TODO: actually make the integer get saved in a variable, symbol table?
+    public Object visit(IntDeclarationNode n) {
+        int expr = (int) n.arithmeticExpressionChild.accept(this);
+        return expr;
+    }
+
+    @Override
+    public Object visit(BooleanDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(StringDeclarationNode n) {
+        return null;
+    }
 
 }
