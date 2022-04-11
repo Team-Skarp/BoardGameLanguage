@@ -22,6 +22,8 @@ DESIGNDCL   : 'design';
 //Special decleration
 ACTIONDCL   : 'action';
 CHOICEDCL   : 'choice';
+PATHDCL     : 'path';
+GRIDDCL     : 'grid';
 
 //Primitive types
 INT     : ('-')?[0-9]+;
@@ -102,7 +104,7 @@ gameloop
     ;
 
 setupBlock
-    : LBRACE (normalDeclaration | designDeclaration | statements | setupBlock | assignmentStatement)* RBRACE
+    : LBRACE (normalDeclaration | setupDeclaration | statements | setupBlock | assignmentStatement )* RBRACE
     ;
 
 normalBlock
@@ -116,6 +118,13 @@ normalDeclaration
     | stringDeclaration EOL
     | listDeclaration EOL
     | IDENTIFIER (IDENTIFIER|COMMA)* EOL
+    ;
+
+// Setup special Declerations
+setupDeclaration
+    : pathDeclaration EOL
+    | gridDeclaration EOL
+    | designDeclaration EOL
     ;
 
 rulesBlock
@@ -155,6 +164,16 @@ stringDeclaration
 listDeclaration
     : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
     | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
+    ;
+
+pathDeclaration
+    : PATHDCL IDENTIFIER LSBRACE INT RSBRACE EOL (UNI_DIR | BI_DIR | STATIC_DIR)?
+    | PATHDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE (UNI_DIR | BI_DIR | STATIC_DIR)?
+    ;
+
+gridDeclaration
+    : GRIDDCL IDENTIFIER LSBRACE INT COMMA INT RSBRACE
+    | GRIDDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT COMMA INT RSBRACE
     ;
 
 
