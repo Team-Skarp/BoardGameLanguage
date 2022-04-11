@@ -1,17 +1,15 @@
-import ASTnodes.*;
-
+import ASTnodes.ASTNode;
 import ASTvisitors.ASTbuilder;
 import ASTvisitors.PrettyPrinter;
+import ASTvisitors.SymbolHarvester;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import symboltable.SymbolTable;
 
-/**
- * Demo file to showcase a pretty print visitor on our AST
- */
-public class PrettyPrinterDemo {
+public class SymbolTableDemo {
 
     public static void main(String[] args) {
         CharStream input;
@@ -19,17 +17,17 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("2 + 2 - 2");
+        input = CharStreams.fromString("SETUP {{int a; int a;} {int a;} {int a;} {int a;}}");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        BoardParser.BooleanExpressionContext cst = parser.booleanExpression();
+        BoardParser.SetupContext cst = parser.setup();
+        ASTNode ast = new ASTbuilder().visitSetup(cst);
 
-        ASTNode ast = new ASTbuilder().visitBooleanExpression(cst);
+        SymbolHarvester sh = new SymbolHarvester();
+        SymbolTable symbolTable = (SymbolTable) ast.accept(sh);
 
-        PrettyPrinter pp = new PrettyPrinter();
-        ast.accept(pp);
     }
 }

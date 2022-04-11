@@ -1,14 +1,13 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import antlr.BoardVisitor;
 
 public class AssignNode implements ASTNode{
 
     public final IdNode id;
-    public final ExprNode expr;
+    public final ArithmeticExpression expr;
 
-    public AssignNode(IdNode id, ExprNode expr) {
+    public AssignNode(IdNode id, ArithmeticExpression expr) {
         this.id = id;
         this.expr = expr;
     }

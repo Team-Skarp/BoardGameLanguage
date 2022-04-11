@@ -20,7 +20,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSetup(BoardParser.SetupContext ctx) {
-        return null;
+
+        return ctx.setupBlock().accept(this);
+
     }
 
     @Override
@@ -35,16 +37,45 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSetupBlock(BoardParser.SetupBlockContext ctx) {
-        return null;
+        BlockNode block = new BlockNode();
+
+        for (ParseTree node : ctx.children) {
+            ASTNode astNode = node.accept(this);
+
+            if (astNode != null) {
+
+                block.children.add(astNode);
+            }
+        }
+
+        System.out.println(block.children);
+        return block;
+
     }
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
-        return null;
+        BlockNode block = new BlockNode();
+
+        //Loop through every ast node and add it as child to block node
+        for (ParseTree node : ctx.children) {
+            ASTNode astNode = node.accept(this);
+
+            if (astNode != null) {
+
+                block.children.add(astNode);
+            }
+        }
+
+        System.out.println(block.children);
+        return block;
     }
 
     @Override
     public ASTNode visitNormalDeclaration(BoardParser.NormalDeclarationContext ctx) {
+        if (ctx.integerDeclaration() != null) {
+            return ctx.integerDeclaration().accept(this);
+        }
         return null;
     }
 
@@ -75,6 +106,19 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntegerDeclaration(BoardParser.IntegerDeclarationContext ctx) {
+        if (ctx.ASSIGN() != null && ctx.COMMA() != null) {
+            return null; //Not implemented
+        }
+        else if (ctx.ASSIGN() != null) {
+            return new IntegerAssignDeclarationNode(new IdNode(ctx.IDENTIFIER().getText(), "int"), ctx.arithmeticExpression().accept(this));
+        }
+        else if (ctx.IDENTIFIER() != null && ctx.COMMA() != null) {
+            return null; //Not implemented
+        }
+        else if (ctx.IDENTIFIER() != null) {
+            return new IntegerDeclarationNode(new IdNode(ctx.IDENTIFIER().getText(), "int"));
+        }
+
         return null;
     }
 

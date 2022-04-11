@@ -135,6 +135,20 @@ public class Evaluator implements ASTvisitor<Object> {
         return l_result && r_result;
     }
 
+    @Override
+    public Object visit(BlockNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(IntegerDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(IntegerAssignDeclarationNode n) {
+        return null;
+    }
 
 
 }
