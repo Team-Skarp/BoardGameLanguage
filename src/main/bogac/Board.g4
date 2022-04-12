@@ -5,9 +5,9 @@
 grammar Board;
 
 //Block structures
-SETUPBLC  : 'SETUP';
-RULESBLC  : 'RULES';
-GMLOOPBLC : 'GAMELOOP';
+SETUPBLC    : 'SETUP';
+RULESBLC    : 'RULES';
+GAMELOOPBLC : 'GAMELOOP';
 
 //Primitive type declarations
 INTDCL      : 'int';
@@ -20,16 +20,28 @@ LISTDCL     : 'list';
 DESIGNDCL   : 'design';
 
 //Special decleration
+SPECIALDCL  : 'special';
 ACTIONDCL   : 'action';
 CHOICEDCL   : 'choice';
 PATHDCL     : 'path';
 GRIDDCL     : 'grid';
+OTHERDCL    : 'other';
+VOIDDCL     : 'void';
 
 //Primitive types
 INT     : ('-')?[0-9]+;
 BOOL    : 'True' | 'False';
 STRING  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
 
+//Control structures
+IF      : 'if';
+ELSEIF  : 'elseif';
+ELSE    : 'else';
+FOR     : 'for';
+FOREACH : 'foreach';
+WHILE   : 'while';
+RETURN  : 'return';
+BREAK   : 'break';
 
 //Operators
 MOD     : '%';
@@ -50,25 +62,15 @@ NOT     : 'not'|'!';
 AND     : 'and'|'&&';
 OR      : 'or'|'||';
 
-//Control structures
-IF      : 'if';
-ELSEIF  : 'elseif';
-ELSE    : 'else';
-FOR     : 'for';
-FOREACH : 'foreach';
-RETURN  : 'return';
-WHILE   : 'while';
-
 //Special keywords
 FROM        : 'from';
 TILE_EVENT  : 'onLand' | 'onLeave' | 'onVisit';
 IN          : 'in';
-SPECIAL     : 'special';
 UNI_DIR     : 'uni';
 BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
 
-PRINT   : 'print';
+PRINT       : 'print';
 
 //Delimiters
 LPAREN      : '(';
@@ -77,14 +79,15 @@ LSBRACE     : '[';
 RSBRACE     : ']';
 LBRACE      : '{';
 RBRACE      : '}';
-COMMA       : ',';
+QUOTE       : '"';
 COLON       : ':';
+EOL         : ';';
+DOT         : '.';
+COMMA       : ',';
 
 IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
 NEWLINE : '\n'      -> skip;
 WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
-EOL     : ';';
-DOT     : '.';
 
 game
     : setup rules gameloop
@@ -99,7 +102,7 @@ rules
     ;
 
 gameloop
-    : EOF
+    : GAMELOOPBLC gameloopBlock
     | print
     ;
 
@@ -109,6 +112,15 @@ setupBlock
 
 normalBlock
     : LBRACE (normalDeclaration | statements | normalBlock | assignmentStatement)* RBRACE
+    ;
+
+rulesBlock
+    : LBRACE (uniqueDeclaration | statements | rulesBlock | assignmentStatement)* RBRACE
+    ;
+
+gameloopBlock
+    : LBRACE (print | statements | gameloopBlock)* RBRACE
+    | IDENTIFIER ASSIGN actionAssignment
     ;
 
 //Primitive type decleration
@@ -125,10 +137,6 @@ setupDeclaration
     : pathDeclaration EOL
     | gridDeclaration EOL
     | designDeclaration EOL
-    ;
-
-rulesBlock
-    : LBRACE (uniqueDeclaration | statements | rulesBlock | assignmentStatement)* RBRACE
     ;
 
 uniqueDeclaration
@@ -148,7 +156,6 @@ integerDeclaration
     | IDENTIFIER COMMA integerDeclaration
     | IDENTIFIER
     ;
-
 
 booleanDeclaration
     : BOOLDCL IDENTIFIER ASSIGN booleanExpression COMMA booleanDeclaration
@@ -180,7 +187,7 @@ gridDeclaration
 
 //Special and choice declarations should only be found in Rules block
 specialDeclaration
-    : SPECIAL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
+    : SPECIALDCL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
     ;
 
 choiceDeclaration
@@ -222,8 +229,9 @@ choiceAssignment
     | IDENTIFIER COLON LBRACE print RBRACE EOL
     ;
 
+// Action assignment, function call and method call
 actionAssignment
-    : IDENTIFIER DOT IDENTIFIER LPAREN IDENTIFIER RPAREN
+    : IDENTIFIER DOT IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     ;
 
@@ -341,5 +349,5 @@ foreach
     ;
 
 print
-    : PRINT LPAREN (STRING | INT | arithmeticExpression | IDENTIFIER)* RPAREN
+    : PRINT LPAREN (STRING | INT | arithmeticExpression | IDENTIFIER)* RPAREN EOL
     ;
