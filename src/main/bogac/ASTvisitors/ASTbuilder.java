@@ -20,9 +20,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSetup(BoardParser.SetupContext ctx) {
-
         return ctx.setupBlock().accept(this);
-
     }
 
     @Override
@@ -34,6 +32,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitGameloop(BoardParser.GameloopContext ctx) {
         return null;
     }
+
+    @Override
+    public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) { return  null;}
 
     @Override
     public ASTNode visitSetupBlock(BoardParser.SetupBlockContext ctx) {
@@ -156,12 +157,47 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitPathDeclaration(BoardParser.PathDeclarationContext ctx) {
-        return null;
+        if (ctx.IDENTIFIER() != null && ctx.INT() != null) {
+            if (ctx.UNI_DIR() != null) {
+                return new PathDeclarationNode(
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        Integer.parseInt(ctx.INT().getText()),
+                        ctx.UNI_DIR().getText()
+                );
+            } else if (ctx.BI_DIR() != null) {
+                return new PathDeclarationNode(
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        Integer.parseInt(ctx.INT().getText()),
+                        ctx.BI_DIR().getText()
+                );
+            } else if (ctx.STATIC_DIR() != null) {
+                return new PathDeclarationNode(
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        Integer.parseInt(ctx.INT().getText()),
+                        ctx.STATIC_DIR().getText()
+                );
+            } else {
+                return new PathDeclarationNode(
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        Integer.parseInt(ctx.INT().getText())
+                );
+            }
+        } else {
+            return null;
+        }
     }
 
     @Override
     public ASTNode visitGridDeclaration(BoardParser.GridDeclarationContext ctx) {
-        return null;
+        if (ctx.IDENTIFIER() != null && ctx.INT().get(0) != null && ctx.INT().get(1) != null) {
+            return new GridDeclarationNode(
+                    new IdNode(ctx.IDENTIFIER().get(0).getText(), "grid"),
+                    Integer.parseInt(ctx.INT().get(0).getText()),
+                    Integer.parseInt(ctx.INT().get(1).getText())
+            );
+        } else {
+            return null;
+        }
     }
 
     @Override

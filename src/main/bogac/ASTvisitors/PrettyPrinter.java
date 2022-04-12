@@ -253,4 +253,42 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visit(PathDeclarationNode n) {
+        indent++;
+
+        System.out.println(n.id.type + " ");
+        System.out.println(n.id.value + " ");
+        System.out.println(n.direction + " ");
+        System.out.println(n.length + " ");
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(PathTypedDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Void visit(GridDeclarationNode n) {
+        indent++;
+
+        System.out.println("type:" + n.id.type);
+        System.out.println("varName:" + n.id.value);
+        System.out.println("x size:" + n.x_size);
+        System.out.println("y size:" + n.y_size);
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(GridTypedDeclarationNode n) {
+        return null;
+    }
+
 }
