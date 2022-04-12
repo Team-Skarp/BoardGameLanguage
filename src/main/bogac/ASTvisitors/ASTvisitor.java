@@ -33,4 +33,5 @@ public interface ASTvisitor<T> {
     T visit(ArithmeticNode n);
     T visit(BooleanDeclarationNode n);
     T visit(StringDeclarationNode n);
+    T visit(PathDeclarationNode n);
 }
