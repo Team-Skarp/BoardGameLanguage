@@ -229,12 +229,13 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     
     @Override
     public Void visit(BooleanDeclarationNode n) {
-         indent++;
-         System.out.print(n.typeChild+" ");
-         System.out.print(n.identifierChild+" ");
-         System.out.println(n.assignChild);
-         n.booleanExpressionChild.accept(this);
-         indent--;
+        indent++;
+        System.out.println("type:" + n.id.type);
+        System.out.println("varName:" + n.id.value);
+        if (n.booleanExpressionChild != null){
+            n.booleanExpressionChild.accept(this);
+        }
+        indent--;
         return null;
     }
 

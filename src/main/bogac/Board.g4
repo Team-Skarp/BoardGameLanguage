@@ -30,7 +30,7 @@ VOIDDCL     : 'void';
 
 //Primitive types
 INT     : ('-')?[0-9]+;
-BOOL    : 'True' | 'False';
+BOOL    : 'true' | 'false';
 STRING  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
 
 //Control structures
@@ -160,6 +160,7 @@ integerDeclaration
 booleanDeclaration
     : BOOLDCL IDENTIFIER ASSIGN booleanExpression COMMA booleanDeclaration
     | BOOLDCL IDENTIFIER ASSIGN booleanExpression
+    | BOOLDCL IDENTIFIER COMMA booleanDeclaration
     | BOOLDCL IDENTIFIER
     ;
 

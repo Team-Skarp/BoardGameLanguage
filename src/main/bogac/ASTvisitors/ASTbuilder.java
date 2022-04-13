@@ -218,18 +218,20 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return null;
     }
 
+    //TODO: check for correct capitalization of true and false
     @Override
+    //TODO: change "bool" to booldcl
     public ASTNode visitBooleanDeclaration(BoardParser.BooleanDeclarationContext ctx) {
         if (ctx.booleanExpression() != null) {
+            System.out.println("1");
             return new BooleanDeclarationNode(
-                    ctx.BOOLDCL().getText(),
-                    ctx.IDENTIFIER().getText(),
-                    ctx.ASSIGN().getText(),
-                    ctx.getChild(3).accept(this));
+                    new IdNode(ctx.IDENTIFIER().getText(),"bool"),
+                    ctx.getChild(3).accept(this)
+            );
         } else if (ctx.BOOLDCL() != null && ctx.IDENTIFIER() != null) {
             return new BooleanDeclarationNode(
-                    ctx.BOOLDCL().getText(),
-                    ctx.IDENTIFIER().getText());
+                    new IdNode(ctx.IDENTIFIER().getText(),"bool")
+            );
         }
         return null;
     }
