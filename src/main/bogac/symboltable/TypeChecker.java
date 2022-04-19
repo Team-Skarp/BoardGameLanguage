@@ -207,6 +207,26 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(PathDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(PathTypedDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(GridDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(GridTypedDeclarationNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(BooleanDeclarationNode n) {
         return null;
     }

@@ -125,7 +125,7 @@ gameloopBlock
 
 //Primitive type decleration
 normalDeclaration
-    : integerDeclaration EOL
+    : INTDCL integerDeclaration EOL
     | booleanDeclaration EOL
     | stringDeclaration EOL
     | listDeclaration EOL
@@ -151,10 +151,10 @@ designDeclaration
     ;
 
 integerDeclaration
-    : INTDCL IDENTIFIER ASSIGN arithmeticExpression COMMA integerDeclaration
-    | INTDCL IDENTIFIER ASSIGN arithmeticExpression
-    | INTDCL IDENTIFIER COMMA integerDeclaration
-    | INTDCL IDENTIFIER
+    : IDENTIFIER ASSIGN arithmeticExpression COMMA integerDeclaration
+    | IDENTIFIER ASSIGN arithmeticExpression
+    | IDENTIFIER COMMA integerDeclaration
+    | IDENTIFIER
     ;
 
 booleanDeclaration
@@ -264,10 +264,10 @@ statements
     ;
 
 arithmeticExpression
-    : additive+
+    : additive
     ;
 booleanExpression
-    : logor+
+    : logor
     ;
 
 additive
