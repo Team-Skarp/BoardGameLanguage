@@ -176,4 +176,24 @@ public class Evaluator implements ASTvisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(PathDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(PathTypedDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(GridDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(GridTypedDeclarationNode n) {
+        return null;
+    }
+
 }

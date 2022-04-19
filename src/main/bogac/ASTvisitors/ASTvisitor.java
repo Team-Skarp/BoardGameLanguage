@@ -39,4 +39,9 @@ public interface ASTvisitor<T> {
     T visit(StringDeclarationNode n);
 
     T visit(IntegerAssignDeclarationNode n);
+    T visit(PathDeclarationNode n);
+    T visit(PathTypedDeclarationNode n);
+
+    T visit(GridDeclarationNode n);
+    T visit(GridTypedDeclarationNode n);
 }

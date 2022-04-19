@@ -3,25 +3,20 @@ package ASTnodes;
 import ASTvisitors.ASTvisitor;
 
 public class BooleanDeclarationNode implements ASTNode {
-    public String typeChild;
-    public String identifierChild;
-    public String assignChild;
+    public IdNode id;
     public ASTNode booleanExpressionChild;
 
-    public BooleanDeclarationNode(String typeChild, String identifierChild, String assignChild, ASTNode booleanExpressionChild) {
-        this.typeChild = typeChild;
-        this.identifierChild = identifierChild;
-        this.assignChild = assignChild;
+    public BooleanDeclarationNode(IdNode id, ASTNode booleanExpressionChild) {
+        this.id = id;
         this.booleanExpressionChild = booleanExpressionChild;
     }
 
-    public BooleanDeclarationNode(String typeChild, String identifierChild) {
-        this.typeChild = typeChild;
-        this.identifierChild = identifierChild;
+    public BooleanDeclarationNode(IdNode id) {
+        this.id = id;
     }
 
     @Override
     public Object accept(ASTvisitor v) {
-        return null;
+        return v.visit(this);
     }
 }

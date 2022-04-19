@@ -19,7 +19,7 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("bool x = TRUE;");
+        input = CharStreams.fromString("bool y = true;");
         System.out.println(input);
 
         lexer = new BoardLexer(input);
