@@ -11,7 +11,8 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     private final String    TAB = "\t";
 
     @Override
-    public Void visit(AssignNode n) {
+    public Void visit(ArithmeticExpression n) {
+        visit(n);
         return null;
     }
 
@@ -89,7 +90,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     @Override
     public Void visit(IdNode n) {
 
-        System.out.println(TAB.repeat(indent) + n.value);
+        System.out.println(TAB.repeat(indent) + n.name);
 
         return null;
     }
@@ -212,7 +213,17 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
-    public Void visit(ArithmeticNode n) {
+    public Void visit(Assignment n) {
+        return null;
+    }
+
+    @Override
+    public Void visit(StringNode n) {
+        return null;
+    }
+
+    @Override
+    public Void visit(BooleanExpression n) {
         return null;
     }
 

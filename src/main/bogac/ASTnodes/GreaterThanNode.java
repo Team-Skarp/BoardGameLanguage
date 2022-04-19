@@ -2,7 +2,7 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class GreaterThanNode implements ASTNode {
+public class GreaterThanNode implements ASTNode, BooleanExpression {
     public ASTNode left;
     public ASTNode right;
 

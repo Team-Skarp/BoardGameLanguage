@@ -2,6 +2,8 @@ import org.junit.Test;
 import symboltable.ReferenceErrorException;
 import symboltable.Symbol;
 import symboltable.SymbolTable;
+import symboltable.attributes.PrimitiveAttributes;
+import symboltable.types.IntType;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +15,7 @@ public class SymbolTableTest {
         //int a; { a = 3 }
         SymbolTable symbolTable = new SymbolTable();
 
-        symbolTable.enterSymbol("a", "int");
+        symbolTable.enterSymbol("a", new PrimitiveAttributes(new IntType()));
         symbolTable.openScope();
 
         Symbol symbol = symbolTable.retrieveSymbol("a");
@@ -40,7 +42,7 @@ public class SymbolTableTest {
         SymbolTable symbolTable = new SymbolTable();
 
         symbolTable.openScope();
-        symbolTable.enterSymbol("a", "int");
+        symbolTable.enterSymbol("a", new PrimitiveAttributes(new IntType()));
         symbolTable.closeScope();
 
         assertThrows(ReferenceErrorException.class, ()-> symbolTable.retrieveSymbol("a"));

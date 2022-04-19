@@ -1,19 +1,22 @@
 package ASTvisitors;
 
 import ASTnodes.*;
+import symboltable.DuplicateSymbolException;
 import symboltable.SymbolTable;
+import symboltable.attributes.PrimitiveAttributes;
+import symboltable.types.IntType;
 
 
 public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
-    SymbolTable sb;
+    SymbolTable ST;
 
     public SymbolHarvester() {
-        this.sb = new SymbolTable();
+        this.ST = new SymbolTable();
     }
 
     @Override
-    public SymbolTable visit(AssignNode n) {
+    public SymbolTable visit(ArithmeticExpression n) {
         return null;
     }
 
@@ -109,7 +112,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(BlockNode n) {
-        sb.openScope();
+        ST.openScope();
 
         //Visit all children of block node
         for (ASTNode node : n.children) {
@@ -117,28 +120,57 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
             node.accept(this);
         }
 
-        sb.closeScope();
+        ST.closeScope();
 
-        return sb;
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(Assignment n) {
+        return visit(n);
+    }
+
+    @Override
+    public SymbolTable visit(StringNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(BooleanExpression n) {
+        return null;
     }
 
     @Override
     public SymbolTable visit(IntegerDeclarationNode n) {
 
-        sb.enterSymbol(n.id.value, n.id.type);
-        return sb;
+        IdNode identifier = n.id;
+
+        PrimitiveAttributes attrs = new PrimitiveAttributes(new IntType());
+
+        identifier.attrs = attrs;
+
+        if (ST.declaredLocally(identifier.name)) {
+            throw new DuplicateSymbolException(identifier.name + " is already declared in current scope");
+        }
+
+        ST.enterSymbol(identifier.name, attrs);
+        return ST;
     }
 
     @Override
     public SymbolTable visit(IntegerAssignDeclarationNode n) {
 
-        sb.enterSymbol(n.id.value, n.id.type);
-        return sb;
-    }
+        IdNode identifier = n.id;
+        PrimitiveAttributes attrs = new PrimitiveAttributes(new IntType());
 
-    @Override
-    public SymbolTable visit(ArithmeticNode n) {
-        return null;
+        identifier.attrs = attrs;
+
+        if (ST.declaredLocally(identifier.name)) {
+            throw new DuplicateSymbolException(identifier.name + " is already declared in current scope");
+        }
+
+        ST.enterSymbol(identifier.name, attrs);
+        return ST;
     }
 
     @Override

@@ -2,7 +2,7 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class NegationNode implements ASTNode {
+public class NegationNode implements ASTNode, BooleanExpression {
     public ASTNode child;
 
     public NegationNode(ASTNode child) {

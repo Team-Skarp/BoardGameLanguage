@@ -5,8 +5,8 @@ import ASTnodes.*;
 public class Evaluator implements ASTvisitor<Object> {
 
     @Override
-    public Integer visit(AssignNode n) {
-        return 0;
+    public Object visit(ArithmeticExpression n) {
+        return null;
     }
 
     @Override
@@ -141,6 +141,21 @@ public class Evaluator implements ASTvisitor<Object> {
     }
 
     @Override
+    public Object visit(Assignment n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(StringNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(BooleanExpression n) {
+        return null;
+    }
+
+    @Override
     public Object visit(IntegerDeclarationNode n) {
         return null;
     }
@@ -150,10 +165,6 @@ public class Evaluator implements ASTvisitor<Object> {
         return null;
     }
 
-    @Override
-    public Object visit(ArithmeticNode n) {
-        return null;
-    }
 
     @Override
     public Object visit(BooleanDeclarationNode n) {

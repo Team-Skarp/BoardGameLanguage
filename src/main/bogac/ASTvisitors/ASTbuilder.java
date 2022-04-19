@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import symboltable.types.IntType;
 
 /**
  * Class which converts antlers auto-generated CST into our desired AST
@@ -166,17 +167,19 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntegerDeclaration(BoardParser.IntegerDeclarationContext ctx) {
+        String name = ctx.IDENTIFIER().getText();
+
         if (ctx.ASSIGN() != null && ctx.COMMA() != null) {
-            return null; //Not implemented
+            return null; //IntegerAssignMultipleDeclaration
         }
         else if (ctx.ASSIGN() != null) {
-            return new IntegerAssignDeclarationNode(new IdNode(ctx.IDENTIFIER().getText(), "int"), ctx.arithmeticExpression().accept(this));
+            return new IntegerAssignDeclarationNode(new IdNode(name, new IntType()), ctx.arithmeticExpression().accept(this));
         }
         else if (ctx.IDENTIFIER() != null && ctx.COMMA() != null) {
             return null; //Not implemented
         }
         else if (ctx.IDENTIFIER() != null) {
-            return new IntegerDeclarationNode(new IdNode(ctx.IDENTIFIER().getText(), "int"));
+            return new IntegerDeclarationNode(new IdNode(name, new IntType()));
         }
 
         return null;
@@ -328,7 +331,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new IntNode(Integer.parseInt(ctx.INT().getText()));
         }
         else if (ctx.IDENTIFIER() != null) {
-            return new IdNode(ctx.IDENTIFIER().getText(), "ID");
+            return new IdNode(ctx.IDENTIFIER().getText());
         }else if(ctx.arithmeticExpression() != null){
             return ctx.getChild(1).accept(this);
         }
@@ -411,7 +414,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if (ctx.BOOL() != null){
             return new BooleanNode(Boolean.parseBoolean(ctx.BOOL().getText()));
         }else if (ctx.IDENTIFIER() != null) {
-            return new IdNode(ctx.IDENTIFIER().getText(), "ID");
+            return new IdNode(ctx.IDENTIFIER().getText());
         }else if(ctx.booleanExpression() != null){
             return ctx.getChild(1).accept(this);
         }

@@ -1,4 +1,4 @@
 package ASTnodes;
 
-public interface ArithmeticExpression {
+public interface ArithmeticExpression extends ASTNode {
 }

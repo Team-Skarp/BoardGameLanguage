@@ -5,29 +5,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Block {
+/**
+ * Class used to define a single scope in the compiler
+ *
+ * Blocks contains all the symbols found within a given scope.
+ *
+ * Scopes are only initialised by the {@link SymbolTable} class
+ */
+class Block {
 
     private Block                parent;
     private Map<String, Symbol>  symbols = new HashMap<String, Symbol>();
     private List<Block>          children = new ArrayList<>();
 
-    public void addSymbol(Symbol sym) {
+    void addSymbol(Symbol sym) {
         symbols.put(sym.name, sym);
     }
 
-    public Symbol getSymbolWith(String name) {
+    Symbol getSymbolWith(String name) {
 
         return symbols.get(name);
 
     }
-    public void addChild(Block block) {
+    void addChild(Block block) {
         children.add(block);
     }
 
-    public Block getParent() {
+    Block getParent() {
         return parent;
     }
-    public void setParent(Block block) {
+
+    void setParent(Block block) {
         parent = block;
     }
 }

@@ -1,5 +1,7 @@
 package symboltable;
 
+import symboltable.attributes.Attributes;
+
 public class SymbolTable {
 
     //Global block
@@ -10,7 +12,7 @@ public class SymbolTable {
         activeBlock.setParent(null);
     }
 
-    public void openScope() {
+    public SymbolTable openScope() {
 
         System.out.println("Scope opened");
         Block child = new Block();
@@ -18,17 +20,21 @@ public class SymbolTable {
         child.setParent(activeBlock);
 
         activeBlock = child;    //Hand control to child block
+
+        return this;
     }
 
-    public void closeScope() {
+    public SymbolTable closeScope() {
         System.out.println("Scope closed");
         activeBlock = activeBlock.getParent();
+
+        return this;
     }
 
     /**
      * Retrieves a symbol from either the current scope or any of the parrent scopes.
      * @param name of the symbol
-     * @return
+     * @return Symbol that is found
      */
     public Symbol retrieveSymbol(String name) {
 
@@ -50,24 +56,22 @@ public class SymbolTable {
             return found_sym;
         }
 
-        System.out.println("Symbol retrieved: " + sym.name + " " + sym.type);
+        System.out.println(String.format("Symbol retrieved: '%s' of type '%s' ", name, sym.attrs.thisType()));
         return sym;
     }
 
     /**
      * Enters a single Symbol into the current block
      * @param name of the symbol
-     * @param type of the symbol
+     * @param attrs {@link Attributes} of the symbol
      */
-    public void enterSymbol(String name, String type) {
+    public SymbolTable enterSymbol(String name, Attributes attrs) {
 
-        System.out.println("Symbol entered: " + type + " " + name);
+        System.out.println(String.format("Symbol entered: '%s' of type '%s'", name, attrs.thisType()));
 
-        if (isAlreadyDeclaredWith(name)) {
-            throw new DuplicateSymbolException(name + " is already declared in current scope");
-        }
+        activeBlock.addSymbol(new Symbol(name, attrs));
 
-        activeBlock.addSymbol(new Symbol(name, type));
+        return this;
 
     }
 
@@ -76,7 +80,7 @@ public class SymbolTable {
      * @param name of the symbol
      * @return
      */
-    private boolean isAlreadyDeclaredWith(String name) {
+    public boolean declaredLocally(String name) {
         Symbol sym = activeBlock.getSymbolWith(name);
         if (sym != null) {
             return true;

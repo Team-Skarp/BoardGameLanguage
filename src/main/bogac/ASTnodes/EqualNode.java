@@ -2,7 +2,7 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class EqualNode implements ASTNode {
+public class EqualNode implements ASTNode, BooleanExpression {
     public ASTNode left;
     public ASTNode right;
 

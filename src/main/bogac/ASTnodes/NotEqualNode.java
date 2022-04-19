@@ -2,7 +2,7 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class NotEqualNode implements ASTNode {
+public class NotEqualNode implements ASTNode, BooleanExpression {
     public ASTNode left;
     public ASTNode right;
 

@@ -2,7 +2,7 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class MinusNode implements ASTNode, ArithmeticExpression{
+public class MinusNode implements ASTNode, ArithmeticExpression {
 
     public final ASTNode left;
     public final ASTNode right;
