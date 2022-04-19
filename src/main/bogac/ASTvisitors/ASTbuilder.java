@@ -7,7 +7,10 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import symboltable.types.BoolType;
+import symboltable.types.GridType;
 import symboltable.types.IntType;
+import symboltable.types.PathType;
 
 /**
  * Class which converts antlers auto-generated CST into our desired AST
@@ -161,25 +164,25 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if (ctx.IDENTIFIER() != null && ctx.INT() != null) {
             if (ctx.UNI_DIR() != null) {
                 return new PathDeclarationNode(
-                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), new PathType()),
                         Integer.parseInt(ctx.INT().getText()),
                         ctx.UNI_DIR().getText()
                 );
             } else if (ctx.BI_DIR() != null) {
                 return new PathDeclarationNode(
-                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), new PathType()),
                         Integer.parseInt(ctx.INT().getText()),
                         ctx.BI_DIR().getText()
                 );
             } else if (ctx.STATIC_DIR() != null) {
                 return new PathDeclarationNode(
-                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), new PathType()),
                         Integer.parseInt(ctx.INT().getText()),
                         ctx.STATIC_DIR().getText()
                 );
             } else {
                 return new PathDeclarationNode(
-                        new IdNode(ctx.IDENTIFIER().get(0).getText(), "path"),
+                        new IdNode(ctx.IDENTIFIER().get(0).getText(), new PathType()),
                         Integer.parseInt(ctx.INT().getText())
                 );
             }
@@ -192,7 +195,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitGridDeclaration(BoardParser.GridDeclarationContext ctx) {
         if (ctx.IDENTIFIER() != null && ctx.INT().get(0) != null && ctx.INT().get(1) != null) {
             return new GridDeclarationNode(
-                    new IdNode(ctx.IDENTIFIER().get(0).getText(), "grid"),
+                    new IdNode(ctx.IDENTIFIER().get(0).getText(), new GridType()),
                     Integer.parseInt(ctx.INT().get(0).getText()),
                     Integer.parseInt(ctx.INT().get(1).getText())
             );
@@ -228,12 +231,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if (ctx.booleanExpression() != null) {
             System.out.println("1");
             return new BooleanDeclarationNode(
-                    new IdNode(ctx.IDENTIFIER().getText(),"bool"),
+                    new IdNode(ctx.IDENTIFIER().getText(),new BoolType()),
                     ctx.getChild(3).accept(this)
             );
         } else if (ctx.BOOLDCL() != null && ctx.IDENTIFIER() != null) {
             return new BooleanDeclarationNode(
-                    new IdNode(ctx.IDENTIFIER().getText(),"bool")
+                    new IdNode(ctx.IDENTIFIER().getText(),new BoolType())
             );
         }
         return null;
