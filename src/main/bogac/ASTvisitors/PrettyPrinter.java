@@ -242,7 +242,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     public Void visit(BooleanDeclarationNode n) {
         indent++;
         System.out.println("type:" + n.id.type);
-        System.out.println("varName:" + n.id.value);
+        System.out.println("varName:" + n.id.name);
         if (n.booleanExpressionChild != null){
             n.booleanExpressionChild.accept(this);
         }
@@ -270,7 +270,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         indent++;
 
         System.out.println(n.id.type + " ");
-        System.out.println(n.id.value + " ");
+        System.out.println(n.id.name + " ");
         System.out.println(n.direction + " ");
         System.out.println(n.length + " ");
 
@@ -289,7 +289,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         indent++;
 
         System.out.println("type:" + n.id.type);
-        System.out.println("varName:" + n.id.value);
+        System.out.println("varName:" + n.id.name);
         System.out.println("x size:" + n.x_size);
         System.out.println("y size:" + n.y_size);
 

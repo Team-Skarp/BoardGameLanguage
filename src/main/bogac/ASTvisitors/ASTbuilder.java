@@ -11,11 +11,12 @@ import symboltable.types.BoolType;
 import symboltable.types.GridType;
 import symboltable.types.IntType;
 import symboltable.types.PathType;
-
+import Logging.Logger;
 /**
  * Class which converts antlers auto-generated CST into our desired AST
  */
 public class ASTbuilder implements BoardVisitor<ASTNode> {
+    Logger lo = new Logger();
 
     @Override
     public ASTNode visitGame(BoardParser.GameContext ctx) {
@@ -229,7 +230,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     //TODO: change "bool" to booldcl
     public ASTNode visitBooleanDeclaration(BoardParser.BooleanDeclarationContext ctx) {
         if (ctx.booleanExpression() != null) {
-            System.out.println("1");
             return new BooleanDeclarationNode(
                     new IdNode(ctx.IDENTIFIER().getText(),new BoolType()),
                     ctx.getChild(3).accept(this)

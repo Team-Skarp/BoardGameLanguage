@@ -7,6 +7,7 @@ import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import Logging.Logger;
 
 /**
  * Demo file to showcase a pretty print visitor on our AST
@@ -14,13 +15,15 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class PrettyPrinterDemo {
 
     public static void main(String[] args) {
+        Logger lo = new Logger();
+
         CharStream input;
         BoardLexer lexer;
         CommonTokenStream tokens;
         BoardParser parser;
 
         input = CharStreams.fromString("bool y = true;");
-        System.out.println(input);
+        lo.g("input: "+input);
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
