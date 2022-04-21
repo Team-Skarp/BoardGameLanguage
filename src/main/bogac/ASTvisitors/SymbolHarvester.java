@@ -208,4 +208,24 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(GridTypedDeclarationNode n) {
         return null;
     }
+
+    @Override
+    public SymbolTable visit(ConditionalNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ElifConditionalNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ElseNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(PredicateNode n) {
+        return null;
+    }
 }

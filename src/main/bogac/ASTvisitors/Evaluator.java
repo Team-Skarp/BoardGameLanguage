@@ -1,8 +1,10 @@
 package ASTvisitors;
 
 import ASTnodes.*;
+import Logging.Logger;
 
 public class Evaluator implements ASTvisitor<Object> {
+    Logger lo = new Logger();
 
     @Override
     public Object visit(ArithmeticExpression n) {
@@ -137,6 +139,7 @@ public class Evaluator implements ASTvisitor<Object> {
 
     @Override
     public Object visit(BlockNode n) {
+        n.children.forEach(child -> child.accept(this)); //not working yet. gotta implement symbol table stuff
         return null;
     }
 
@@ -193,6 +196,34 @@ public class Evaluator implements ASTvisitor<Object> {
 
     @Override
     public Object visit(GridTypedDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ConditionalNode n) {
+        lo.g(n.predicate+" "+n.ifBlock+" "+n.elseBlock);
+        boolean predicate = (boolean) n.predicate.accept(this);
+        Object ifBlock = n.ifBlock.accept(this);
+        Object elseBlock = n.elseBlock.accept(this);
+        if (predicate){
+            return ifBlock;
+        }else{
+            return elseBlock;
+        }
+    }
+
+    @Override
+    public Object visit(ElifConditionalNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ElseNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(PredicateNode n) {
         return null;
     }
 

@@ -331,14 +331,17 @@ booleanAtom
     | LPAREN booleanExpression RPAREN
     ;
 
+
 ifStatement
-    : IF LPAREN booleanExpression RPAREN normalBlock
-    | IF LPAREN booleanExpression RPAREN normalBlock elseStatement
+    : IF LPAREN booleanExpression RPAREN normalBlock (elseifStatement)* (elseStatement)?
     ;
 
+//TODO: create elif
 elseStatement
     : ELSE normalBlock
-    | ELSE ifStatement
+    ;
+elseifStatement
+    : ELSEIF LPAREN booleanExpression RPAREN normalBlock
     ;
 
 whileStatement

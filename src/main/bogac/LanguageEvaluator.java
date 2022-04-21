@@ -17,7 +17,7 @@ public class LanguageEvaluator {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("path main[24];");
+        input = CharStreams.fromString("if(true){if(false){}else{bool asd = true;}}else{ bool eqw = false;}");
 
         lexer   = new BoardLexer(input);
         tokens  = new CommonTokenStream(lexer);
@@ -26,8 +26,8 @@ public class LanguageEvaluator {
         // BoardParser.IntegerDeclarationContext cst = parser.integerDeclaration();
         // ASTNode ast = new ASTbuilder().visitIntegerDeclaration(cst);
 
-        BoardParser.PathDeclarationContext cst = parser.pathDeclaration();
-        ASTNode ast = new ASTbuilder().visitPathDeclaration(cst);
+        BoardParser.IfStatementContext cst = parser.ifStatement();
+        ASTNode ast = new ASTbuilder().visitIfStatement(cst);
 
         Evaluator evaluator = new Evaluator();
         Object result = ast.accept(evaluator);

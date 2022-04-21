@@ -12,6 +12,11 @@ import symboltable.types.GridType;
 import symboltable.types.IntType;
 import symboltable.types.PathType;
 import Logging.Logger;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Class which converts antlers auto-generated CST into our desired AST
  */
@@ -62,18 +67,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
         BlockNode block = new BlockNode();
-
         //Loop through every ast node and add it as child to block node
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
-
             if (astNode != null) {
-
                 block.children.add(astNode);
             }
         }
 
-        System.out.println(block.children);
         return block;
     }
 
@@ -81,6 +82,8 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitNormalDeclaration(BoardParser.NormalDeclarationContext ctx) {
         if (ctx.integerDeclaration() != null) {
             return ctx.integerDeclaration().accept(this);
+        }else if(ctx.booleanDeclaration() != null){
+            return ctx.booleanDeclaration().accept(this);
         }
         return null;
     }
@@ -289,6 +292,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitStatements(BoardParser.StatementsContext ctx) {
+        if(ctx.ifStatement() != null){
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
@@ -463,13 +469,68 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return null;
     }
 
+
+
     @Override
     public ASTNode visitIfStatement(BoardParser.IfStatementContext ctx) {
+        if (ctx.booleanExpression() != null && ctx.normalBlock() != null){
+            //loop to get all elseif blocks
+            List<ASTNode> elseifBlocks = new ArrayList<>();
+            //Loop through every ast node and add it as child to block node
+            for (ParseTree node : ctx.children) {
+                ASTNode astNode = node.accept(this);
+                ElifConditionalNode elifConditionalNode = new ElifConditionalNode(); //created to test class type of astNode
+                if (astNode != null && astNode.getClass() == elifConditionalNode.getClass()) {
+                    //block.children.add(astNode);
+                    elseifBlocks.add(astNode);
+                }
+
+            }
+            lo.g(ctx.children);
+            //if elseif else
+            if(ctx.elseStatement() != null && ctx.elseifStatement() != null){
+                return new ConditionalNode(
+                        ctx.getChild(2).accept(this),
+                        ctx.getChild(4).accept(this),
+                        elseifBlocks,
+                        ctx.getChild(ctx.children.size()-1).getChild(1).accept(this));
+            }
+            //if else
+            else if(ctx.elseStatement() != null){
+                return new ConditionalNode(
+                        ctx.getChild(2).accept(this),
+                        ctx.getChild(4).accept(this),
+                        ctx.getChild(ctx.children.size()-1).getChild(1).accept(this));
+            }
+            //if elseif
+            else if(ctx.elseifStatement() != null){
+                return new ConditionalNode(
+                        ctx.getChild(2).accept(this),
+                        ctx.getChild(4).accept(this),
+                        elseifBlocks);
+            }
+            //if
+            else{
+                return new ConditionalNode(ctx.getChild(2).accept(this),
+                        ctx.getChild(4).accept(this));
+            }
+        }
+
         return null;
     }
 
     @Override
     public ASTNode visitElseStatement(BoardParser.ElseStatementContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitElseifStatement(BoardParser.ElseifStatementContext ctx) {
+        lo.g(ctx.children);
+        if(ctx.booleanExpression() != null && ctx.normalBlock() != null){
+            return new ElifConditionalNode(ctx.getChild(2).accept(this),
+                    ctx.getChild(4).accept(this));
+        }
         return null;
     }
 

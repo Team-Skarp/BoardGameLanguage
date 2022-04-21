@@ -44,4 +44,9 @@ public interface ASTvisitor<T> {
 
     T visit(GridDeclarationNode n);
     T visit(GridTypedDeclarationNode n);
+
+    T visit(ConditionalNode n);
+    T visit(ElifConditionalNode n);
+    T visit(ElseNode n);
+    T visit(PredicateNode n);
 }

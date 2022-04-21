@@ -227,6 +227,26 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(ConditionalNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(ElifConditionalNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(ElseNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(PredicateNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(BooleanDeclarationNode n) {
         return null;
     }

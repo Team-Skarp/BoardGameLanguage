@@ -1,6 +1,7 @@
 package ASTvisitors;
 
 import ASTnodes.*;
+import Logging.Logger;
 
 /**
  * Class for printing out an AST tree
@@ -9,7 +10,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     private int             indent = 0;
     private final String    TAB = "\t";
-
+    Logger lo = new Logger();
     @Override
     public Void visit(ArithmeticExpression n) {
         visit(n);
@@ -209,6 +210,14 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(BlockNode n) {
+        System.out.println(TAB.repeat(indent) + "block");
+        indent++;
+        for(ASTNode child: n.children){
+            child.accept(this);
+        }
+        indent--;
+        //System.out.println(TAB.repeat(indent) + "block");
+
         return null;
     }
 
@@ -240,9 +249,9 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     
     @Override
     public Void visit(BooleanDeclarationNode n) {
+        System.out.println(TAB.repeat(indent)+"type: " + n.id.type);
+        System.out.println(TAB.repeat(indent)+"varName: " + n.id.name);
         indent++;
-        System.out.println("type:" + n.id.type);
-        System.out.println("varName:" + n.id.name);
         if (n.booleanExpressionChild != null){
             n.booleanExpressionChild.accept(this);
         }
@@ -300,6 +309,52 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(GridTypedDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Void visit(ConditionalNode n) {
+        System.out.println(TAB.repeat(indent) + "if statement");
+        indent++;
+        n.predicate.accept(this);
+        n.ifBlock.accept(this);
+        if(n.elseifBlocks != null){
+            n.elseifBlocks.forEach(block -> block.accept(this));
+        }
+        if(n.elseBlock != null){
+            n.elseBlock.accept(this);
+        }
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(ElifConditionalNode n) {
+        System.out.println(TAB.repeat(indent) + "elif block");
+        indent++;
+        n.predicate.accept(this);
+        n.ifBlock.accept(this);
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(ElseNode n) {
+        System.out.println(TAB.repeat(indent) + "else block");
+        indent++;
+        n.elseBlock.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(PredicateNode n) {
+        System.out.println(TAB.repeat(indent) + "predicate");
+        indent++;
+        n.value.accept(this);
+        indent--;
+
         return null;
     }
 
