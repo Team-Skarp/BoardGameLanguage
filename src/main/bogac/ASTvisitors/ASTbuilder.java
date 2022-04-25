@@ -7,10 +7,7 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import symboltable.types.BoolType;
-import symboltable.types.GridType;
-import symboltable.types.IntType;
-import symboltable.types.PathType;
+import symboltable.types.*;
 import Logging.Logger;
 
 import java.lang.reflect.Type;

@@ -24,7 +24,7 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("while(i<1){}");
+        input = CharStreams.fromString("while(true){if(false){foreach(car in garage){}}}");
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
