@@ -24,13 +24,13 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("if(true){}elseif(true){}elseif(true){}else{}");
+        input = CharStreams.fromString("while(i<1){}");
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        ASTNode ast = getAST(parser,"ifstatement");
+        ASTNode ast = getAST(parser,"statements");
         PrettyPrinter pp = new PrettyPrinter();
         ast.accept(pp);
     }
@@ -59,6 +59,21 @@ public class PrettyPrinterDemo {
                 BoardParser.NormalBlockContext cstNormalBlock = parser.normalBlock();
                 ast = new ASTbuilder().visitNormalBlock(cstNormalBlock);
                 lo.g("starting AST at normal block");
+                return ast;
+            case "statements":
+                BoardParser.StatementsContext cststatements = parser.statements();
+                ast = new ASTbuilder().visitStatements(cststatements);
+                lo.g("starting AST at statements");
+                return ast;
+            case "while":
+                BoardParser.WhileStatementContext cstwhile = parser.whileStatement();
+                ast = new ASTbuilder().visitWhileStatement(cstwhile);
+                lo.g("starting AST at while");
+                return ast;
+            case "decl":
+                BoardParser.NormalDeclarationContext cstdecl = parser.normalDeclaration();
+                ast = new ASTbuilder().visitNormalDeclaration(cstdecl);
+                lo.g("starting AST at normal decl");
                 return ast;
             default:
                 lo.g("Invalid AST root");

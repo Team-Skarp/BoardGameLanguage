@@ -84,6 +84,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return ctx.integerDeclaration().accept(this);
         }else if(ctx.booleanDeclaration() != null){
             return ctx.booleanDeclaration().accept(this);
+        }else if (ctx.stringDeclaration() != null){
+            return ctx.stringDeclaration().accept(this);
+        }else if (ctx.listDeclaration() != null){
+            return ctx.listDeclaration().accept(this);
         }
         return null;
     }
@@ -387,6 +391,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if(ctx.ifStatement() != null){
             return ctx.getChild(0).accept(this);
         }
+        else if(ctx.whileStatement() != null){
+            return ctx.getChild(0).accept(this);
+        }
+        else if(ctx.foreach() != null){
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
@@ -633,11 +643,19 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitWhileStatement(BoardParser.WhileStatementContext ctx) {
+        if(ctx.booleanExpression() != null && ctx.normalBlock() != null){
+            return new WhileNode(ctx.getChild(2).accept(this),ctx.getChild(4).accept(this));
+        }
         return null;
     }
 
     @Override
     public ASTNode visitForeach(BoardParser.ForeachContext ctx) {
+        if(ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null && ctx.normalBlock() != null){
+            return new ForeachNode(new IdNode(ctx.IDENTIFIER(0).getText()),
+                    new IdNode(ctx.IDENTIFIER(1).getText())
+                    ,ctx.getChild(6).accept(this));
+        }
         return null;
     }
 

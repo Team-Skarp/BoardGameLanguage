@@ -293,4 +293,14 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(PredicateNode n) {
         return null;
     }
+
+    @Override
+    public SymbolTable visit(WhileNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ForeachNode n) {
+        return null;
+    }
 }

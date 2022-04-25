@@ -247,4 +247,14 @@ public class Evaluator implements ASTvisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(WhileNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ForeachNode n) {
+        return null;
+    }
+
 }

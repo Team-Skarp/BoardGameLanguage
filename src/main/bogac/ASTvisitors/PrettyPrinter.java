@@ -385,4 +385,25 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visit(WhileNode n) {
+        System.out.println(TAB.repeat(indent) + "while");
+        indent++;
+        n.predicate.accept(this);
+        n.whileBlock.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(ForeachNode n) {
+        System.out.println(TAB.repeat(indent) + "foreach");
+        indent++;
+        n.newId.accept(this);
+        n.mainId.accept(this);
+        n.foreachBlock.accept(this);
+        indent--;
+        return null;
+    }
+
 }

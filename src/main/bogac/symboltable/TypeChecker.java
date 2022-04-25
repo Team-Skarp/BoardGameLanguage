@@ -398,6 +398,16 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(WhileNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(ForeachNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(BooleanDeclarationNode n) {
         return null;
     }

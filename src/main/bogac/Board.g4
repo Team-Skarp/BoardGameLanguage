@@ -376,7 +376,6 @@ ifStatement
     : IF LPAREN booleanExpression RPAREN normalBlock (elseifStatement)* (elseStatement)?
     ;
 
-//TODO: create elif
 elseStatement
     : ELSE normalBlock
     ;
@@ -389,7 +388,7 @@ whileStatement
     ;
 
 foreach
-    : FOREACH IDENTIFIER IN IDENTIFIER normalBlock
+    : FOREACH LPAREN IDENTIFIER IN IDENTIFIER RPAREN normalBlock
     ;
 
 print
