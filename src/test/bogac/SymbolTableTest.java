@@ -1,3 +1,4 @@
+import ASTnodes.SequentialDeclaration;
 import org.junit.Test;
 import symboltable.ReferenceErrorException;
 import symboltable.Symbol;

@@ -29,9 +29,9 @@ OTHERDCL    : 'other';
 VOIDDCL     : 'void';
 
 //Primitive types
-INT     : ('-')?[0-9]+;
+INT     : [0-9]+;
 BOOL    : 'true' | 'false';
-STRING  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
+STR  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
 
 //Control structures
 IF      : 'if';
@@ -126,53 +126,75 @@ gameloopBlock
 //Primitive type decleration
 normalDeclaration
     : INTDCL integerDeclaration EOL
-    | booleanDeclaration EOL
-    | stringDeclaration EOL
-    | listDeclaration EOL
-    | IDENTIFIER (IDENTIFIER|COMMA)* EOL
+    | BOOLDCL booleanDeclaration EOL
+    | STRDCL stringDeclaration EOL
+    | LISTDCL listDeclaration EOL
+    | IDENTIFIER designDeclaration EOL
+    | sequentialDeclaration EOL
     ;
 
 // Setup special Declerations
 setupDeclaration
     : pathDeclaration EOL
     | gridDeclaration EOL
-    | designDeclaration EOL
+    | designDefinition
     ;
 
 uniqueDeclaration
     : specialDeclaration
-    | actionDeclaration
+    | actionDefinition
     | choiceDeclaration
     ;
 
-//Design declerations should only appear in SETUP block
 designDeclaration
+    : IDENTIFIER (COMMA IDENTIFIER)*
+    ;
+
+//Design declerations should only appear in SETUP block
+designDefinition
     : DESIGNDCL IDENTIFIER (FROM IDENTIFIER)? designBody
     ;
 
 integerDeclaration
-    : IDENTIFIER ASSIGN arithmeticExpression COMMA integerDeclaration
-    | IDENTIFIER ASSIGN arithmeticExpression
-    | IDENTIFIER COMMA integerDeclaration
+    : IDENTIFIER ASSIGN arithmeticExpression
     | IDENTIFIER
     ;
 
+sequentialDeclaration
+    : INTDCL integerDeclaration (COMMA integerDeclaration)+ //Integermultiple
+    ;
+
 booleanDeclaration
-    : BOOLDCL IDENTIFIER ASSIGN booleanExpression COMMA booleanDeclaration
-    | BOOLDCL IDENTIFIER ASSIGN booleanExpression
-    | BOOLDCL IDENTIFIER COMMA booleanDeclaration
-    | BOOLDCL IDENTIFIER
+    : IDENTIFIER ASSIGN booleanExpression COMMA booleanDeclaration
+    | IDENTIFIER ASSIGN booleanExpression
+    | IDENTIFIER COMMA booleanDeclaration
+    | IDENTIFIER
     ;
 
 stringDeclaration
-    : STRDCL IDENTIFIER ASSIGN STRING COMMA stringDeclaration
-    | STRDCL IDENTIFIER ASSIGN STRING
-    | STRDCL IDENTIFIER
+    : IDENTIFIER ASSIGN STR COMMA stringDeclaration
+    | IDENTIFIER ASSIGN STR
+    | IDENTIFIER
     ;
 
 listDeclaration
-    : LISTDCL COLON IDENTIFIER ASSIGN LSBRACE (IDENTIFIER|COMMA)* RSBRACE
-    | LISTDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT RSBRACE
+    : COLON listType IDENTIFIER ASSIGN LSBRACE (listElement? | listElement (COMMA listElement)*)  RSBRACE
+    | COLON listType IDENTIFIER
+    ;
+
+listType
+    : IDENTIFIER
+    | INTDCL
+    | BOOLDCL
+    | STRDCL
+    | LISTDCL COLON listType //To define lists of lists
+    ;
+
+//list:list:int matrix = [[1,2,3], [1,2,3]]
+
+listElement
+    : primitiveValue
+    | IDENTIFIER
     ;
 
 pathDeclaration
@@ -196,6 +218,10 @@ choiceDeclaration
     ;
 
 actionDeclaration
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON primitiveType)?
+    ;
+
+actionDefinition
     : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON primitiveType)? rulesBlock
     ;
 
@@ -217,11 +243,11 @@ booleanAssigment
     ;
 
 stringAssigment
-    : IDENTIFIER ASSIGN STRING
+    : IDENTIFIER ASSIGN STR
     ;
 
 dotAssignment
-    : IDENTIFIER DOT IDENTIFIER ASSIGN (STRING|INT|BOOL|IDENTIFIER)*
+    : IDENTIFIER DOT IDENTIFIER ASSIGN (STR|INT|BOOL|IDENTIFIER)*
     ;
 
 choiceAssignment
@@ -239,12 +265,15 @@ actionAssignment
 
 // Special body's
 designBody
-    : LBRACE (fieldRow)* RBRACE
+    : LBRACE (fieldRow)+ RBRACE
     ;
 
 fieldRow
-    : primitiveType IDENTIFIER EOL
-    | primitiveType IDENTIFIER LPAREN IDENTIFIER IDENTIFIER RPAREN EOL
+    : INTDCL IDENTIFIER EOL
+    | BOOLDCL IDENTIFIER EOL
+    | STRDCL IDENTIFIER EOL
+    | LISTDCL COLON listType IDENTIFIER EOL
+    | actionDeclaration EOL
     ;
 
 //Primitive types
@@ -252,9 +281,15 @@ primitiveType
     : INTDCL | BOOLDCL | STRDCL
     ;
 
+primitiveValue
+    : INT | BOOL | STR
+    ;
+
 formalParameters
-    : primitiveType COLON IDENTIFIER
-    | primitiveType COLON IDENTIFIER COMMA formalParameters
+    : primitiveType IDENTIFIER
+    | primitiveType IDENTIFIER COMMA formalParameters
+    | IDENTIFIER IDENTIFIER COMMA formalParameters
+    | IDENTIFIER IDENTIFIER
     ;
 
 statements
@@ -284,7 +319,12 @@ multiplicative
     ;
 
 pow
-    : pow EXP arithmeticAtom
+    : pow EXP unaryMinus
+    | unaryMinus
+    ;
+
+unaryMinus
+    : MINUS arithmeticAtom
     | arithmeticAtom
     ;
 
@@ -350,5 +390,5 @@ foreach
     ;
 
 print
-    : PRINT LPAREN (STRING | INT | arithmeticExpression | IDENTIFIER)* RPAREN EOL
+    : PRINT LPAREN (STR | INT | arithmeticExpression | IDENTIFIER)* RPAREN EOL
     ;

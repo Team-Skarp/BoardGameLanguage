@@ -18,7 +18,7 @@ public class IntegerAssignmentNode implements ASTNode<Object>, Assignment{
     }
 
     @Override
-    public ASTNode getLeft() {
+    public IdNode getLeft() {
         return id;
     }
 

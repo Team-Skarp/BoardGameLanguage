@@ -10,6 +10,7 @@ public interface ASTvisitor<T> {
     T visit(ArithmeticExpression n);
     T visit(PlusNode n);
     T visit(MinusNode n);
+    T visit(UnaryMinusNode n);
     T visit(MultNode n);
     T visit(DivNode n);
     T visit(ModNode n);
@@ -34,14 +35,16 @@ public interface ASTvisitor<T> {
     T visit(BlockNode n);
     T visit(Assignment n);
 
+    T visit(DesignDefinitionNode n);
+
+    T visit(Declaration n);
+    T visit(SequentialDeclaration n);
     T visit(IntegerDeclarationNode n);
+    T visit(IntegerAssignDeclarationNode n);
     T visit(BooleanDeclarationNode n);
     T visit(StringDeclarationNode n);
-
-    T visit(IntegerAssignDeclarationNode n);
     T visit(PathDeclarationNode n);
     T visit(PathTypedDeclarationNode n);
-
     T visit(GridDeclarationNode n);
     T visit(GridTypedDeclarationNode n);
 }

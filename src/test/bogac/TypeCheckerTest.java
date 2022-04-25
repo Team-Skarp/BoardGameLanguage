@@ -1,12 +1,14 @@
-import ASTnodes.IdNode;
-import ASTnodes.PlusNode;
+import ASTnodes.*;
 import org.junit.Test;
 import symboltable.SymbolTable;
 import symboltable.TypeChecker;
 import symboltable.TypeErrorException;
 import symboltable.attributes.PrimitiveAttributes;
+import symboltable.types.BoolType;
 import symboltable.types.IntType;
 import symboltable.types.StringType;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,4 +32,28 @@ public class TypeCheckerTest {
 
         assertThrows(TypeErrorException.class, () -> typeChecker.visit(plus));
     }
+
+    @Test
+    public void should_throw_typeerror_when_expression_type_does_not_match() {
+
+        ST = new SymbolTable();
+
+        //int a, b = false
+        IntegerDeclarationNode a = new IntegerDeclarationNode(new IdNode("a", new IntType()));
+        IntegerAssignDeclarationNode b = new IntegerAssignDeclarationNode(new IdNode("b"), new BooleanNode(false));
+
+        ST.enterSymbol("a", new PrimitiveAttributes(new IntType()));
+        ST.enterSymbol("b", new PrimitiveAttributes(new BoolType()));
+
+        SequentialDeclaration sequence = new SequentialDeclaration();
+        sequence.declarations = List.of(a, b);
+        sequence.type = new IntType();
+
+        TypeChecker typeChecker = new TypeChecker(ST);
+
+        assertThrows(TypeErrorException.class, () -> typeChecker.visit(sequence));
+
+    }
+
+
 }

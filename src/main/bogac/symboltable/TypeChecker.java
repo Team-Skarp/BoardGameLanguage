@@ -43,8 +43,37 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(DesignDefinitionNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(Declaration n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(SequentialDeclaration n) {
+
+        TypeDenoter sequenceType = n.type;
+        for (Declaration dcl : n.declarations) {
+            if (dcl instanceof Assignment) {
+                Expression expr = (Expression) ((Assignment) dcl).getRight();
+                TypeDenoter typeOfExpr = (TypeDenoter) expr.accept(this);
+
+                if (sequenceType.getClass() != typeOfExpr.getClass()) {
+                    throw new TypeErrorException(String.format("value of expression yielded type '%s' and cannot be assigned to '%s' declaration",typeOfExpr, sequenceType));
+                }
+            }
+        }
+
+        return sequenceType;
+    }
+
+    @Override
     public TypeDenoter visit(ArithmeticExpression n) {
         return null;
+
     }
 
     @Override
@@ -54,44 +83,97 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
         if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
-            return leftType;
+            return new IntType();
         }
         else if (leftType.getClass() == StringType.class && rightType.getClass() == StringType.class) {
-            return leftType;
+            return new StringType();
         }
         else {
-            //'a of type 'int' cannot be assigned to type 'string'
             throw new TypeErrorException(String.format("type '%s' cannot be added to type '%s'", leftType, rightType));
         }
     }
 
     @Override
     public TypeDenoter visit(MinusNode n) {
-        return null;
+
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new IntType();
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be negated to type '%s'", leftType, rightType));
+        }
+    }
+
+    @Override
+    public TypeDenoter visit(UnaryMinusNode n) {
+
+        TypeDenoter operandType = (TypeDenoter) n.operand.accept(this);
+
+        if (operandType.getClass() == IntType.class) {
+            return new IntType();
+        }
+        else {
+            throw new TypeErrorException(String.format("unary minus is not defined for type '%s'", operandType));
+        }
     }
 
     @Override
     public TypeDenoter visit(MultNode n) {
-        return null;
+
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new IntType();
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be multiplied with type '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(DivNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new IntType();
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be divided with type '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(ModNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new IntType();
+        }
+        else {
+            throw new TypeErrorException(String.format("modulus can not operate on type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(PowNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new IntType();
+        }
+        else {
+            throw new TypeErrorException(String.format("exponent can not operate on type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
-
      //Returns the type of the looked up identifier
     public TypeDenoter visit(IdNode n) {
 
@@ -127,27 +209,73 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(NotEqualNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new BoolType();
+        }
+        else if (leftType.getClass() == StringType.class && rightType.getClass() == StringType.class) {
+            return new BoolType();
+        }
+        else if (leftType.getClass() == BoolType.class && rightType.getClass() == BoolType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("not equal is not defined between type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(LessThanNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("less than is not defined for type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(GreaterThanNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("less than is not defined for type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(GreaterThanEqualsNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("greater than or equal is not defined for type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(LessThanEqualsNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("less than is not defined for type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
@@ -157,17 +285,40 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(NegationNode n) {
-        return null;
+        TypeDenoter exprType = (TypeDenoter) n.child.accept(this);
+
+        if (exprType.getClass() == BoolType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("negation is not defined for type: '%s'", exprType));
+        }
     }
 
     @Override
     public TypeDenoter visit(OrNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == BoolType.class && rightType.getClass() == BoolType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("or operator is not defined for type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
     public TypeDenoter visit(AndNode n) {
-        return null;
+        TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
+        TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
+
+        if (leftType.getClass() == BoolType.class && rightType.getClass() == BoolType.class) {
+            return new BoolType();
+        }
+        else {
+            throw new TypeErrorException(String.format("and operator is not defined for type '%s' and '%s'", leftType, rightType));
+        }
     }
 
     @Override
@@ -201,7 +352,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return new IntType();
         }
         else {
-            throw new TypeErrorException(String.format("Type of expression should be of type 'int', got type '%s'", exprType));
+            throw new TypeErrorException(String.format("type of expression should be of type 'int', got type '%s'", exprType));
         }
 
     }
@@ -224,6 +375,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     @Override
     public TypeDenoter visit(GridTypedDeclarationNode n) {
         return null;
+
     }
 
     @Override
@@ -234,5 +386,6 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     @Override
     public TypeDenoter visit(StringDeclarationNode n) {
         return null;
+
     }
 }

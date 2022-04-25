@@ -1,4 +1,4 @@
 package ASTnodes;
 
-public interface BooleanExpression extends ASTNode{
+public interface BooleanExpression extends ASTNode, Expression{
 }

@@ -17,7 +17,7 @@ public class TypeCheckDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("2 + 2");
+        input = CharStreams.fromString("int a, b = false, c;");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);

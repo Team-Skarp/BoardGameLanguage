@@ -19,7 +19,7 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("bool y = true;");
+        input = CharStreams.fromString("int a, b = 5 + 5, c;");
         System.out.println(input);
 
         lexer = new BoardLexer(input);
@@ -29,8 +29,8 @@ public class PrettyPrinterDemo {
         //BoardParser.ArithmeticExpressionContext cst = parser.arithmeticExpression();
         //ASTNode ast = new ASTbuilder().visitArithmeticExpression(cst);
 
-        BoardParser.BooleanDeclarationContext cst = parser.booleanDeclaration();
-        ASTNode ast = new ASTbuilder().visitBooleanDeclaration(cst);
+        BoardParser.SequentialDeclarationContext cst = parser.sequentialDeclaration();
+        ASTNode ast = new ASTbuilder().visitSequentialDeclaration(cst);
 
         PrettyPrinter pp = new PrettyPrinter();
         ast.accept(pp);

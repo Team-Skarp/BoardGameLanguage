@@ -27,6 +27,11 @@ public class Evaluator implements ASTvisitor<Object> {
     }
 
     @Override
+    public Object visit(UnaryMinusNode n) {
+        return null;
+    }
+
+    @Override
     public Integer visit(MultNode n) {
         int l_result = (int) n.left.accept(this);
         int r_result = (int) n.right.accept(this);
@@ -142,6 +147,21 @@ public class Evaluator implements ASTvisitor<Object> {
 
     @Override
     public Object visit(Assignment n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(DesignDefinitionNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(Declaration n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(SequentialDeclaration n) {
         return null;
     }
 

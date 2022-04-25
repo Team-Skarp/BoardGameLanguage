@@ -3,8 +3,13 @@ package ASTvisitors;
 import ASTnodes.*;
 import symboltable.DuplicateSymbolException;
 import symboltable.SymbolTable;
+import symboltable.TypeChecker;
+import symboltable.TypeErrorException;
+import symboltable.attributes.Attributes;
 import symboltable.attributes.PrimitiveAttributes;
 import symboltable.types.IntType;
+import symboltable.types.Primitive;
+import symboltable.types.TypeDenoter;
 
 
 public class SymbolHarvester implements ASTvisitor<SymbolTable> {
@@ -27,6 +32,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(MinusNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(UnaryMinusNode n) {
         return null;
     }
 
@@ -131,6 +141,61 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(DesignDefinitionNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(Declaration n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(SequentialDeclaration n) {
+
+        TypeChecker typeChecker = new TypeChecker(ST);
+        Attributes attributes;
+        TypeDenoter sequenceType = n.type;
+
+        try {
+
+            attributes = initAttribute(sequenceType);
+
+            for (Declaration declaration : n.declarations) {
+
+                //Typecheck the declaration
+                declaration.accept(typeChecker);
+
+                ST.enterSymbol(declaration.getIdentifier().name, attributes);
+            }
+        } catch (TypeErrorException typeError) {
+            System.out.println(typeError.getMessage());
+        }
+
+        return ST;
+    }
+
+    private Attributes initAttribute(TypeDenoter type) {
+
+        Attributes attributes;
+
+        if (type instanceof Primitive) {
+            attributes = new PrimitiveAttributes((Primitive) type);
+        }
+
+//        //SpcTile a, b, c;
+//        else if (type.getClass() == DesignType.class) {
+//            //todo: Not implemented. We need to get type of design type from design ast node
+//            attributes = null;
+//        }
+
+        else {
+            throw new TypeErrorException(String.format("type '%s' is not compatible with sequential declaration", type));
+        }
+
+        return attributes;
+    }
+    @Override
     public SymbolTable visit(StringNode n) {
         return null;
     }
@@ -174,9 +239,8 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
-    public SymbolTable visit(BooleanDeclarationNode n) {
-        sb.enterSymbol(n.id.value,n.id.type);
-        return sb;
+    public SymbolTable visit(BooleanDeclarationNode n) { //TODO Implement proper entering of symbol
+        return null;
     }
 
     @Override
@@ -186,8 +250,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(PathDeclarationNode n) {
-        sb.enterSymbol(n.id.value, n.id.type);
-        return sb;
+        return null;
     }
 
     @Override
@@ -197,8 +260,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(GridDeclarationNode n) {
-        sb.enterSymbol(n.id.value, n.id.type);
-        return sb;
+        return null;
     }
 
     @Override

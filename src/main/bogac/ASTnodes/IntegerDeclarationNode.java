@@ -2,10 +2,9 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class IntegerDeclarationNode implements ASTNode {
+public class IntegerDeclarationNode implements ASTNode<Object>, Declaration {
 
     public final IdNode    id;
-    //TODO: Implement type
 
     public IntegerDeclarationNode(IdNode identifier) {
         this.id = identifier;
@@ -14,5 +13,10 @@ public class IntegerDeclarationNode implements ASTNode {
     @Override
     public Object accept(ASTvisitor v) {
         return v.visit(this);
+    }
+
+    @Override
+    public IdNode getIdentifier() {
+        return id;
     }
 }

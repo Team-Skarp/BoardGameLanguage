@@ -2,7 +2,7 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class PlusNode implements ASTNode, ArithmeticExpression {
+public class PlusNode implements ASTNode, ArithmeticExpression, BinaryOperator {
 
     public final ASTNode left;
     public final ASTNode right;
@@ -20,5 +20,15 @@ public class PlusNode implements ASTNode, ArithmeticExpression {
     @Override
     public String toString() {
         return "PlusNode";
+    }
+
+    @Override
+    public Expression getLeft() {
+        return (Expression) left;
+    }
+
+    @Override
+    public Expression getRight() {
+        return (Expression) right;
     }
 }

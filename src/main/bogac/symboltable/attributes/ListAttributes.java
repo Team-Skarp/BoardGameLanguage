@@ -18,6 +18,9 @@ public class ListAttributes implements Attributes {
 
     @Override
     public TypeDenoter thisType() {
-        return new ListType();
+        return new ListType(elementType);
     }
 }
+
+//list:int b = [1,2,3]
+//

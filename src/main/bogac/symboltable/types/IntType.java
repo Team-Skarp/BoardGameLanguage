@@ -6,4 +6,6 @@ public class IntType implements TypeDenoter, Primitive {
     public String toString() {
         return "int";
     }
+
+
 }

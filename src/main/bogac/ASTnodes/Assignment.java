@@ -2,7 +2,9 @@ package ASTnodes;
 
 public interface Assignment extends ASTNode<Object> {
 
-    ASTNode getLeft();
+    IdNode getLeft();
     ASTNode getRight();
 
 }
+
+

@@ -10,9 +10,9 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     private int             indent = 0;
     private final String    TAB = "\t";
 
+
     @Override
     public Void visit(ArithmeticExpression n) {
-        visit(n);
         return null;
     }
 
@@ -38,6 +38,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         n.right.accept(this);
         indent--;
 
+        return null;
+    }
+
+    @Override
+    public Void visit(UnaryMinusNode n) {
         return null;
     }
 
@@ -98,7 +103,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     @Override
     public Void visit(IntNode n) {
 
-        System.out.println(TAB.repeat(indent) + String.valueOf(n.value));
+        System.out.println(TAB.repeat(indent) + n.value);
         return null;
     }
 
@@ -218,6 +223,29 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(DesignDefinitionNode n) {
+        return null;
+    }
+
+    @Override
+    public Void visit(Declaration n) {
+        return null;
+    }
+
+    @Override
+    public Void visit(SequentialDeclaration n) {
+        System.out.println(TAB.repeat(indent) + "Sequential Declaration of: " + n.type);
+
+        indent++;
+        for (Declaration dcl : n.declarations) {
+            dcl.accept(this);
+        }
+        indent--;
+
+        return null;
+    }
+
+    @Override
     public Void visit(StringNode n) {
         return null;
     }
@@ -229,12 +257,16 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(IntegerDeclarationNode n) {
-        System.out.println(TAB.repeat(indent));
+        System.out.println(TAB.repeat(indent) + n.id.name);
         return null;
     }
 
     @Override
     public Void visit(IntegerAssignDeclarationNode n) {
+        System.out.println(TAB.repeat(indent) + n.id.name);
+        indent++;
+        n.expr.accept(this);
+        indent--;
         return null;
     }
     
@@ -242,7 +274,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     public Void visit(BooleanDeclarationNode n) {
         indent++;
         System.out.println("type:" + n.id.type);
-        System.out.println("varName:" + n.id.value);
+        System.out.println("varName:" + n.id.name);
         if (n.booleanExpressionChild != null){
             n.booleanExpressionChild.accept(this);
         }
@@ -254,12 +286,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     @Override
     public Void visit(StringDeclarationNode n) {
         indent++;
-
-        System.out.println(n.typeChild + " ");
-        System.out.println(n.identifierChild + " ");
-        System.out.println(n.assignChild + " ");
-        System.out.println(n.stringChild);
-
+        
         indent--;
 
         return null;
@@ -270,7 +297,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         indent++;
 
         System.out.println(n.id.type + " ");
-        System.out.println(n.id.value + " ");
+        System.out.println(n.id.name + " ");
         System.out.println(n.direction + " ");
         System.out.println(n.length + " ");
 
@@ -289,7 +316,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         indent++;
 
         System.out.println("type:" + n.id.type);
-        System.out.println("varName:" + n.id.value);
+        System.out.println("varName:" + n.id.name);
         System.out.println("x size:" + n.x_size);
         System.out.println("y size:" + n.y_size);
 
