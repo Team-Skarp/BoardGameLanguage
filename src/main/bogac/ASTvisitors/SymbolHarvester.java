@@ -239,8 +239,10 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
-    public SymbolTable visit(BooleanDeclarationNode n) { //TODO Implement proper entering of symbol
-        return null;
+    public SymbolTable visit(BooleanDeclarationNode n) {
+        IdNode identifier = n.id;
+        ST.enterSymbol(identifier.name,identifier.attrs);
+        return ST;
     }
 
     @Override
@@ -250,7 +252,9 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(PathDeclarationNode n) {
-        return null;
+        IdNode identifier = n.id;
+        ST.enterSymbol(identifier.name,identifier.attrs);
+        return ST;
     }
 
     @Override
@@ -260,11 +264,33 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(GridDeclarationNode n) {
-        return null;
+        IdNode identifier = n.id;
+        ST.enterSymbol(identifier.name,identifier.attrs);
+        return ST;
     }
 
     @Override
     public SymbolTable visit(GridTypedDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ConditionalNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ElifConditionalNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ElseNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(PredicateNode n) {
         return null;
     }
 }
