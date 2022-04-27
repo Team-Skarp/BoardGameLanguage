@@ -162,18 +162,17 @@ integerDeclaration
 
 sequentialDeclaration
     : INTDCL integerDeclaration (COMMA integerDeclaration)+ //Integermultiple
+    | BOOLDCL booleanDeclaration (COMMA booleanDeclaration)+
+    | STRDCL stringDeclaration (COMMA stringDeclaration)+
     ;
 
 booleanDeclaration
-    : IDENTIFIER ASSIGN booleanExpression COMMA booleanDeclaration
-    | IDENTIFIER ASSIGN booleanExpression
-    | IDENTIFIER COMMA booleanDeclaration
+    : IDENTIFIER ASSIGN booleanExpression
     | IDENTIFIER
     ;
 
 stringDeclaration
-    : IDENTIFIER ASSIGN STR COMMA stringDeclaration
-    | IDENTIFIER ASSIGN STR
+    : IDENTIFIER ASSIGN STR
     | IDENTIFIER
     ;
 
@@ -299,10 +298,10 @@ statements
     ;
 
 arithmeticExpression
-    : additive
+    : additive+
     ;
 booleanExpression
-    : logor
+    : logor+
     ;
 
 additive
@@ -392,5 +391,5 @@ foreach
     ;
 
 print
-    : PRINT LPAREN (STR | INT | arithmeticExpression | IDENTIFIER)* RPAREN EOL
+    : PRINT LPAREN (STR | booleanExpression)? (COMMA (STR | booleanExpression))* RPAREN EOL
     ;

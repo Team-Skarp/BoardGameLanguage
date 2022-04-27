@@ -23,14 +23,13 @@ public class PrettyPrinterDemo {
         BoardLexer lexer;
         CommonTokenStream tokens;
         BoardParser parser;
-
-        input = CharStreams.fromString("while(true){if(false){foreach(car in garage){}}}");
+        input = CharStreams.fromString("str a = \"hej\";");
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        ASTNode ast = getAST(parser,"statements");
+        ASTNode ast = getAST(parser,"decl");
         PrettyPrinter pp = new PrettyPrinter();
         ast.accept(pp);
     }
@@ -45,10 +44,15 @@ public class PrettyPrinterDemo {
                 ast = new ASTbuilder().visitBooleanDeclaration(cstBooleanDeclaration);
                 lo.g("starting AST at BooleanDeclaration");
                 return ast;
-            case "arithmeticexpression":
+            case "aexpr":
                 BoardParser.ArithmeticExpressionContext cstArithmeticExpression = parser.arithmeticExpression();
                 ast = new ASTbuilder().visitArithmeticExpression(cstArithmeticExpression);
                 lo.g("starting AST at arithmeticExpression");
+                return ast;
+            case "bexpr":
+                BoardParser.BooleanExpressionContext cstbexpr = parser.booleanExpression();
+                ast = new ASTbuilder().visitBooleanExpression(cstbexpr);
+                lo.g("starting AST at boolean expression");
                 return ast;
             case "ifstatement":
                 BoardParser.IfStatementContext cstIfStatement = parser.ifStatement();
@@ -74,6 +78,11 @@ public class PrettyPrinterDemo {
                 BoardParser.NormalDeclarationContext cstdecl = parser.normalDeclaration();
                 ast = new ASTbuilder().visitNormalDeclaration(cstdecl);
                 lo.g("starting AST at normal decl");
+                return ast;
+            case "print":
+                BoardParser.PrintContext cstprint = parser.print();
+                ast = new ASTbuilder().visitPrint(cstprint);
+                lo.g("starting AST at print");
                 return ast;
             default:
                 lo.g("Invalid AST root");

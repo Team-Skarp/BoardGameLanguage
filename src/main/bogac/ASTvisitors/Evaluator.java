@@ -257,4 +257,9 @@ public class Evaluator implements ASTvisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(PrintNode n) {
+        return null;
+    }
+
 }

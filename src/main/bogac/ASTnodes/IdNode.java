@@ -7,7 +7,7 @@ public class IdNode implements ASTNode {
 
     public final String name;
     public final TypeDenoter type;
-    public Attributes attrs;
+    public Attributes attrs;  //TODO: explain Hans wtf this is. added value field to keep value
 
     /**
      * Constructor used in case of visitor not needing additional attributes

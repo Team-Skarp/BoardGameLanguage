@@ -4,9 +4,9 @@ import ASTvisitors.ASTvisitor;
 
 public class UnaryMinusNode implements ASTNode, ArithmeticExpression {
 
-    public ArithmeticExpression operand;
+    public ASTNode operand;
 
-    public UnaryMinusNode(ArithmeticExpression operand) {
+    public UnaryMinusNode(ASTNode operand) {
         this.operand = operand;
     }
 
