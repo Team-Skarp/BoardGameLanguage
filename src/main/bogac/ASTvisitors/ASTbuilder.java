@@ -318,7 +318,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
         if(ctx.IDENTIFIER() != null && ctx.ASSIGN() != null){
             IdNode id = new IdNode(ctx.getChild(0).getText(),new StringType());
-            return new StringDeclarationNode(id,ctx.getChild(2).accept(this));
+            return new StringDeclarationNode(id,new StringNode(ctx.STR().getText()));
         }
         else if(ctx.IDENTIFIER() != null){
             IdNode id = new IdNode(ctx.getChild(0).getText(),new StringType());

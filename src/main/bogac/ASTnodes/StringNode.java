@@ -2,16 +2,17 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class StringNode implements ASTNode<Object>{
+public class StringNode implements ASTNode, Expression {
 
-    public final String string;
+    public String value;
 
-    public StringNode(String string) {
-        this.string = string;
+    public StringNode(String value) {
+        value = value.substring(1,value.length()-1);
+        this.value = value;
     }
 
     @Override
     public Object accept(ASTvisitor v) {
-        return null;
+        return v.visit(this);
     }
 }

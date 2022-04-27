@@ -23,7 +23,7 @@ public class PrettyPrinterDemo {
         BoardLexer lexer;
         CommonTokenStream tokens;
         BoardParser parser;
-        input = CharStreams.fromString("str a = \"hej\";");
+        input = CharStreams.fromString("str a = \"hej\",b,c;");
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
