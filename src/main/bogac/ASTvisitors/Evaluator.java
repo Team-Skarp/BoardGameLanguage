@@ -7,6 +7,11 @@ public class Evaluator implements ASTvisitor<Object> {
     Logger lo = new Logger();
 
     @Override
+    public Object visit(GameNode n) {
+        return null;
+    }
+
+    @Override
     public Object visit(ArithmeticExpression n) {
         return null;
     }

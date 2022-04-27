@@ -21,6 +21,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(GameNode n) {
+        return null;
+    }
+
+    @Override
     public SymbolTable visit(ArithmeticExpression n) {
         return null;
     }

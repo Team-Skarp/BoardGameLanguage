@@ -22,30 +22,39 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitGame(BoardParser.GameContext ctx) {
+        if(ctx.setup() != null && ctx.rules() != null && ctx.gameloop() != null){
+            return new GameNode(ctx.setup().accept(this),ctx.rules().accept(this),ctx.gameloop().accept(this));
+        }
         return null;
     }
 
     @Override
     public ASTNode visitSetup(BoardParser.SetupContext ctx) {
-        return ctx.setupBlock().accept(this);
+        if(ctx.setupBlock() != null){
+            return ctx.setupBlock().accept(this);
+        }
+        return null;
     }
 
     @Override
     public ASTNode visitRules(BoardParser.RulesContext ctx) {
+        if(ctx.rulesBlock() != null){
+            return ctx.rulesBlock().accept(this);
+        }
         return null;
     }
 
     @Override
     public ASTNode visitGameloop(BoardParser.GameloopContext ctx) {
+        if(ctx.gameloopBlock() != null){
+            return ctx.gameloopBlock().accept(this);
+        }
         return null;
     }
 
     @Override
-    public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) { return  null;}
-
-    @Override
-    public ASTNode visitSetupBlock(BoardParser.SetupBlockContext ctx) {
-        BlockNode block = new BlockNode();
+    public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) {
+        BlockNode block = new BlockNode("gameloop block");
 
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
@@ -55,15 +64,28 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                 block.children.add(astNode);
             }
         }
+        return block;
+    }
 
-        System.out.println(block.children);
+    @Override
+    public ASTNode visitSetupBlock(BoardParser.SetupBlockContext ctx) {
+        BlockNode block = new BlockNode("setup block");
+
+        for (ParseTree node : ctx.children) {
+            ASTNode astNode = node.accept(this);
+
+            if (astNode != null) {
+
+                block.children.add(astNode);
+            }
+        }
         return block;
 
     }
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
-        BlockNode block = new BlockNode();
+        BlockNode block = new BlockNode("normal block");
         //Loop through every ast node and add it as child to block node
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
@@ -98,7 +120,17 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitRulesBlock(BoardParser.RulesBlockContext ctx) {
-        return null;
+        BlockNode block = new BlockNode("rules block");
+
+        for (ParseTree node : ctx.children) {
+            ASTNode astNode = node.accept(this);
+
+            if (astNode != null) {
+
+                block.children.add(astNode);
+            }
+        }
+        return block;
     }
 
     @Override
@@ -300,8 +332,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitBooleanDeclaration(BoardParser.BooleanDeclarationContext ctx) {
         if(ctx.IDENTIFIER() != null && ctx.ASSIGN() != null){
             IdNode id = new IdNode(ctx.getChild(0).getText(),new BoolType());
-            lo.g(ctx.children);
-            lo.g(ctx.booleanExpression().children);
             return new BooleanDeclarationNode(id,ctx.getChild(2).accept(this));
         }
         else if(ctx.IDENTIFIER() != null){
@@ -313,9 +343,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitStringDeclaration(BoardParser.StringDeclarationContext ctx) {
-        lo.g(ctx.children);
-        ctx.children.forEach(c-> System.out.println(c.getText()));
-
         if(ctx.IDENTIFIER() != null && ctx.ASSIGN() != null){
             IdNode id = new IdNode(ctx.getChild(0).getText(),new StringType());
             return new StringDeclarationNode(id,new StringNode(ctx.STR().getText()));
@@ -323,18 +350,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.IDENTIFIER() != null){
             IdNode id = new IdNode(ctx.getChild(0).getText(),new StringType());
             return new StringDeclarationNode(id);
-        }
-
-        System.out.println("something is wrong...");
-
-        // Check if string exists
-        if (ctx.STR() != null) {
-            return new StringDeclarationNode(new IdNode(ctx.IDENTIFIER().getText()));
-
-        }
-        // Check if only strdcl and identifier exists
-        else if (ctx.STR() != null && ctx.IDENTIFIER() != null) {
-            return new StringDeclarationNode(new IdNode(ctx.IDENTIFIER().getText()));
         }
 
         // Guard return null
@@ -683,14 +698,20 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitPrint(BoardParser.PrintContext ctx) {
+        lo.g(ctx.children);
         if(ctx.PRINT() != null){
             List<ASTNode> prints = new ArrayList<>();
             //horrible forloop to only get elements between commas in the print statement
             for(int i = 0; i < ctx.children.size()-4; i+=2){
                 System.out.println(ctx.getChild(i+2).getText());
                 ASTNode astNode = ctx.getChild(i+2).accept(this);
-                lo.g(astNode);
-                prints.add(astNode);
+                lo.g(":::"+astNode);
+                //if astnode is null, that means its a simple string
+                if(astNode == null){
+                    prints.add(new StringNode(ctx.getChild(i+2).getText()));
+                }else{
+                    prints.add(astNode);
+                }
             }
             return new PrintNode(prints);
         }

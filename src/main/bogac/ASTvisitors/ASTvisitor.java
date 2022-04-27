@@ -6,6 +6,7 @@ import ASTnodes.*;
  * This interface serves as the base visitor
  */
 public interface ASTvisitor<T> {
+    T visit(GameNode n);
 
     T visit(ArithmeticExpression n);
     T visit(PlusNode n);
