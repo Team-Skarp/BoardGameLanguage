@@ -4,8 +4,8 @@ import ASTvisitors.ASTvisitor;
 
 public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment, Declaration {
 
-    public final IdNode     id;
-    public final Expression expr;
+    public IdNode     id;
+    public Expression expr;
 
     public IntegerAssignDeclarationNode(IdNode id, Expression expr) {
         this.id = id;

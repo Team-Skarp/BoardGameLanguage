@@ -17,15 +17,18 @@ public class TypeCheckDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("int a, b = false, c;");
+        //input = CharStreams.fromString("{int a, b = false, c;}");
+        input = CharStreams.fromString("bool a = true;");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
-
+/*
         BoardParser.AdditiveContext cst = parser.additive();
         ASTNode ast = new ASTbuilder().visitAdditive(cst);
-
+*/
+        BoardParser.NormalDeclarationContext cst = parser.normalDeclaration();
+        ASTNode<?> ast = new ASTbuilder().visitNormalDeclaration(cst);
         //Give it an empty symbol table
         SymbolTable ST = new SymbolTable();
 

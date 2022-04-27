@@ -255,7 +255,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         String name = ctx.IDENTIFIER().getText();
 
         if (ctx.ASSIGN() != null) {
-            return new IntegerAssignDeclarationNode(new IdNode(name, new IntType()), (Expression) ctx.arithmeticExpression().accept(this));
+            return new IntegerAssignDeclarationNode(
+              new IdNode(name, new IntType()),
+              (Expression) ctx.arithmeticExpression().accept(this)
+            ); //todo: is "ctx.arith..." this right?
         }
 
         else if (ctx.IDENTIFIER() != null) {
@@ -472,6 +475,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitUnaryMinus(BoardParser.UnaryMinusContext ctx) {
+        System.out.println("UnaryMinusChildCount is " + ctx.getChildCount());
+
+        if (ctx.MINUS() != null) {
+            return new UnaryMinusNode((ArithmeticExpression) ctx.getChild(0).accept(this));
+        }
+        if (ctx.arithmeticAtom() != null) {
+            return new IntNode(1);
+        }
         return null;
     }
 

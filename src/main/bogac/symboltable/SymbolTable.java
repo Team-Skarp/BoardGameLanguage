@@ -2,7 +2,7 @@ package symboltable;
 
 import symboltable.attributes.Attributes;
 
-public class SymbolTable {
+public class SymbolTable { //Is this a symbol table or a symbol tree with block nodes
 
     //Global block
     private Block activeBlock;
@@ -40,23 +40,23 @@ public class SymbolTable {
 
         Symbol sym = activeBlock.getSymbolWith(name);
 
-        if (sym == null) {
-            Block temp_block = activeBlock;
+        if (sym == null) {  //If symbol is not found in current block-scope
+            Block temp_block = activeBlock; //Remember current scope
 
-            if (activeBlock.getParent() == null) {
+            if (activeBlock.getParent() == null) {  //If no parent scope exists, symbol does not exist
                 throw new ReferenceErrorException(String.format("name '%s' is not defined", name));
             }
 
-            activeBlock = activeBlock.getParent();
+            activeBlock = activeBlock.getParent();  //todo: consider whether it is a little bit hacky to set a symbol table's active block (own scope) to be its parent scope
 
-            Symbol found_sym = retrieveSymbol(name); //Call recursively to find the symbol in the parrent block
+            Symbol found_sym = retrieveSymbol(name); //Call recursively to find the symbol in the parent block
 
             activeBlock = temp_block;   //Set the active block back to be the temporary block
 
             return found_sym;
         }
 
-        System.out.println(String.format("Symbol retrieved: '%s' of type '%s' ", name, sym.attrs.thisType()));
+        System.out.printf("Symbol retrieved: '%s' of type '%s' %n", name, sym.attrs.thisType());
         return sym;
     }
 
@@ -67,7 +67,7 @@ public class SymbolTable {
      */
     public SymbolTable enterSymbol(String name, Attributes attrs) {
 
-        System.out.println(String.format("Symbol entered: '%s' of type '%s'", name, attrs.thisType()));
+        System.out.printf("Symbol entered: '%s' of type '%s'%n", name, attrs.thisType());
 
         activeBlock.addSymbol(new Symbol(name, attrs));
 
@@ -78,11 +78,11 @@ public class SymbolTable {
     /**
      * Check that a symbol is declared in the current scope
      * @param name of the symbol
-     * @return
+     * @return boolean
      */
     public boolean declaredLocally(String name) {
         Symbol sym = activeBlock.getSymbolWith(name);
-        if (sym != null) {
+        if (sym != null) { // return sym != null;
             return true;
         }
         else {

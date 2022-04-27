@@ -24,15 +24,17 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("while(true){if(false){foreach(car in garage){}}}");
+        input = CharStreams.fromString("int a = 7;");
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        ASTNode ast = getAST(parser,"statements");
+        ASTNode ast = getAST(parser,"booleandeclaration");
         PrettyPrinter pp = new PrettyPrinter();
-        ast.accept(pp);
+        if (ast != null) {
+            ast.accept(pp);
+        }
     }
 
     public static ASTNode getAST(BoardParser parser,String input){
