@@ -27,7 +27,5 @@ public class SymbolTableDemo {
 
         SymbolHarvester sh = new SymbolHarvester();
         SymbolTable symbolTable = (SymbolTable) ast.accept(sh);
-
-
     }
 }

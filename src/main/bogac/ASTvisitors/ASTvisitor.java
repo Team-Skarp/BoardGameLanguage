@@ -55,4 +55,6 @@ public interface ASTvisitor<T> {
     T visit(PredicateNode n);
     T visit(WhileNode n);
     T visit(ForeachNode n);
+
+    T visit(PrintNode n);
 }

@@ -10,6 +10,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     private int             indent = 0;
     private final String    TAB = "\t";
+    Logger lo = new Logger();
 
 
     @Override
@@ -44,6 +45,10 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(UnaryMinusNode n) {
+        System.out.print(TAB.repeat(indent) + "-");
+        indent--;
+        n.operand.accept(this);
+        indent++;
         return null;
     }
 
@@ -256,6 +261,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(StringNode n) {
+        System.out.println(TAB.repeat(indent)+"\""+n.value+"\"");
         return null;
     }
 
@@ -266,7 +272,13 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(IntegerDeclarationNode n) {
-        System.out.println(TAB.repeat(indent) + n.id.name);
+        System.out.println(TAB.repeat(indent)+"type: " + n.id.type);
+        System.out.println(TAB.repeat(indent)+"varName: " + n.id.name);
+        indent++;
+        if (n.value != null){
+            n.value.accept(this);
+        }
+        indent--;
         return null;
     }
 
@@ -284,8 +296,8 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         System.out.println(TAB.repeat(indent)+"type: " + n.id.type);
         System.out.println(TAB.repeat(indent)+"varName: " + n.id.name);
         indent++;
-        if (n.booleanExpressionChild != null){
-            n.booleanExpressionChild.accept(this);
+        if (n.value != null){
+            n.value.accept(this);
         }
         indent--;
         return null;
@@ -294,8 +306,12 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(StringDeclarationNode n) {
+        System.out.println(TAB.repeat(indent)+"type: " + n.id.type);
+        System.out.println(TAB.repeat(indent)+"varName: " + n.id.name);
         indent++;
-        
+        if (n.value != null){
+            n.value.accept(this);
+        }
         indent--;
 
         return null;
@@ -402,6 +418,15 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         n.newId.accept(this);
         n.mainId.accept(this);
         n.foreachBlock.accept(this);
+        indent--;
+        return null;
+    }
+
+    @Override
+    public Void visit(PrintNode n) {
+        System.out.println(TAB.repeat(indent) + "print");
+        indent++;
+        n.prints.forEach(print -> System.out.println(print));
         indent--;
         return null;
     }
