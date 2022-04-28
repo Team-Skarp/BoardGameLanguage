@@ -103,19 +103,18 @@ rules
 
 gameloop
     : GAMELOOPBLC gameloopBlock
-    | print
     ;
 
 setupBlock
-    : LBRACE (normalDeclaration | setupDeclaration | statements | setupBlock | assignmentStatement )* RBRACE
+    : LBRACE (print | normalDeclaration | setupDeclaration | statements | setupBlock | assignmentStatement )* RBRACE
     ;
 
 normalBlock
-    : LBRACE (normalDeclaration | statements | normalBlock | assignmentStatement)* RBRACE
+    : LBRACE (print | normalDeclaration | statements | normalBlock | assignmentStatement)* RBRACE
     ;
 
 rulesBlock
-    : LBRACE (uniqueDeclaration | statements | rulesBlock | assignmentStatement)* RBRACE
+    : LBRACE (print | uniqueDeclaration | statements | rulesBlock | assignmentStatement)* RBRACE
     ;
 
 gameloopBlock

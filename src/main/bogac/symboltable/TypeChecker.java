@@ -71,6 +71,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(GameNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(ArithmeticExpression n) {
         return null;
 

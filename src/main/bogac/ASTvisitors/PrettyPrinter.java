@@ -14,6 +14,14 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
 
     @Override
+    public Void visit(GameNode n) {
+        n.setup.accept(this);
+        n.rules.accept(this);
+        n.gameloop.accept(this);
+        return null;
+    }
+
+    @Override
     public Void visit(ArithmeticExpression n) {
         return null;
     }
@@ -46,9 +54,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     @Override
     public Void visit(UnaryMinusNode n) {
         System.out.print(TAB.repeat(indent) + "-");
-        indent--;
+        //to help pretty print unary negative more readable
+        int tempIndent = indent;
+        indent = 0;
         n.operand.accept(this);
-        indent++;
+        indent = tempIndent;
         return null;
     }
 
@@ -220,7 +230,8 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(BlockNode n) {
-        System.out.println(TAB.repeat(indent) + "block");
+        System.out.println(TAB.repeat(indent) + n.blockType);
+
         indent++;
         for(ASTNode child: n.children){
             child.accept(this);
@@ -426,7 +437,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     public Void visit(PrintNode n) {
         System.out.println(TAB.repeat(indent) + "print");
         indent++;
-        n.prints.forEach(print -> System.out.println(print));
+        n.prints.forEach(print -> print.accept(this));
         indent--;
         return null;
     }

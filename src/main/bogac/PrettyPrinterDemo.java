@@ -23,15 +23,16 @@ public class PrettyPrinterDemo {
         BoardLexer lexer;
         CommonTokenStream tokens;
         BoardParser parser;
-        input = CharStreams.fromString("bool a = true;");
-
-        //input = CharStreams.fromString("int a = 7;");
+        //use this string, starting from gamestart, before pushing any changes. no errors must occur when parsing this string.
+        String completeGameStringTestBeforePushingToGit = "SETUP{while(a > 2){if(!(2==-3)){if(2-2*3!=b){bool a,b=true,c=true and false,d;}elseif(!c){str a = \"hej\",b,c=\":D\";}else{int a = 2*2,b = a*2^2,c;}}else{foreach(car in garage){bool car = 2;}}}}RULES{print(5,\"cars in the\",garage)}GAMELOOP{while(true){print(2*2+2);}}";
+        String testString = "bool a = true;";
+        input = CharStreams.fromString(completeGameStringTestBeforePushingToGit);
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        ASTNode<?> ast = getAST(parser,"decl");
+        ASTNode<?> ast = getAST(parser,"game");
         PrettyPrinter pp = new PrettyPrinter();
         ast.accept(pp);
     }
@@ -85,6 +86,16 @@ public class PrettyPrinterDemo {
                 BoardParser.PrintContext cstprint = parser.print();
                 ast = new ASTbuilder().visitPrint(cstprint);
                 lo.g("starting AST at print");
+                return ast;
+            case "setup":
+                BoardParser.SetupContext cstsetup = parser.setup();
+                ast = new ASTbuilder().visitSetup(cstsetup);
+                lo.g("starting AST at setup");
+                return ast;
+            case "game":
+                BoardParser.GameContext cstgame = parser.game();
+                ast = new ASTbuilder().visitGame(cstgame);
+                lo.g("starting AST at game");
                 return ast;
             default:
                 lo.g("Invalid AST root");
