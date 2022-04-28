@@ -23,23 +23,23 @@ public class PrettyPrinterDemo {
         BoardLexer lexer;
         CommonTokenStream tokens;
         BoardParser parser;
-        input = CharStreams.fromString("str a = \"hej\",b,c;");
+        input = CharStreams.fromString("bool a = true;");
 
-        input = CharStreams.fromString("int a = 7;");
+        //input = CharStreams.fromString("int a = 7;");
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        ASTNode ast = getAST(parser,"decl");
+        ASTNode<?> ast = getAST(parser,"decl");
         PrettyPrinter pp = new PrettyPrinter();
         ast.accept(pp);
     }
 
-    public static ASTNode getAST(BoardParser parser,String input){
+    public static ASTNode<?> getAST(BoardParser parser,String input){
         Logger lo = new Logger();
         input = input.toLowerCase(Locale.ROOT);
-        ASTNode ast;
+        ASTNode<?> ast;
         switch(input){
             case "booleandeclaration":
                 BoardParser.BooleanDeclarationContext cstBooleanDeclaration = parser.booleanDeclaration();

@@ -323,7 +323,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(BlockNode n) {
-        for (ASTNode child : n.children) {
+        for (ASTNode<?> child : n.children) {
             child.accept(this);
         }
         return null;
@@ -337,7 +337,10 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     @Override
     public TypeDenoter visit(BooleanExpression n) {
         return null;
-    }
+    } // expr booloprtr expr
+
+    // 3 < 7
+    // true == true
 
     @Override
     public TypeDenoter visit(IntegerDeclarationNode n) {

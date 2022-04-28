@@ -350,11 +350,10 @@ equality
     ;
 
 relational
-    : relational GTH arithmeticExpression
-    | relational LTH arithmeticExpression
-    | relational GTHEQL arithmeticExpression
-    | relational LTHEQL arithmeticExpression
-    | arithmeticExpression
+    : relational GTH negation
+    | relational LTH negation
+    | relational GTHEQL negation
+    | relational LTHEQL negation
     | negation
     ;
 
@@ -367,6 +366,7 @@ negation
 booleanAtom
     : BOOL
     | IDENTIFIER
+    | arithmeticExpression
     | LPAREN booleanExpression RPAREN
     ;
 

@@ -1,5 +1,6 @@
 import ASTnodes.ASTNode;
 import ASTvisitors.ASTbuilder;
+import ASTvisitors.SymbolHarvester;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
@@ -29,10 +30,13 @@ public class TypeCheckDemo {
 */
         BoardParser.NormalDeclarationContext cst = parser.normalDeclaration();
         ASTNode<?> ast = new ASTbuilder().visitNormalDeclaration(cst);
-        //Give it an empty symbol table
+        //Give it an empty symbol table //todo: why is empty?
         SymbolTable ST = new SymbolTable();
 
-        TypeChecker typeChecker = new TypeChecker(ST);
+        SymbolHarvester sh = new SymbolHarvester();
+        SymbolTable symbolTable = (SymbolTable) ast.accept(sh);
+
+        TypeChecker typeChecker = new TypeChecker(symbolTable);
         TypeDenoter resultType = (TypeDenoter) ast.accept(typeChecker);
 
         System.out.println(resultType.getClass().getName());
