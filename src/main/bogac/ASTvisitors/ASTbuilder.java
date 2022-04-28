@@ -698,14 +698,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitPrint(BoardParser.PrintContext ctx) {
-        lo.g(ctx.children);
         if(ctx.PRINT() != null){
             List<ASTNode> prints = new ArrayList<>();
             //horrible forloop to only get elements between commas in the print statement
             for(int i = 0; i < ctx.children.size()-4; i+=2){
-                System.out.println(ctx.getChild(i+2).getText());
                 ASTNode astNode = ctx.getChild(i+2).accept(this);
-                lo.g(":::"+astNode);
                 //if astnode is null, that means its a simple string
                 if(astNode == null){
                     prints.add(new StringNode(ctx.getChild(i+2).getText()));
