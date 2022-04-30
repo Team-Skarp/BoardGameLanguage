@@ -1,3 +1,5 @@
+package bogac;
+
 import ASTnodes.IdNode;
 import ASTnodes.IntegerDeclarationNode;
 import ASTnodes.SequentialDeclaration;

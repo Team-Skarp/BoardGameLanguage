@@ -27,8 +27,9 @@ public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment
         return expr;
     }
 
+
     @Override
-    public IdNode getIdentifier() {
+    public IdNode getIdentifier() { //TODO: Redundant maybe. It's the same as getLeft method :(
         return id;
     }
 }

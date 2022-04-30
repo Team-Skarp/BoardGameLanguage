@@ -11,6 +11,7 @@ public class PrintNode implements ASTNode {
     public PrintNode(List<ASTNode> prints) {
         this.prints = prints;
     }
+
     @Override
     public Object accept(ASTvisitor v) {
         return v.visit(this);
