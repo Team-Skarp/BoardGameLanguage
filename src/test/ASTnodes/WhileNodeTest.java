@@ -25,6 +25,6 @@ class WhileNodeTest {
     void accept() {
         whileNode = new WhileNode(predicateNodeFalse, blockNodeWhile);
 
-        whileNode.accept(new PrettyPrinter())
+        whileNode.accept(new PrettyPrinter());
     }
 }
