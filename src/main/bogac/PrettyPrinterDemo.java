@@ -24,7 +24,7 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
         //use this string, starting from gamestart, before pushing any changes. no errors must occur when parsing this string.
-        String completeGameStringTestBeforePushingToGit = "SETUP{while(a > 2){if(!(2==-3)){if(2-2*3!=b){bool a,b=true,c=true and false,d;}elseif(!c){str a = \"hej\",b,c=\":D\";}else{int a = 2*2,b = a*2^2,c;}}else{foreach(car in garage){bool car = 2;}}}}RULES{print(5,\"cars in the\",garage)}GAMELOOP{while(true){print(2*2+2);}}";
+        String completeGameStringTestBeforePushingToGit = "SETUP {while(a > 2) {if (!(2==-3)) {if (2-2*3!=b) {bool a,b=true,c=true and false,d;} elseif (!c) {str a = \"hej\",b,c=\":D\";} else {int a = 2*2,b = a*2^2,c;}} else {foreach (car in garage) {bool car = 2;}}}}RULES{print(9,\"cars in the\",garage);}GAMELOOP{while(true){print(2*2+2);}}";
         String testString = "bool a = true;";
         input = CharStreams.fromString(completeGameStringTestBeforePushingToGit);
         lo.g("input: "+input);
@@ -32,7 +32,7 @@ public class PrettyPrinterDemo {
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        ASTNode<?> ast = getAST(parser,"game");
+        ASTNode ast = getAST(parser,"game");
         PrettyPrinter pp = new PrettyPrinter();
         ast.accept(pp);
     }

@@ -14,7 +14,7 @@ public class BooleanDeclarationNode implements Declaration {
         this.value = value;
     }
     @Override
-    public Object accept(ASTvisitor<?> v) {
+    public Object accept(ASTvisitor v) {
         return v.visit(this);
     }
 

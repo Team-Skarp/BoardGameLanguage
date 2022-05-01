@@ -7,8 +7,9 @@ public class StringNode implements ASTNode, Expression {
     public String value;
 
     public StringNode(String value) {
-        value = value.substring(1,value.length()-1);
-        this.value = value;
+
+        System.out.println("hej hans" + value);
+        this.value = value.substring(1,value.length()-1); //todo: hvad sker der her?
     }
 
     @Override

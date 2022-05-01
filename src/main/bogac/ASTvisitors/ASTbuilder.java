@@ -581,9 +581,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode<?>> {
         else if (ctx.LTH() != null){
             return new LessThanNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
         }
-        else if (ctx.arithmeticExpression() != null){
+        /*
+        else if (ctx.negation() arithmeticExpression() != null){
             return ctx.getChild(0).accept(this);
-        }
+        }*/
         else if (ctx.negation() != null){
             return ctx.getChild(0).accept(this);
         }

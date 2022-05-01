@@ -13,7 +13,7 @@ public class IntegerAssignmentNode implements ASTNode<Object>, Assignment{
     }
 
     @Override
-    public Object accept(ASTvisitor<?> v) {
+    public Object accept(ASTvisitor v) {
         return v.visit(this);
     }
 
