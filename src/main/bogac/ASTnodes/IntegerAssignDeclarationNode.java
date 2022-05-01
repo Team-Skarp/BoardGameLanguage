@@ -1,14 +1,16 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
+import symboltable.types.IntType;
+import symboltable.types.TypeDenoter;
 
 public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment, Declaration {
 
-    public final IdNode     id;
+    public final String name;
     public final Expression expr;
 
-    public IntegerAssignDeclarationNode(IdNode id, Expression expr) {
-        this.id = id;
+    public IntegerAssignDeclarationNode(String name, Expression expr) {
+        this.name = name;
         this.expr = expr;
     }
 
@@ -19,7 +21,7 @@ public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment
 
     @Override
     public IdNode getLeft() {
-        return id;
+        return new IdNode(name);
     }
 
     @Override
@@ -28,7 +30,13 @@ public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment
     }
 
     @Override
-    public IdNode getIdentifier() {
-        return id;
+    public String varName() {
+        return name;
     }
+
+    @Override
+    public TypeDenoter type() {
+        return new IntType();
+    }
+
 }

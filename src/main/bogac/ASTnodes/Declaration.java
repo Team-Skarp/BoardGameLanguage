@@ -1,6 +1,10 @@
 package ASTnodes;
 
+import symboltable.types.TypeDenoter;
+
 public interface Declaration extends ASTNode<Object> {
 
-    IdNode getIdentifier();
+    String varName();
+    TypeDenoter type();
+
 }

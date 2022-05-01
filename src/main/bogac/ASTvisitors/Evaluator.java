@@ -164,7 +164,22 @@ public class Evaluator implements ASTvisitor<Object> {
     }
 
     @Override
+    public Object visit(ActionDefinitionNode n) {
+        return null;
+    }
+
+    @Override
     public Object visit(Declaration n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ActionDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(DesignDeclarationNode n) {
         return null;
     }
 
@@ -264,6 +279,11 @@ public class Evaluator implements ASTvisitor<Object> {
 
     @Override
     public Object visit(PrintNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ActionCallNode n) {
         return null;
     }
 

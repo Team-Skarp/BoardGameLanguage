@@ -1,7 +1,5 @@
 package symboltable;
 
-import symboltable.attributes.Attributes;
-
 public class SymbolTable {
 
     //Global block
@@ -56,20 +54,22 @@ public class SymbolTable {
             return found_sym;
         }
 
-        System.out.println(String.format("Symbol retrieved: '%s' of type '%s' ", name, sym.attrs.thisType()));
+        System.out.println(String.format("Symbol retrieved: '%s' of type '%s' ", name, sym.type));
         return sym;
     }
 
     /**
      * Enters a single Symbol into the current block
-     * @param name of the symbol
-     * @param attrs {@link Attributes} of the symbol
+     * @throws DuplicateSymbolException if symbol already exist
      */
-    public SymbolTable enterSymbol(String name, Attributes attrs) {
+    public SymbolTable enterSymbol(Symbol sym) {
 
-        System.out.println(String.format("Symbol entered: '%s' of type '%s'", name, attrs.thisType()));
+        if (declaredLocally(sym.name)) {
+            throw new DuplicateSymbolException("variable '%s' is already defined in current scope".formatted(sym.name));
+        }
+        activeBlock.addSymbol(sym);
 
-        activeBlock.addSymbol(new Symbol(name, attrs));
+        System.out.println(String.format("Symbol entered: '%s' of type '%s'", sym.name, sym.type));
 
         return this;
 

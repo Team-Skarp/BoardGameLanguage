@@ -1,6 +1,6 @@
 package symboltable.types;
 
-public class BoolType implements TypeDenoter, Primitive {
+public class BoolType implements TypeDenoter, SequentiallyDeclared {
 
     @Override
     public String toString() {
