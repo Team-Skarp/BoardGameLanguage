@@ -24,9 +24,9 @@ public class PrettyPrinterDemo {
         CommonTokenStream tokens;
         BoardParser parser;
         //use this string, starting from gamestart, before pushing any changes. no errors must occur when parsing this string.
-        String completeGameStringTestBeforePushingToGit = "SETUP {while(a > 2) {if (!(2==-3)) {if (2-2*3!=b) {bool a,b=true,c=true and false,d;} elseif (!c) {str a = \"hej\",b,c=\":D\";} else {int a = 2*2,b = a*2^2,c;}} else {foreach (car in garage) {bool car = 2;}}}}RULES{print(9,\"cars in the\",garage);}GAMELOOP{while(true){print(2*2+2);}}";
-        String testString = "bool a = true;";
-        input = CharStreams.fromString(completeGameStringTestBeforePushingToGit);
+        String completeGameStringTestBeforePushingToGit = "SETUP{while(a > 2){if(!(2==-3)){if(2-2*3!=b){bool a,b=true,c=true and false,d;}elseif(!c){str a = \"hej\",b,c=\":D\";}else{int a = 2*2,b = a*2^2,c;}}else{foreach(car in garage){bool car = 2;}}}}RULES{print(5,\"cars in the\",garage);}GAMELOOP{while(true){print(2*2+2);}}";
+        String testString = "SETUP{int a = 4;}";
+        input = CharStreams.fromString(testString);
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
@@ -37,10 +37,10 @@ public class PrettyPrinterDemo {
         ast.accept(pp);
     }
 
-    public static ASTNode<?> getAST(BoardParser parser,String input){
+    public static ASTNode getAST(BoardParser parser,String input){
         Logger lo = new Logger();
         input = input.toLowerCase(Locale.ROOT);
-        ASTNode<?> ast;
+        ASTNode ast;
         switch(input){
             case "booleandeclaration":
                 BoardParser.BooleanDeclarationContext cstBooleanDeclaration = parser.booleanDeclaration();

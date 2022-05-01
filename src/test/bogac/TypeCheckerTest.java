@@ -1,3 +1,5 @@
+package bogac;
+
 import ASTnodes.*;
 import org.junit.Test;
 import symboltable.SymbolTable;

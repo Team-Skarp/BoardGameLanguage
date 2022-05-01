@@ -353,8 +353,8 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
         System.out.println("type:" + n.id.type);
         System.out.println("varName:" + n.id.name);
-        System.out.println("x size:" + n.x_size);
-        System.out.println("y size:" + n.y_size);
+        System.out.println("x size:" + n.xSize);
+        System.out.println("y size:" + n.ySize);
 
         indent--;
 

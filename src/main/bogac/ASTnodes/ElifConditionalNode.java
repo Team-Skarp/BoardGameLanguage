@@ -11,7 +11,11 @@ public class ElifConditionalNode implements ASTNode {
         this.predicate = boolExpr;
         this.ifBlock = ifBlock;
     }
+
     //empty, used for population in if node
+    /**
+     * Skal det her slettes??? Hilsen Hans og Ming
+     */
     public ElifConditionalNode() {
         this.predicate = null;
         this.ifBlock = null;

@@ -30,7 +30,7 @@ public class IdNode implements ASTNode {
     }
 
     /**
-     * Used when the identifier is only referenced in a grammer rule
+     * Used when the identifier is only referenced in a grammar rule
      * @param name of the identifier
      */
     public IdNode(String name) {
