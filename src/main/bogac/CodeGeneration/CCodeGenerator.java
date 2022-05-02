@@ -5,9 +5,9 @@ import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 
 /**
- * Class for printing out an AST tree
+ * Class for generating C code.
  */
-public class CodeGenerator implements ASTvisitor<String> {
+public class CCodeGenerator implements ASTvisitor<String> {
 
     private int             indent = 0;
     private final String    TAB = "\t";

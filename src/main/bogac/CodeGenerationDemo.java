@@ -1,15 +1,14 @@
 import ASTnodes.*;
 
 import ASTvisitors.ASTbuilder;
-import CodeGeneration.CodeGenerator;
+import CodeGeneration.CCodeGenerator;
+import CodeGeneration.Assemblyx86CodeGenerator;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import Logging.Logger;
-
-import java.util.Locale;
 
 /**
  * Demo file to showcase a pretty print visitor on our AST
@@ -38,7 +37,8 @@ public class CodeGenerationDemo {
         BoardParser.GameContext cst = parser.game();
         ASTNode ast = new ASTbuilder().visitGame(cst);
 
-        CodeGenerator pp = new CodeGenerator();
+        //CCodeGenerator pp = new CCodeGenerator();
+        Assemblyx86CodeGenerator pp = new Assemblyx86CodeGenerator();
         String code = (String) ast.accept(pp);
         lo.g("\n"+code);
     }
