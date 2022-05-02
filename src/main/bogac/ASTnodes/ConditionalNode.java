@@ -8,7 +8,7 @@ import java.util.List;
 public class ConditionalNode implements ASTNode {
     public ASTNode predicate;
     public ASTNode ifBlock;
-    public List<ASTNode> elseifBlocks = new ArrayList<>();
+    public List<ASTNode> elseifBlocks;
     public ASTNode elseBlock;
 
 

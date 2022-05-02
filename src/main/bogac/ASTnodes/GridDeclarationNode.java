@@ -4,13 +4,13 @@ import ASTvisitors.ASTvisitor;
 
 public class GridDeclarationNode implements ASTNode {
     public final IdNode id;
-    public final int x_size;
-    public final int y_size;
+    public final int xSize;
+    public final int ySize;
 
-    public GridDeclarationNode(IdNode id, int x_size, int y_size) {
+    public GridDeclarationNode(IdNode id, int xSize, int ySize) {
         this.id = id;
-        this.x_size = x_size;
-        this.y_size = y_size;
+        this.xSize = xSize;
+        this.ySize = ySize;
     }
 
     @Override

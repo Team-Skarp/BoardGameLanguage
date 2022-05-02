@@ -1,3 +1,5 @@
+package bogac;
+
 import ASTnodes.SequentialDeclaration;
 import org.junit.Test;
 import symboltable.ReferenceErrorException;

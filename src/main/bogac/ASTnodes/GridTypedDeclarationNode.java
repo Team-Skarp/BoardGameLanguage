@@ -4,15 +4,15 @@ import ASTvisitors.ASTvisitor;
 
 public class GridTypedDeclarationNode implements ASTNode {
     public final IdNode id;
-    public final String tile_type;
-    public final int x_size;
-    public final int y_size;
+    public final String tileType;
+    public final int xSize;
+    public final int ySize;
 
-    public GridTypedDeclarationNode(IdNode id, String tile_type, int x_size, int y_size) {
+    public GridTypedDeclarationNode(IdNode id, String tileType, int xSize, int ySize) {
         this.id = id;
-        this.tile_type = tile_type;
-        this.x_size = x_size;
-        this.y_size = y_size;
+        this.tileType = tileType;
+        this.xSize = xSize;
+        this.ySize = ySize;
     }
 
     @Override
