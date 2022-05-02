@@ -2,7 +2,8 @@
 /src/main/bogac/antlr
 
 **/.DS_Store
-
+out.asm
+out.c
 .idea
 
 .classpath

@@ -8,12 +8,30 @@ import Logging.Logger;
  * Class for generating assembly x86 code
  * requires nasm: sudo apt-get install nasm
  * to compile and run the generated assembly code, save the code in a assembly.asm file, and run this on WSL:
- * "nasm -f elf64 -o assembly.o assembly.asm && ld assembly.o -o assembly && ./assembly"
+ * "nasm -f elf64 -o out.o out.asm && ld out.o -o out && ./out"
  */
+
 public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
+    Logger lo = new Logger();
+    private final String EOL = ";\n";
+    private final String indent = "    ";
+    private int var_total = 0;
+
+    String data =   "\nsection .data                         ; allocate data to memory\n";
+
+    String text =   "\nsection .text                         ; flow of the program\n" +
+                    "    global _start\n";
+
+    String end =    "_end:\n" +
+                    "    mov       rax, 60                 ; system call for exit\n" +
+                    "    xor       rdi, rdi                ; exit code 0\n" +
+                    "    syscall                           ; invoke operating system to exit";
     @Override
     public String visit(GameNode n) {
-        return null;
+        String str = "_start:\n"+n.setup.accept(this);
+
+        text+=indent+"global _end\n\n";
+        return data+text+str+end;
     }
 
     @Override
@@ -128,7 +146,11 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BlockNode n) {
-        return null;
+        String str = "";
+        for(ASTNode c : n.children){
+            str+=c.accept(this)+"\n";
+        }
+        return str;
     }
 
     @Override
@@ -223,6 +245,27 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PrintNode n) {
-        return null;
+        String str = "";
+        int printsTotal = n.prints.size();
+        int currentPrint = 1;
+        for(ASTNode p : n.prints){
+            if(p.getClass() == StringNode.class){
+                //string literal
+                String txt = ((StringNode) p).value;
+                String variable = "var"+var_total;
+                data+=indent+variable+" db \""+txt+"\","+(printsTotal == currentPrint ? 10 : 1)+"\n"; //10 indicates the \n after text
+                var_total++;
+                str+=   "\n    mov       rax, 1                  ; system call for write\n" +
+                        "    mov       rdi, 1                  ; file handle 1 is stdout\n" +
+                        "    mov       rsi, "+variable+"              ; address of string to output\n" +
+                        "    mov       rdx, "+(txt.length()+1)+"                 ; number of bytes\n" +
+                        "    syscall                           ; invoke operating system to do the write ";
+            }else if(p instanceof ArithmeticExpression ) {
+                //arithmetic
+
+            }
+            currentPrint++;
+        }
+        return str;
     }
 }
