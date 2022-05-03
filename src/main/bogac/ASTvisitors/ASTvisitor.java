@@ -8,6 +8,7 @@ import ASTnodes.*;
 public interface ASTvisitor<T> {
     T visit(GameNode n);
 
+    T visit(Expression n);
     T visit(ArithmeticExpression n);
     T visit(PlusNode n);
     T visit(MinusNode n);
@@ -33,12 +34,20 @@ public interface ASTvisitor<T> {
     T visit(OrNode n);
     T visit(AndNode n);
 
+    //Blocks
     T visit(BlockNode n);
+    T visit(ActionBodyNode n);
+
     T visit(Assignment n);
 
+    //Definitions
     T visit(DesignDefinitionNode n);
+    T visit(ActionDefinitionNode n);
 
+    //Declarations
     T visit(Declaration n);
+    T visit(ActionDeclarationNode n);
+    T visit(DesignDeclarationNode n);
     T visit(SequentialDeclaration n);
     T visit(IntegerDeclarationNode n);
     T visit(IntegerAssignDeclarationNode n);
@@ -49,7 +58,7 @@ public interface ASTvisitor<T> {
     T visit(GridDeclarationNode n);
     T visit(GridTypedDeclarationNode n);
 
-    //conditionals
+    //Conditionals
     T visit(ConditionalNode n);
     T visit(ElifConditionalNode n);
     T visit(ElseNode n);
@@ -57,5 +66,8 @@ public interface ASTvisitor<T> {
     T visit(WhileNode n);
     T visit(ForeachNode n);
 
+    //Misc
     T visit(PrintNode n);
+    T visit(ActionCallNode n);
+    T visit(ReturnNode n);
 }

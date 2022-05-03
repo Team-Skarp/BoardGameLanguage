@@ -1,6 +1,6 @@
 package symboltable.types;
 
-public class StringType implements Primitive {
+public class StringType implements TypeDenoter, SequentiallyDeclared {
 
     @Override
     public String toString() {

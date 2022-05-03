@@ -2,12 +2,9 @@ package symboltable;
 
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
-import symboltable.types.BoolType;
-import symboltable.types.IntType;
-import symboltable.types.StringType;
-import symboltable.types.TypeDenoter;
+import symboltable.types.*;
 
-import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Class used to type check any given node in the AST. The class needs a symbol table in order
@@ -17,10 +14,12 @@ import java.lang.reflect.Type;
  */
 public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
-    private SymbolTable ST;
+    private final SymbolTable ST;
+    private final TypeEnvironment TENV;
 
-    public TypeChecker(SymbolTable ST) {
+    public TypeChecker(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
+        this.TENV = TENV;
     }
 
     /**
@@ -48,8 +47,25 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(ActionDefinitionNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(Declaration n) {
         return null;
+    }
+
+    @Override
+    public TypeDenoter visit(ActionDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(DesignDeclarationNode n) {
+
+        //Check that the type is actually in the type environment
+        return TENV.recieveType(n.ref.name);
     }
 
     @Override
@@ -76,6 +92,12 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(Expression n) {
+        return (TypeDenoter) n.accept(this);
+
+    }
+
+    @Override
     public TypeDenoter visit(ArithmeticExpression n) {
         return null;
 
@@ -87,14 +109,16 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
         }
-        else if (leftType.getClass() == StringType.class && rightType.getClass() == StringType.class) {
+        else if (leftType instanceof StringType && rightType instanceof StringType) {
             return new StringType();
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be added to type '%s'", leftType, rightType));
+            throw new TypeErrorException(
+                    String.format("type '%s' cannot be added to type '%s'", leftType, rightType)
+            );
         }
     }
 
@@ -104,7 +128,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
         }
         else {
@@ -117,7 +141,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         TypeDenoter operandType = (TypeDenoter) n.operand.accept(this);
 
-        if (operandType.getClass() == IntType.class) {
+        if (operandType instanceof IntType) {
             return new IntType();
         }
         else {
@@ -131,7 +155,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
         }
         else {
@@ -144,7 +168,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
         }
         else {
@@ -157,7 +181,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
         }
         else {
@@ -170,7 +194,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
         }
         else {
@@ -179,11 +203,10 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
-     //Returns the type of the looked up identifier
     public TypeDenoter visit(IdNode n) {
 
         Symbol symbol = ST.retrieveSymbol(n.name);
-        return symbol.attrs.thisType();
+        return symbol.type;
     }
 
     @Override
@@ -197,13 +220,13 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
         }
-        else if (leftType.getClass() == StringType.class && rightType.getClass() == StringType.class) {
+        else if (leftType instanceof StringType && rightType instanceof StringType) {
             return new BoolType();
         }
-        else if (leftType.getClass() == BoolType.class && rightType.getClass() == BoolType.class) {
+        else if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
         }
         else {
@@ -217,13 +240,13 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
         }
-        else if (leftType.getClass() == StringType.class && rightType.getClass() == StringType.class) {
+        else if (leftType instanceof StringType && rightType instanceof StringType) {
             return new BoolType();
         }
-        else if (leftType.getClass() == BoolType.class && rightType.getClass() == BoolType.class) {
+        else if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
         }
         else {
@@ -236,7 +259,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
         }
         else {
@@ -249,7 +272,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
         }
         else {
@@ -262,7 +285,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
         }
         else {
@@ -275,7 +298,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == IntType.class && rightType.getClass() == IntType.class) {
+        if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
         }
         else {
@@ -292,7 +315,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     public TypeDenoter visit(NegationNode n) {
         TypeDenoter exprType = (TypeDenoter) n.child.accept(this);
 
-        if (exprType.getClass() == BoolType.class) {
+        if (exprType instanceof BoolType) {
             return new BoolType();
         }
         else {
@@ -305,7 +328,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == BoolType.class && rightType.getClass() == BoolType.class) {
+        if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
         }
         else {
@@ -318,7 +341,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter leftType = (TypeDenoter) n.left.accept(this);
         TypeDenoter rightType = (TypeDenoter) n.right.accept(this);
 
-        if (leftType.getClass() == BoolType.class && rightType.getClass() == BoolType.class) {
+        if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
         }
         else {
@@ -331,6 +354,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         for (ASTNode child : n.children) {
             child.accept(this);
         }
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(ActionBodyNode n) {
         return null;
     }
 
@@ -353,7 +381,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     public TypeDenoter visit(IntegerAssignDeclarationNode n) {
         TypeDenoter exprType = (TypeDenoter) n.expr.accept(this);
 
-        if (exprType.getClass() == IntType.class) {
+        if (exprType instanceof IntType) {
             return new IntType();
         }
         else {
@@ -414,6 +442,41 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(PrintNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(ActionCallNode call) {
+        Symbol actionSym = ST.retrieveSymbol(call.actionName);
+        ActionType action = (ActionType) actionSym.type;
+
+        List<Declaration> formalParameters = action.formalParameters;
+        if (formalParameters.size() != call.actualParameters.size()) {
+            throw new TypeErrorException(
+                    "action '%s' takes '%d' positional arguments but '%d' were given".
+                    formatted(actionSym.name, formalParameters.size(), call.actualParameters.size()));
+        }
+
+        int arg = 0;
+        while (arg < formalParameters.size()) {
+            TypeDenoter paramType = formalParameters.get(arg).type();
+            TypeDenoter argumentType = visit(call.actualParameters.get(arg));
+
+            if (paramType.getClass() != argumentType.getClass()){
+                throw new TypeErrorException(
+                        "expected type '%s' on argument index '%d' but recieved type '%s'".
+                                formatted(paramType, arg, argumentType)
+                );
+            }
+
+            arg++;
+        }
+
+        return action.returnType;
+    }
+
+    @Override
+    public TypeDenoter visit(ReturnNode n) {
         return null;
     }
 

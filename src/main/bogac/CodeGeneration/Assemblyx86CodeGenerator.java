@@ -35,6 +35,11 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(Expression n) {
+        return null;
+    }
+
+    @Override
     public String visit(ArithmeticExpression n) {
         return null;
     }
@@ -154,6 +159,11 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ActionBodyNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(Assignment n) {
         return null;
     }
@@ -164,7 +174,22 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ActionDefinitionNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(Declaration n) {
+        return null;
+    }
+
+    @Override
+    public String visit(ActionDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(DesignDeclarationNode n) {
         return null;
     }
 
@@ -267,5 +292,15 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
             currentPrint++;
         }
         return str;
+    }
+
+    @Override
+    public String visit(ActionCallNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(ReturnNode n) {
+        return null;
     }
 }

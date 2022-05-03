@@ -2,8 +2,9 @@ package symboltable.types;
 
 public class PathType implements TypeDenoter {
 
-    @Override
-    public String toString() {
-        return "path";
+    public final DesignRef type;        //Tile type of the path
+
+    public PathType(String type) {
+        this.type = new DesignRef(type);
     }
 }
