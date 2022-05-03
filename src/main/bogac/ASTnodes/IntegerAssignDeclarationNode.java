@@ -29,6 +29,7 @@ public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment
         return expr;
     }
 
+
     @Override
     public String varName() {
         return name;

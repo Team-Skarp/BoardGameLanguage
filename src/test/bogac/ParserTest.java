@@ -1,3 +1,5 @@
+package bogac;
+
 import antlr.*;
 
 import org.antlr.v4.runtime.*;
