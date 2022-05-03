@@ -191,6 +191,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitAssignmentStatement(BoardParser.AssignmentStatementContext ctx) {
+        if(ctx.children != null){
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 

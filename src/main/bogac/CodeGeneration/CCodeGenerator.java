@@ -5,9 +5,10 @@ import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 
 /**
- * Class for printing out an AST tree
+ * Class for generating C code.
+ * "gcc out.c -o out && ./out"
  */
-public class CodeGenerator implements ASTvisitor<String> {
+public class CCodeGenerator implements ASTvisitor<String> {
 
     private int             indent = 0;
     private final String    TAB = "\t";
@@ -20,7 +21,6 @@ public class CodeGenerator implements ASTvisitor<String> {
                 "\n" +
                 "int main(int argc, char *argv[])";
         str += (String) n.setup.accept(this);
-
         return str;
     }
 
@@ -45,7 +45,7 @@ public class CodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(UnaryMinusNode n) {
-        String str = " ( -( "+n.operand+" ) ) ";
+        String str = " ( -( "+n.operand.accept(this)+" ) ) ";
         return str;
     }
 
@@ -76,7 +76,8 @@ public class CodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IdNode n) {
-        return null;
+        String str = ""+n.name;
+        return str;
     }
 
     @Override
@@ -168,6 +169,7 @@ public class CodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(Assignment n) {
+        System.out.println("SSSSSSSSSSSSSSSSSSs");
         return null;
     }
 
@@ -273,7 +275,8 @@ public class CodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(WhileNode n) {
-        return null;
+        String str = "while("+n.predicate.accept(this)+")"+n.whileBlock.accept(this);
+        return str;
     }
 
     @Override
@@ -285,9 +288,7 @@ public class CodeGenerator implements ASTvisitor<String> {
     public String visit(PrintNode n) {
         String str = "printf(\"";
         String endPart = "";
-
         for(ASTNode p : n.prints){
-            System.out.println(p.getClass());
             if(p.getClass() == StringNode.class){
                 //string literals
                 str +="%s";
