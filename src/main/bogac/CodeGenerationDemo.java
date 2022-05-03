@@ -44,10 +44,10 @@ public class CodeGenerationDemo {
         ASTNode ast = new ASTbuilder().visitGame(cst);
 
 
-        CCodeGenerator pp = new CCodeGenerator();
-        String outputName = "out.c";
-        //Assemblyx86CodeGenerator pp = new Assemblyx86CodeGenerator();
-        //String outputName = "out.asm";
+        //CCodeGenerator pp = new CCodeGenerator();
+        //String outputName = "out.c";
+        Assemblyx86CodeGenerator pp = new Assemblyx86CodeGenerator();
+        String outputName = "out.asm";
 
         String code = (String) ast.accept(pp);
 

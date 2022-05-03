@@ -320,7 +320,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 endPart += ", \""+((StringNode) p).value+"\"";
             }else if(p.getClass() == IdNode.class){
                 //variables
-                System.out.println(((IdNode) p).type);
                 //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
                 str +="%s";
                 endPart += (","+((IdNode) p).name);
