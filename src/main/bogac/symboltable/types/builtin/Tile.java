@@ -57,7 +57,7 @@ public class Tile implements BuiltInType {
         ActionDefinitionNode isEmpty = new ActionDefinitionNode(
                 "isEmpty",
                 new BoolType(),
-                new BlockNode("action")
+                new ActionBodyNode()
                 //TODO: Implemented rest of the action
 
         );

@@ -1,22 +1,21 @@
 package symboltable.types;
 
-import symboltable.FormalParameter;
+import ASTnodes.Declaration;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ActionType implements TypeDenoter {
 
     public final TypeDenoter returnType;
-    public final List<FormalParameter> formalParameters;
+    public final List<Declaration> formalParameters;
 
-    public ActionType(TypeDenoter returnType, List<FormalParameter> formalParams) {
+    public ActionType(TypeDenoter returnType, List<Declaration> formalParams) {
         this.returnType = returnType;
         this.formalParameters = formalParams;
     }
-    public ActionType(TypeDenoter returnType, FormalParameter... param) {
+    public ActionType(TypeDenoter returnType, Declaration... param) {
         this.returnType = returnType;
-        this.formalParameters = (List<FormalParameter>) Arrays.asList(param);
+        this.formalParameters = List.of(param);
     }
 
     @Override

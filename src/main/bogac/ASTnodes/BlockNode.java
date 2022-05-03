@@ -7,11 +7,10 @@ import java.util.List;
 
 public class BlockNode implements ASTNode {
 
-    public final List<ASTNode> children = new ArrayList<>();
-    public final String blockType;
+    public final List<ASTNode> children;
 
-    public BlockNode(String blockType) {
-        this.blockType = blockType;
+    public BlockNode(ASTNode... children) {
+        this.children = List.of(children);
     }
 
     @Override

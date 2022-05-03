@@ -8,6 +8,7 @@ import ASTnodes.*;
 public interface ASTvisitor<T> {
     T visit(GameNode n);
 
+    T visit(Expression n);
     T visit(ArithmeticExpression n);
     T visit(PlusNode n);
     T visit(MinusNode n);
@@ -33,7 +34,10 @@ public interface ASTvisitor<T> {
     T visit(OrNode n);
     T visit(AndNode n);
 
+    //Blocks
     T visit(BlockNode n);
+    T visit(ActionBodyNode n);
+
     T visit(Assignment n);
 
     //Definitions
@@ -65,4 +69,5 @@ public interface ASTvisitor<T> {
     //Misc
     T visit(PrintNode n);
     T visit(ActionCallNode n);
+    T visit(ReturnNode n);
 }

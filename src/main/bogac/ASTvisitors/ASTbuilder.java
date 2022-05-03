@@ -53,47 +53,48 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) {
-        BlockNode block = new BlockNode("gameloop block");
-
+        List<ASTNode> children = new ArrayList<>();
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
 
             if (astNode != null) {
 
-                block.children.add(astNode);
+                children.add(astNode);
             }
         }
-        return block;
+
+        return new BlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override
     public ASTNode visitSetupBlock(BoardParser.SetupBlockContext ctx) {
-        BlockNode block = new BlockNode("setup block");
-
+        List<ASTNode> children = new ArrayList<>();
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
 
             if (astNode != null) {
 
-                block.children.add(astNode);
+                children.add(astNode);
             }
         }
-        return block;
+
+        return new BlockNode(children.toArray(new ASTNode[0]));
 
     }
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
-        BlockNode block = new BlockNode("normal block");
-        //Loop through every ast node and add it as child to block node
+        List<ASTNode> children = new ArrayList<>();
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
+
             if (astNode != null) {
-                block.children.add(astNode);
+
+                children.add(astNode);
             }
         }
 
-        return block;
+        return new BlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override
@@ -119,17 +120,18 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitRulesBlock(BoardParser.RulesBlockContext ctx) {
-        BlockNode block = new BlockNode("rules block");
 
+        List<ASTNode> children = new ArrayList<>();
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
 
             if (astNode != null) {
 
-                block.children.add(astNode);
+                children.add(astNode);
             }
         }
-        return block;
+
+        return new BlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override

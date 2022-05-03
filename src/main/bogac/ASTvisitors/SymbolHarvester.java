@@ -25,6 +25,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(Expression n) {
+        return null;
+    }
+
+    @Override
     public SymbolTable visit(ArithmeticExpression n) {
         return null;
     }
@@ -137,6 +142,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         ST.closeScope();
 
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ActionBodyNode n) {
+        return null;
     }
 
     @Override
@@ -365,6 +375,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ActionCallNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ReturnNode n) {
         return null;
     }
 }

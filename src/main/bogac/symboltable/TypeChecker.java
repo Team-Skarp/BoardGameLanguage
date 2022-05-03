@@ -4,6 +4,8 @@ import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import symboltable.types.*;
 
+import java.util.List;
+
 /**
  * Class used to type check any given node in the AST. The class needs a symbol table in order
  * to do type checking
@@ -90,6 +92,12 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(Expression n) {
+        return (TypeDenoter) n.accept(this);
+
+    }
+
+    @Override
     public TypeDenoter visit(ArithmeticExpression n) {
         return null;
 
@@ -108,7 +116,9 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return new StringType();
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be added to type '%s'", leftType, rightType));
+            throw new TypeErrorException(
+                    String.format("type '%s' cannot be added to type '%s'", leftType, rightType)
+            );
         }
     }
 
@@ -348,6 +358,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(ActionBodyNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(StringNode n) {
         return new StringType();
     }
@@ -431,7 +446,37 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
-    public TypeDenoter visit(ActionCallNode n) {
+    public TypeDenoter visit(ActionCallNode call) {
+        Symbol actionSym = ST.retrieveSymbol(call.actionName);
+        ActionType action = (ActionType) actionSym.type;
+
+        List<Declaration> formalParameters = action.formalParameters;
+        if (formalParameters.size() != call.actualParameters.size()) {
+            throw new TypeErrorException(
+                    "action '%s' takes '%d' positional arguments but '%d' were given".
+                    formatted(actionSym.name, formalParameters.size(), call.actualParameters.size()));
+        }
+
+        int arg = 0;
+        while (arg < formalParameters.size()) {
+            TypeDenoter paramType = formalParameters.get(arg).type();
+            TypeDenoter argumentType = visit(call.actualParameters.get(arg));
+
+            if (paramType.getClass() != argumentType.getClass()){
+                throw new TypeErrorException(
+                        "expected type '%s' on argument index '%d' but recieved type '%s'".
+                                formatted(paramType, arg, argumentType)
+                );
+            }
+
+            arg++;
+        }
+
+        return action.returnType;
+    }
+
+    @Override
+    public TypeDenoter visit(ReturnNode n) {
         return null;
     }
 
