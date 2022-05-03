@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import symboltable.SymbolTable;
 import symboltable.TypeChecker;
+import symboltable.TypeEnvironment;
 import symboltable.types.TypeDenoter;
 
 public class TypeCheckDemo {
@@ -32,7 +33,9 @@ public class TypeCheckDemo {
         ASTNode<?> ast = new ASTbuilder().visitNormalDeclaration(cst);
         //Give it an empty symbol table //todo: why is empty?
         SymbolTable ST = new SymbolTable();
+        TypeEnvironment TENV = new TypeEnvironment();
 
+        TypeChecker typeChecker = new TypeChecker(ST, TENV);
         SymbolHarvester sh = new SymbolHarvester();
         SymbolTable symbolTable = (SymbolTable) ast.accept(sh);
 

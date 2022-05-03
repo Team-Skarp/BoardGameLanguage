@@ -15,7 +15,6 @@ BOOLDCL     : 'bool';
 STRDCL      : 'str';
 LISTDCL     : 'list';
 
-
 //Design declerations
 DESIGNDCL   : 'design';
 
@@ -25,7 +24,6 @@ ACTIONDCL   : 'action';
 CHOICEDCL   : 'choice';
 PATHDCL     : 'path';
 GRIDDCL     : 'grid';
-OTHERDCL    : 'other';
 VOIDDCL     : 'void';
 
 //Primitive types
@@ -106,19 +104,19 @@ gameloop
     ;
 
 setupBlock
-    : LBRACE (print | normalDeclaration | setupDeclaration | statements | setupBlock | assignmentStatement )* RBRACE
+    : LBRACE (normalDeclaration | setupDeclaration | statement | setupBlock )* RBRACE
     ;
 
 normalBlock
-    : LBRACE (print | normalDeclaration | statements | normalBlock | assignmentStatement)* RBRACE
+    : LBRACE (normalDeclaration | statement | normalBlock )* RBRACE
     ;
 
 rulesBlock
-    : LBRACE (print | uniqueDeclaration | statements | rulesBlock | assignmentStatement)* RBRACE
+    : LBRACE (uniqueDeclaration | statement | rulesBlock )* RBRACE
     ;
 
 gameloopBlock
-    : LBRACE (print | statements | gameloopBlock)* RBRACE
+    : LBRACE (statement | gameloopBlock)* RBRACE
     | IDENTIFIER ASSIGN actionAssignment
     ;
 
@@ -160,9 +158,10 @@ integerDeclaration
     ;
 
 sequentialDeclaration
-    : INTDCL integerDeclaration (COMMA integerDeclaration)+ //Integermultiple
+    : INTDCL integerDeclaration (COMMA integerDeclaration)+
     | BOOLDCL booleanDeclaration (COMMA booleanDeclaration)+
     | STRDCL stringDeclaration (COMMA stringDeclaration)+
+    | IDENTIFIER designDeclaration (COMMA designDeclaration)+
     ;
 
 booleanDeclaration
@@ -216,11 +215,20 @@ choiceDeclaration
     ;
 
 actionDeclaration
-    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON primitiveType)?
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON returnType)?
     ;
 
 actionDefinition
-    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON primitiveType)? rulesBlock
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON returnType)? rulesBlock
+    ;
+
+actionCall //TODO: Not implemented
+    : 'NOT IMPLEMENTED'
+    ;
+
+returnType
+    : primitiveType
+    | IDENTIFIER
     ;
 
 assignmentStatement
@@ -272,6 +280,7 @@ fieldRow
     | STRDCL IDENTIFIER EOL
     | LISTDCL COLON listType IDENTIFIER EOL
     | actionDeclaration EOL
+    | IDENTIFIER IDENTIFIER EOL
     ;
 
 //Primitive types
@@ -290,10 +299,17 @@ formalParameters
     | IDENTIFIER IDENTIFIER
     ;
 
-statements
+statement
     : ifStatement
     | whileStatement
     | foreach
+    | assignmentStatement
+    | print
+    | expression EOL
+    ;
+
+expression
+    : booleanExpression
     ;
 
 arithmeticExpression
@@ -330,6 +346,7 @@ arithmeticAtom
     : INT
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
+    | actionCall
     ;
 
 logor
@@ -361,13 +378,16 @@ negation
     | booleanAtom
     ;
 
-//!True > 5
 booleanAtom
     : BOOL
     | IDENTIFIER
     | arithmeticExpression
     | LPAREN booleanExpression RPAREN
+    | actionCall
     ;
+
+
+
 
 
 ifStatement

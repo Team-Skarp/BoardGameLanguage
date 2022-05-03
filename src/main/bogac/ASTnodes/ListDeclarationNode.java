@@ -1,16 +1,17 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
+import symboltable.types.ListType;
 import symboltable.types.TypeDenoter;
 
 public class ListDeclarationNode implements ASTNode<Object>, Declaration {
 
+    public String name;
     public TypeDenoter elementType;
-    public IdNode      id;
 
-    public ListDeclarationNode(TypeDenoter elementType, IdNode id) {
+    public ListDeclarationNode(TypeDenoter elementType, String name) {
         this.elementType = elementType;
-        this.id = id;
+        this.name = name;
     }
 
     @Override
@@ -19,7 +20,12 @@ public class ListDeclarationNode implements ASTNode<Object>, Declaration {
     }
 
     @Override
-    public IdNode getIdentifier() {
-        return id;
+    public String varName() {
+        return name;
+    }
+
+    @Override
+    public TypeDenoter type() {
+        return new ListType(elementType);
     }
 }

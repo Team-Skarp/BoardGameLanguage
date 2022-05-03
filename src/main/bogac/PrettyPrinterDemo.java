@@ -68,8 +68,8 @@ public class PrettyPrinterDemo {
                 lo.g("starting AST at normal block");
                 return ast;
             case "statements":
-                BoardParser.StatementsContext cststatements = parser.statements();
-                ast = new ASTbuilder().visitStatements(cststatements);
+                BoardParser.StatementContext cststatement = parser.statement();
+                ast = new ASTbuilder().visitStatement(cststatement);
                 lo.g("starting AST at statements");
                 return ast;
             case "while":

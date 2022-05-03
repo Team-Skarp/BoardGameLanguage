@@ -1,16 +1,18 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
+import symboltable.types.BoolType;
+import symboltable.types.TypeDenoter;
 
-public class BooleanDeclarationNode implements Declaration {
-    public IdNode id;
-    public ASTNode<?> value;
+public class BooleanDeclarationNode implements ASTNode<Object>, Declaration {
+    public String name;
+    public ASTNode value;
 
-    public BooleanDeclarationNode(IdNode id) {
-        this.id = id;
+    public BooleanDeclarationNode(String name) {
+        this.name = name;
     }
-    public BooleanDeclarationNode(IdNode id, ASTNode<?> value) {
-        this.id = id;
+    public BooleanDeclarationNode(String name, ASTNode value) {
+        this.name = name;
         this.value = value;
     }
     @Override
@@ -19,7 +21,14 @@ public class BooleanDeclarationNode implements Declaration {
     }
 
     @Override
-    public IdNode getIdentifier() {
-        return id;
+    public String varName() {
+        return name;
     }
+
+    @Override
+    public TypeDenoter type() {
+        return new BoolType();
+    }
+
+
 }

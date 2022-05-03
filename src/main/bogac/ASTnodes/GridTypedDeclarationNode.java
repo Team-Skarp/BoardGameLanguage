@@ -1,22 +1,35 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
+import symboltable.types.GridType;
+import symboltable.types.TypeDenoter;
 
-public class GridTypedDeclarationNode implements ASTNode {
-    public final IdNode id;
-    public final String tileType;
-    public final int xSize;
-    public final int ySize;
+public class GridTypedDeclarationNode implements ASTNode<Object>, Declaration {
 
-    public GridTypedDeclarationNode(IdNode id, String tileType, int xSize, int ySize) {
-        this.id = id;
-        this.tileType = tileType;
-        this.xSize = xSize;
-        this.ySize = ySize;
+    public final String name;
+    public final String tile_type;
+    public final int x_size;
+    public final int y_size;
+
+    public GridTypedDeclarationNode(String name, String tile_type, int x_size, int y_size) {
+        this.name = name;
+        this.tile_type = tile_type;
+        this.x_size = x_size;
+        this.y_size = y_size;
     }
 
     @Override
     public Object accept(ASTvisitor v) {
         return v.visit(this);
+    }
+
+    @Override
+    public String varName() {
+        return name;
+    }
+
+    @Override
+    public TypeDenoter type() {
+        return new GridType(tile_type);
     }
 }

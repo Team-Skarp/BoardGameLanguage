@@ -1,27 +1,31 @@
 package ASTvisitors;
 
 import ASTnodes.*;
-import symboltable.DuplicateSymbolException;
-import symboltable.SymbolTable;
-import symboltable.TypeChecker;
-import symboltable.TypeErrorException;
-import symboltable.attributes.Attributes;
-import symboltable.attributes.PrimitiveAttributes;
-import symboltable.types.IntType;
-import symboltable.types.Primitive;
-import symboltable.types.TypeDenoter;
+import symboltable.*;
+import symboltable.types.*;
 
 
+/**
+ * Class used to handle declarations and definitions to do contextual analysis
+ */
 public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     SymbolTable ST;
+    TypeEnvironment TENV;
+    TypeChecker TC;
 
     public SymbolHarvester() {
         this.ST = new SymbolTable();
+        this.TENV = new TypeEnvironment();
     }
 
     @Override
     public SymbolTable visit(GameNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(Expression n) {
         return null;
     }
 
@@ -141,65 +145,101 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(ActionBodyNode n) {
+        return null;
+    }
+
+    @Override
     public SymbolTable visit(Assignment n) {
         return visit(n);
     }
 
     @Override
     public SymbolTable visit(DesignDefinitionNode n) {
+
+        //Create a seperate symbol table that resides in the design type
+        SymbolTable fields = new SymbolTable();
+
+        //Write in all the declarations into that symboltable
+        Symbol sym;
+
+        for (Declaration field : n.fields) {
+            sym = new Symbol(field.varName(), field.type());
+            fields.enterSymbol(sym);
+        }
+
+        //Save design type inside type environment
+        DesignType type;
+
+        if (n.parentType == null) {
+            type = new DesignType(
+                    n.typeDefinition.name,
+                    fields
+            );
+        }
+        else {
+            type = new DesignType(
+                    n.typeDefinition.name,
+                    n.parentType.name,
+                    fields
+            );
+        }
+
+        TENV.enterType(type);
+
+        return ST;
+
+    }
+
+    @Override
+    public SymbolTable visit(ActionDefinitionNode n) {
         return null;
     }
 
     @Override
     public SymbolTable visit(Declaration n) {
+        n.accept(this);
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ActionDeclarationNode n) {
         return null;
+    }
+
+    @Override
+    public SymbolTable visit(DesignDeclarationNode n) {
+
+        //Check that the type is actually defined in the type environment
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
+
+        Symbol sym = new Symbol(
+                n.name,
+                new DesignRef(n.name));
+
+        ST.enterSymbol(sym);
+        return ST;
     }
 
     @Override
     public SymbolTable visit(SequentialDeclaration n) {
 
-        TypeChecker typeChecker = new TypeChecker(ST);
-        Attributes attributes;
-        TypeDenoter sequenceType = n.type;
+        TC = new TypeChecker(ST, TENV);
 
-        try {
+        for (Declaration declaration : n.declarations) {
 
-            attributes = initAttribute(sequenceType);
+            //Check that every declaration adheres to scope rules
+            declaration.accept(TC);
 
-            for (Declaration declaration : n.declarations) {
-
-                //Typecheck the declaration
-                declaration.accept(typeChecker);
-
-                ST.enterSymbol(declaration.getIdentifier().name, attributes);
-            }
-        } catch (TypeErrorException typeError) {
-            System.out.println(typeError.getMessage());
+            ST.enterSymbol(new Symbol(
+                    declaration.varName(),
+                    n.type));
         }
 
         return ST;
     }
 
-    private Attributes initAttribute(TypeDenoter type) {
-
-        Attributes attributes;
-
-        if (type instanceof Primitive) {
-            attributes = new PrimitiveAttributes((Primitive) type);
-        }
-
-//        //SpcTile a, b, c;
-//        else if (type.getClass() == DesignType.class) {
-//            //todo: Not implemented. We need to get type of design type from design ast node
-//            attributes = null;
-//        }
-
-        else {
-            throw new TypeErrorException(String.format("type '%s' is not compatible with sequential declaration", type));
-        }
-
-        return attributes;
-    }
     @Override
     public SymbolTable visit(StringNode n) {
         return null;
@@ -213,70 +253,89 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(IntegerDeclarationNode n) {
 
-        IdNode identifier = n.id;
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
 
-        PrimitiveAttributes attrs = new PrimitiveAttributes(new IntType());
-
-        identifier.attrs = attrs;
-
-        if (ST.declaredLocally(identifier.name)) {
-            throw new DuplicateSymbolException(identifier.name + " is already declared in current scope");
-        }
-
-        ST.enterSymbol(identifier.name, attrs);
         return ST;
     }
 
     @Override
     public SymbolTable visit(IntegerAssignDeclarationNode n) {
 
-        IdNode identifier = n.id;
-        PrimitiveAttributes attrs = new PrimitiveAttributes(new IntType());
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
 
-        identifier.attrs = attrs;
-
-        if (ST.declaredLocally(identifier.name)) {
-            throw new DuplicateSymbolException(identifier.name + " is already declared in current scope");
-        }
-
-        ST.enterSymbol(identifier.name, attrs);
         return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanDeclarationNode n) {
-        IdNode identifier = n.id;
-        ST.enterSymbol(identifier.name,identifier.attrs);
+
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
+
         return ST;
     }
 
     @Override
     public SymbolTable visit(StringDeclarationNode n) {
-        return null;
+
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
+
+        return ST;
     }
 
     @Override
     public SymbolTable visit(PathDeclarationNode n) {
-        IdNode identifier = n.id;
-        ST.enterSymbol(identifier.name,identifier.attrs);
+
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
+
         return ST;
     }
 
     @Override
     public SymbolTable visit(PathTypedDeclarationNode n) {
-        return null;
+
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
+
+        return ST;
     }
 
     @Override
     public SymbolTable visit(GridDeclarationNode n) {
-        IdNode identifier = n.id;
-        ST.enterSymbol(identifier.name,identifier.attrs);
+
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
+
         return ST;
     }
 
     @Override
     public SymbolTable visit(GridTypedDeclarationNode n) {
-        return null;
+
+        ST.enterSymbol(new Symbol(
+                n.name,
+                n.type()
+        ));
+
+        return ST;
     }
 
     @Override
@@ -311,6 +370,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(PrintNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ActionCallNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(ReturnNode n) {
         return null;
     }
 }

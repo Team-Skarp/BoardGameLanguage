@@ -1,15 +1,18 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.TypeDenoter;
-
-import java.util.ArrayList;
+import symboltable.types.SequentiallyDeclared;
 import java.util.List;
 
 public class SequentialDeclaration implements ASTNode<Object> {
 
-    public TypeDenoter type;
-    public List<Declaration> declarations = new ArrayList<>();
+    public SequentiallyDeclared type;
+    public List<Declaration> declarations;
+
+    public SequentialDeclaration(SequentiallyDeclared type, Declaration... declarations) {
+        this.type = type;
+        this.declarations = List.of(declarations);
+    }
 
     @Override
     public Object accept(ASTvisitor v) {

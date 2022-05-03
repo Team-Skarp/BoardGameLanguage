@@ -1,14 +1,15 @@
 package symboltable;
 
-import symboltable.attributes.Attributes;
+import symboltable.types.TypeDenoter;
 
 public class Symbol {
 
     public final String name;
-    public final Attributes attrs;
+    public final TypeDenoter type;
 
-    public Symbol(String name, Attributes attrs) {
+    public Symbol(String name, TypeDenoter type) {
         this.name = name;
-        this.attrs = attrs;
+        this.type = type;
     }
+
 }
