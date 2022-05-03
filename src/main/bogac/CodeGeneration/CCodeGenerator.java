@@ -24,6 +24,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
+    @Override
+    public String visit(Expression n) {
+        return null;
+    }
+
 
     @Override
     public String visit(ArithmeticExpression n) {
@@ -168,6 +173,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ActionBodyNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(Assignment n) {
         System.out.println("SSSSSSSSSSSSSSSSSSs");
         return null;
@@ -179,8 +189,23 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ActionDefinitionNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(Declaration n) {
         lo.g(n);
+        return null;
+    }
+
+    @Override
+    public String visit(ActionDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(DesignDeclarationNode n) {
         return null;
     }
 
@@ -191,7 +216,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntegerDeclarationNode n) {
-        String str = n.id.type+" "+n.id.name+" = ";
+        String str = n.type() +" "+n.name+" = ";
         str += n.value.accept(this);
         str += EOL;
         return str;
@@ -204,7 +229,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BooleanDeclarationNode n) {
-        String str = "bool "+n.id.name+" = ";
+        String str = "bool "+n.name+" = ";
         str += n.value.accept(this);
         str += EOL;
         return str;
@@ -212,7 +237,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(StringDeclarationNode n) {
-        String str = "char "+n.id.name;
+        String str = "char "+n.name;
         String end = (String) n.value.accept(this);
         str += "["+end.length()+"] = "+end;
         str += EOL;
@@ -314,5 +339,15 @@ public class CCodeGenerator implements ASTvisitor<String> {
         //char text[13] = " cars in the ";
         //printf("%d%s%s\n",2*2,text, "garage");
         return str;
+    }
+
+    @Override
+    public String visit(ActionCallNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(ReturnNode n) {
+        return null;
     }
 }
