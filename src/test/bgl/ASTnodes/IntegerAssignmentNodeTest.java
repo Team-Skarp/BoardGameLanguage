@@ -21,7 +21,7 @@ class IntegerAssignmentNodeTest {
 
     @Test
     void accept() {
-        integerAssignmentNode = new IntegerAssignmentNode(idNode, plusNode);
+        integerAssignmentNode = new IntegerAssignmentNode(idNode.name, plusNode);
 
         integerAssignmentNode.accept(new PrettyPrinter());
     }
@@ -29,13 +29,13 @@ class IntegerAssignmentNodeTest {
     @Test
     void getLeft() {
 
-        integerAssignmentNode = new IntegerAssignmentNode(idNode, plusNode);
-        assertEquals(idNode.name, integerAssignmentNode.getLeft().name);
+        integerAssignmentNode = new IntegerAssignmentNode(idNode.name, plusNode);
+        assertEquals(idNode.name, integerAssignmentNode.getLeft());
     }
 
     @Test
     void getRight() {
-        integerAssignmentNode = new IntegerAssignmentNode(idNode, plusNode);
+        integerAssignmentNode = new IntegerAssignmentNode(idNode.name, plusNode);
 
         assertEquals(plusNode, integerAssignmentNode.getRight());
     }

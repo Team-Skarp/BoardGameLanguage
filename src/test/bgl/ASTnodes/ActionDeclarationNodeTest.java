@@ -13,7 +13,8 @@ class ActionDeclarationNodeTest {
 
     @BeforeEach
     void setup() {
-        fooDcl = new ActionDeclarationNode("piece", new ActionType(new IntType(), new IntegerDeclarationNode("Dice")),
+        fooDcl = new ActionDeclarationNode("piece",
+                new ActionType(new IntType(), new IntegerDeclarationNode("Dice")),
                 new ListDeclarationNode(new IntType(), "redPieces"),
                 new IntegerDeclarationNode("piece"),
                 new StringDeclarationNode("tile"),
@@ -22,7 +23,6 @@ class ActionDeclarationNodeTest {
 
     @Test
     void accept() {
-
         fooDcl.accept(new PrettyPrinter());
     }
 

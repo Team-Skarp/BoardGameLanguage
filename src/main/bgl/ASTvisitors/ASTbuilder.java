@@ -236,14 +236,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitBooleanAssigment(BoardParser.BooleanAssigmentContext ctx) {
-
-        String name = ctx.IDENTIFIER().getText();
-        ASTNode bexpr = ctx.booleanExpression().accept(this);
-
-        if (name != null && bexpr != null) {
-            return new BooleanAssignmentNode(name, bexpr);
-        } else throw new RuntimeException("Boolean assignment node creation failed");
-
+        return null;
     }
 
     @Override

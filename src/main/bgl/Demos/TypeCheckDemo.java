@@ -2,7 +2,7 @@ package Demos;
 
 import ASTnodes.ASTNode;
 import ASTvisitors.ASTbuilder;
-import ASTvisitors.SymbolHarvester;
+import SymbolTable.SymbolHarvester;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
@@ -35,7 +35,7 @@ public class TypeCheckDemo {
         ASTNode ast = new ASTbuilder().visitNormalDeclaration(cst);
 
         //Give it an empty symbol table //todo: why is empty?
-        // SymbolTable ST = new SymbolTable();
+        SymbolTable ST = new SymbolTable();
 
         TypeEnvironment TENV = new TypeEnvironment();
 

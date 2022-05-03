@@ -21,7 +21,6 @@ class BooleanDeclarationNodeTest {
 
     @BeforeEach
     void setup() {
-        booleanNode = new BooleanNode(false);
         idNode = new IdNode("boolean");
         TENV = new TypeEnvironment();
     }
@@ -29,7 +28,7 @@ class BooleanDeclarationNodeTest {
     @Test
     void accept() {
         idNode = new IdNode("boolean");
-        booleanDeclarationNode = new BooleanDeclarationNode(idNode.name, new BooleanNode(false));
+        booleanDeclarationNode = new BooleanDeclarationNode(idNode.name);
 
         booleanDeclarationNode.accept(new PrettyPrinter());
     }
@@ -44,7 +43,7 @@ class BooleanDeclarationNodeTest {
 
     @Test
     void getIdentifier() {
-        booleanDeclarationNode = new BooleanDeclarationNode(idNode.name, booleanNode);
+        booleanDeclarationNode = new BooleanDeclarationNode(idNode.name);
 
         booleanDeclarationNode.accept(new TypeChecker(new SymbolTable(), TENV));
         assertEquals(idNode.name, booleanDeclarationNode.varName());

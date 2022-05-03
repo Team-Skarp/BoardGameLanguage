@@ -29,7 +29,7 @@ class IntegerAssignDeclarationNodeTest {
 
     @Test
     void getLeft() {
-        assertEquals(idNode.name, integerAssignDeclarationNode.getLeft().name);
+        assertEquals(idNode.name, integerAssignDeclarationNode.getLeft());
     }
 
     @Test

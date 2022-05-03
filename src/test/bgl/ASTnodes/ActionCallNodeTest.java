@@ -11,7 +11,10 @@ class ActionCallNodeTest {
     @Test
     void accept() {
         designRef = new DesignRef("SpecialTile");
-        fooCall = new ActionCallNode("choice", new IntNode(10), new BooleanNode(false), new StringNode("piece"));
+        fooCall = new ActionCallNode("choice",
+                new IntNode(10),
+                new BooleanNode(false),
+                new StringNode("piece"));
 
         fooCall.accept(new PrettyPrinter());
     }

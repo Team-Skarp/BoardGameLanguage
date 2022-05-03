@@ -1,8 +1,8 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.BoolType;
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.BoolType;
+import SymbolTable.types.TypeDenoter;
 
 public class BooleanAssignDeclarationNode implements ASTNode<Object>, Assignment, Declaration {
 

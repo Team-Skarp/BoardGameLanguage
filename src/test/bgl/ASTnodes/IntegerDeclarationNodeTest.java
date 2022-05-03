@@ -25,7 +25,7 @@ class IntegerDeclarationNodeTest {
 
     @Test
     void accept() {
-        integerDeclarationNode= new IntegerDeclarationNode(idNode.name, intNode);
+        integerDeclarationNode= new IntegerDeclarationNode(idNode.name);
 
         integerDeclarationNode.accept(new PrettyPrinter());
     }
