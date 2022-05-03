@@ -29,7 +29,7 @@ public class CGenerationDemo {
         */
         String bglCodeExample = """
                 SETUP {
-                    int a = 0;
+                    str a = \"hej\";
                     print(a);
                 }
                 RULES{}
@@ -47,15 +47,16 @@ public class CGenerationDemo {
         BoardParser.GameContext cst = parser.game();
         ASTNode ast = new ASTbuilder().visitGame(cst);
 
-        // C - code generation
+        // Symmbol harvester
         SymbolHarvester SH = new SymbolHarvester();
         SymbolTable ST = (SymbolTable) ast.accept(SH);
+
+        // C - code generation
         CCodeGenerator generator = new CCodeGenerator(ST);
-        String outputFileName = "out.c";
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);
-
+        System.out.println(code);
         try {
             FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.c",false);
             fw.write(code);

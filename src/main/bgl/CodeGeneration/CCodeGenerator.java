@@ -6,6 +6,9 @@ import Logging.Logger;
 import SymbolTable.SymbolTable;
 import SymbolTable.Symbol;
 import SymbolTable.Block;
+import SymbolTable.types.BoolType;
+import SymbolTable.types.IntType;
+import SymbolTable.types.StringType;
 
 import java.util.List;
 
@@ -350,10 +353,16 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 str +="%s";
                 endPart += ", \""+((StringNode) p).value+"\"";
             }else if(p.getClass() == IdNode.class){
+                Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
+                if(symbol.type instanceof IntType){
+                    str +="%d";
+                }else if(symbol.type instanceof StringType){
+                    str +="%s";
+                }else if(symbol.type instanceof BoolType){
+                    str +="%s";
+                }
                 //variables
                 //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
-                Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
-                str +="%s";
                 endPart += (","+((IdNode) p).name);
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
