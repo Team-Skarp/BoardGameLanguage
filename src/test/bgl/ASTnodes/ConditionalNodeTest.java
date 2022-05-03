@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConditionalNodeTest {
     ConditionalNode conditionalNode;
-    ElifConditionalNode elifConditionalNode;
     PredicateNode predicateNodeTrue;
     PredicateNode predicateNodeFalse;
     BlockNode blockNodeIf;
@@ -28,8 +27,7 @@ class ConditionalNodeTest {
 
     @Test
     void acceptsOnlyIfStatement() {
-        elifConditionalNode = new ElifConditionalNode();
-        blockNodeIf = new BlockNode();
+        blockNodeIf = new BlockNode(new StringNode("\"ifBlock\""));
 
         conditionalNode = new ConditionalNode(predicateNodeTrue, blockNodeIf);
         conditionalNode.accept(new PrettyPrinter());
@@ -37,8 +35,8 @@ class ConditionalNodeTest {
 
     @Test
     void acceptsIfAndElseStatements() {
-        blockNodeIf = new BlockNode();
-        blockNodeElse = new BlockNode();
+        blockNodeIf = new BlockNode(new StringNode("\"ifBlock\""));
+        blockNodeElse = new BlockNode(new StringNode("\"elseIfBlock\""));
 
         conditionalNode = new ConditionalNode(predicateNodeTrue, blockNodeIf, blockNodeElse);
 
@@ -47,11 +45,11 @@ class ConditionalNodeTest {
 
 
     @Test
-    void acceptsIfAndAListOfElifStatements() {
-        blockNodeIf = new BlockNode();
+    void acceptsIfAndAListOfElseIfStatements() {
+        blockNodeIf = new BlockNode(new StringNode("\"ifBlock\""));
         blockNodeElseIfList = new ArrayList<>();
 
-        BlockNodeElseIf = new BlockNode();
+        BlockNodeElseIf = new BlockNode(new StringNode("\"elseIfBlock\""));
         blockNodeElseIfList.add(BlockNodeElseIf);
 
         conditionalNode = new ConditionalNode(predicateNodeTrue, blockNodeIf, blockNodeElseIfList);
@@ -61,12 +59,12 @@ class ConditionalNodeTest {
     }
 
     @Test
-    void acceptsIfAndAListOfElifAndElseStatements() {
-        blockNodeIf = new BlockNode();
-        blockNodeElse = new BlockNode();
+    void acceptsIfAndAListOfElseIfAndElseStatements() {
+        blockNodeIf = new BlockNode(new StringNode("\"ifBlock\""));
+        blockNodeElse = new BlockNode(new StringNode("\"elseBlock\""));
         blockNodeElseIfList = new ArrayList<>();
 
-        BlockNodeElseIf = new BlockNode();
+        BlockNodeElseIf = new BlockNode(new StringNode("\"elseIfBlock\""));
         blockNodeElseIfList.add(BlockNodeElseIf);
 
         conditionalNode = new ConditionalNode(predicateNodeTrue, blockNodeIf, blockNodeElseIfList, blockNodeElse);

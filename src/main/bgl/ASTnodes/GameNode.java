@@ -2,9 +2,6 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GameNode implements ASTNode {
 
     public ASTNode setup;
