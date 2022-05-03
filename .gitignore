@@ -1,5 +1,5 @@
 #Autogen from ANTLR
-/src/main/bogac/antlr
+/src/main/bgl/antlr
 
 **/.DS_Store
 out.asm
