@@ -17,21 +17,28 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
     private final String indent = "    ";
     private int var_total = 0;
 
-    String data =   "\nsection .data                         ; allocate data to memory\n";
+    String functions =      "\nquit:\n" +
+                            "    mov       rax, 60                 ; system call for exit\n" +
+                            "    xor       rdi, rdi                ; exit code 0\n" +
+                            "    syscall                           ; invoke operating system to exit\n" +
+                            "    ret\n" +
+                            "    \n" +
+                            "print:\n" +
+                            "    mov       rax, 1                  ; system call for write\n" +
+                            "    mov       rdi, 1                  ; file handle 1 is stdout\n" +
+                            "    syscall\n" +
+                            "    ret\n\n";
 
-    String text =   "\nsection .text                         ; flow of the program\n" +
-                    "    global _start\n";
-
-    String end =    "_end:\n" +
-                    "    mov       rax, 60                 ; system call for exit\n" +
-                    "    xor       rdi, rdi                ; exit code 0\n" +
-                    "    syscall                           ; invoke operating system to exit";
+    String data =           "    call      quit\n" +
+                            "\n" +
+                            "section .data                         ; allocate data to memory\n";
     @Override
     public String visit(GameNode n) {
-        String str = "_start:\n"+n.setup.accept(this);
-
-        text+=indent+"global _end\n\n";
-        return data+text+str+end;
+        String str =        "section .text                         ; flow of the program\n" +
+                            "    global _start\n" +
+                            "\n" +
+                            "_start:\n"+n.setup.accept(this);
+        return functions+str+data;
     }
 
     @Override
@@ -86,7 +93,8 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntNode n) {
-        return null;
+        String str = ""+n.value;;
+        return str;
     }
 
     @Override
@@ -271,26 +279,29 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(PrintNode n) {
         String str = "";
-        int printsTotal = n.prints.size();
-        int currentPrint = 1;
+        String varName = "var"+var_total;
+        String varLiteral = "";
+        int bytesUsed = 1;
         for(ASTNode p : n.prints){
             if(p.getClass() == StringNode.class){
                 //string literal
-                String txt = ((StringNode) p).value;
-                String variable = "var"+var_total;
-                data+=indent+variable+" db \""+txt+"\","+(printsTotal == currentPrint ? 10 : 1)+"\n"; //10 indicates the \n after text
-                var_total++;
-                str+=   "\n    mov       rax, 1                  ; system call for write\n" +
-                        "    mov       rdi, 1                  ; file handle 1 is stdout\n" +
-                        "    mov       rsi, "+variable+"              ; address of string to output\n" +
-                        "    mov       rdx, "+(txt.length()+1)+"                 ; number of bytes\n" +
-                        "    syscall                           ; invoke operating system to do the write ";
+                bytesUsed += ((StringNode) p).value.length();
+                varLiteral += "\""+((StringNode) p).value+"\",";
             }else if(p instanceof ArithmeticExpression ) {
                 //arithmetic
-
+                String numberStr = (String) p.accept(this);
+                char[] nchar = numberStr.toCharArray();
+                for(int i = 0; i < numberStr.length(); i++){
+                    varLiteral+=((int)nchar[i])+",";
+                }
+                bytesUsed += numberStr.length();
             }
-            currentPrint++;
         }
+        var_total++;
+        str+=   "    mov       rsi, "+varName+"              ; address of string to output\n" +
+                "    mov       rdx, "+bytesUsed+"                 ; number of bytes\n" +
+                "    call      print                             ";
+        data+=indent+varName+" db "+varLiteral+"10\n";
         return str;
     }
 

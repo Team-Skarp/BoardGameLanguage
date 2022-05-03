@@ -4,6 +4,7 @@ import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 import SymbolTable.SymbolTable;
+import SymbolTable.Symbol;
 import SymbolTable.Block;
 
 import java.util.List;
@@ -351,6 +352,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
             }else if(p.getClass() == IdNode.class){
                 //variables
                 //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
+                Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
                 str +="%s";
                 endPart += (","+((IdNode) p).name);
             }else if(p instanceof ArithmeticExpression ){

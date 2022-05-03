@@ -87,9 +87,12 @@ public class SymbolTable {
      * Sets the active block to be that of the parrent block and pops itself
      */
     public void climb() {
+
         Block oldBlock = activeBlock;
-        activeBlock = activeBlock.getParent();
-        activeBlock.getChildren().remove(oldBlock);
+        if (activeBlock.getParent() != null) {
+            activeBlock = activeBlock.getParent();
+            activeBlock.getChildren().remove(oldBlock);
+    }
     }
 
     /**

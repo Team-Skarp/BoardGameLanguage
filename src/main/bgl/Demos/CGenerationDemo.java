@@ -4,6 +4,7 @@ import ASTnodes.ASTNode;
 import ASTvisitors.ASTbuilder;
 import CodeGeneration.CCodeGenerator;
 import SymbolTable.SymbolTable;
+import SymbolTable.SymbolHarvester;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
@@ -29,14 +30,8 @@ public class CGenerationDemo {
         String bglCodeExample = """
                 SETUP {
                     int a = 0;
-                    str msg = "Booping!";
-                    
-                    while(a<5){
-                        print(a," ",msg);
-                        a = a + 1;
-                    }
+                    print(a);
                 }
-                
                 RULES{}
                 GAMELOOP{}
                 """;
@@ -53,14 +48,16 @@ public class CGenerationDemo {
         ASTNode ast = new ASTbuilder().visitGame(cst);
 
         // C - code generation
-        CCodeGenerator generator = new CCodeGenerator(new SymbolTable());
+        SymbolHarvester SH = new SymbolHarvester();
+        SymbolTable ST = (SymbolTable) ast.accept(SH);
+        CCodeGenerator generator = new CCodeGenerator(ST);
         String outputFileName = "out.c";
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);
 
         try {
-            FileWriter fw = new FileWriter("./src/main/bogac/CodeGeneration/GeneratedFiles/out.c",false);
+            FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.c",false);
             fw.write(code);
             fw.close();
         } catch (IOException ex) {

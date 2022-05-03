@@ -58,7 +58,7 @@ public class AsmGenerationDemo {
         String code = (String) ast.accept(generator);
 
         try {
-            FileWriter fw = new FileWriter("./src/main/bogac/CodeGeneration/GeneratedFiles/out.asm", false);
+            FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.asm", false);
             fw.write(code);
             fw.close();
         } catch (IOException ex) {
