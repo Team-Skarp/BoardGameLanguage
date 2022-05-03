@@ -582,7 +582,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         n.prints.forEach(print -> print.accept(this));
 
         indent--;
-        
+
         return null;
     }
 
