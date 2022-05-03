@@ -44,17 +44,15 @@ public class CodeGenerationDemo {
         BoardParser.GameContext cst = parser.game();
 
 
-        ASTNode ast = new Tile().getDesign();
-
-        CCodeGenerator pp = new CCodeGenerator();
-        String outputName = "out.c";
-        //Assemblyx86CodeGenerator pp = new Assemblyx86CodeGenerator();
-        //String outputName = "out.asm";
+        //CCodeGenerator pp = new CCodeGenerator();
+        //String outputName = "out.c";
+        Assemblyx86CodeGenerator pp = new Assemblyx86CodeGenerator();
+        String outputName = "out.asm";
 
         String code = (String) ast.accept(pp);
 
         try{
-            FileWriter fw = new FileWriter("./src/main/bogac/"+outputName,false);
+            FileWriter fw = new FileWriter("./src/main/bogac/CodeGeneration/GeneratedFiles/"+outputName,false);
             fw.write(code);
             fw.close();
         }catch (IOException ex) {
