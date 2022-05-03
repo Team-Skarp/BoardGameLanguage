@@ -29,7 +29,8 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
      */
     @Override
     public TypeDenoter visit(Assignment n) {
-
+        /*
+        // Todo: seems the plan is to do type checking in the symbol table now?
         TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
         TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
 
@@ -38,7 +39,8 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         }
         else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
-        }
+        }*/
+        return (TypeDenoter) new Object();
     }
 
     @Override
@@ -351,7 +353,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(BlockNode n) {
-        for (ASTNode<?> child : n.children) {
+        for (ASTNode child : n.children) {
             child.accept(this);
         }
         return null;
@@ -382,7 +384,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(IntegerAssignDeclarationNode n) {
-        TypeDenoter exprType = (TypeDenoter) n.expr.accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
 
         if (exprType instanceof IntType) {
             return new IntType();
@@ -391,6 +393,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             throw new TypeErrorException(String.format("type of expression should be of type 'int', got type '%s'", exprType));
         }
 
+    }
+
+    @Override
+    public TypeDenoter visit(BooleanAssignDeclarationNode n) {
+        return null;
     }
 
     @Override

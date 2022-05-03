@@ -1,17 +1,17 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.IntType;
+import symboltable.types.BoolType;
 import symboltable.types.TypeDenoter;
 
-public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment, Declaration {
+public class BooleanAssignDeclarationNode implements ASTNode<Object>, Assignment, Declaration {
 
     public final String name;
-    public final ASTNode aexpr;
+    public final BooleanExpression bexpr;
 
-    public IntegerAssignDeclarationNode(String name, ASTNode aexpr) {
+    public BooleanAssignDeclarationNode(String name, BooleanExpression bexpr) {
         this.name = name;
-        this.aexpr = aexpr;
+        this.bexpr = bexpr;
     }
 
     @Override
@@ -25,8 +25,8 @@ public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment
     }
 
     @Override
-    public ASTNode getRight() {
-        return aexpr;
+    public Expression getRight() {
+        return bexpr;
     }
 
 
@@ -37,7 +37,7 @@ public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment
 
     @Override
     public TypeDenoter type() {
-        return new IntType();
+        return new BoolType();
     }
 
 }

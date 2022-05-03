@@ -2,14 +2,14 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class IntegerAssignmentNode implements ASTNode<Object>, Assignment{
+public class BooleanAssignmentNode implements ASTNode<Object>, Assignment{
 
     public String name;
-    public ASTNode aexpr;
+    public ASTNode bexpr;
 
-    public IntegerAssignmentNode(String name, ASTNode aexpr) {
+    public BooleanAssignmentNode(String name, ASTNode bexpr) {
         this.name = name;
-        this.aexpr = aexpr;
+        this.bexpr = bexpr;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class IntegerAssignmentNode implements ASTNode<Object>, Assignment{
 
     @Override
     public ASTNode<?> getRight() {
-        return aexpr;
+        return bexpr;
     }
 }

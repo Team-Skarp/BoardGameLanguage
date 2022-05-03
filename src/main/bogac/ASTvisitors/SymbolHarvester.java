@@ -151,7 +151,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(Assignment n) {
-        return visit(n);
+        return (SymbolTable) n.accept(this);
     }
 
     @Override
@@ -270,6 +270,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         ));
 
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(BooleanAssignDeclarationNode n) {
+        return null; //Todo: implement something
     }
 
     @Override

@@ -217,7 +217,10 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(IntegerDeclarationNode n) {
         String str = n.type() +" "+n.name+" = ";
+        /*
         str += n.value.accept(this);
+
+         */
         str += EOL;
         return str;
     }
@@ -225,6 +228,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(IntegerAssignDeclarationNode n) {
         return null;
+    }
+
+    @Override
+    public String visit(BooleanAssignDeclarationNode n) {
+        return null; //Todo: should probably do something here
     }
 
     @Override

@@ -51,6 +51,7 @@ public interface ASTvisitor<T> {
     T visit(SequentialDeclaration n);
     T visit(IntegerDeclarationNode n);
     T visit(IntegerAssignDeclarationNode n);
+    T visit(BooleanAssignDeclarationNode n);
     T visit(BooleanDeclarationNode n);
     T visit(StringDeclarationNode n);
     T visit(PathDeclarationNode n);

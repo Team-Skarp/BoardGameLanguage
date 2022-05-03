@@ -30,16 +30,19 @@ public class TypeCheckDemo {
         ASTNode ast = new ASTbuilder().visitAdditive(cst);
 */
         BoardParser.NormalDeclarationContext cst = parser.normalDeclaration();
-        ASTNode<?> ast = new ASTbuilder().visitNormalDeclaration(cst);
+        ASTNode ast = new ASTbuilder().visitNormalDeclaration(cst);
+
         //Give it an empty symbol table //todo: why is empty?
-        SymbolTable ST = new SymbolTable();
+        // SymbolTable ST = new SymbolTable();
+
         TypeEnvironment TENV = new TypeEnvironment();
 
-        TypeChecker typeChecker = new TypeChecker(ST, TENV);
+        // TypeChecker typeChecker = new TypeChecker(ST, TENV);
+
         SymbolHarvester sh = new SymbolHarvester();
         SymbolTable symbolTable = (SymbolTable) ast.accept(sh);
 
-        TypeChecker typeChecker = new TypeChecker(symbolTable);
+        TypeChecker typeChecker = new TypeChecker(symbolTable, TENV);
         TypeDenoter resultType = (TypeDenoter) ast.accept(typeChecker);
 
         System.out.println(resultType.getClass().getName());

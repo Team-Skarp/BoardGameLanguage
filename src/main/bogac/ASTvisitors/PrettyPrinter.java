@@ -312,9 +312,12 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         System.out.println(TAB.repeat(indent)+"type: " + n.type());
         System.out.println(TAB.repeat(indent)+"varName: " + n.name);
         indent++;
+        /* intdcls don't have a value
         if (n.value != null){
             n.value.accept(this);
         }
+
+         */
         indent--;
         return null;
     }
@@ -323,11 +326,16 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     public Void visit(IntegerAssignDeclarationNode n) {
         System.out.println(TAB.repeat(indent) + n.name);
         indent++;
-        n.expr.accept(this);
+      // n.expr.accept(this);  // commented out to avoid error while refactoring
         indent--;
         return null;
     }
-    
+
+    @Override
+    public Void visit(BooleanAssignDeclarationNode n) {
+        return null; //Todo: should do something
+    }
+
     @Override
     public Void visit(BooleanDeclarationNode n) {
         System.out.println(TAB.repeat(indent)+"type: " + n.type());

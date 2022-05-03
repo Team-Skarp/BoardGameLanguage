@@ -11,10 +11,13 @@ public class BooleanDeclarationNode implements ASTNode<Object>, Declaration {
     public BooleanDeclarationNode(String name) {
         this.name = name;
     }
+    /* booldcls don't have a value
     public BooleanDeclarationNode(String name, ASTNode value) {
         this.name = name;
         this.value = value;
     }
+
+     */
     @Override
     public Object accept(ASTvisitor v) {
         return v.visit(this);

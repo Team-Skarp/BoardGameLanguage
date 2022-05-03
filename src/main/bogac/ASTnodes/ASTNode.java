@@ -4,5 +4,5 @@ import ASTvisitors.ASTvisitor;
 
 public interface ASTNode<T> {
 
-    T accept(ASTvisitor<T> v);
+    T accept(ASTvisitor v);
 }

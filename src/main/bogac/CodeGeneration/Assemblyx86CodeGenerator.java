@@ -209,6 +209,11 @@ public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(BooleanAssignDeclarationNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(BooleanDeclarationNode n) {
         return null;
     }

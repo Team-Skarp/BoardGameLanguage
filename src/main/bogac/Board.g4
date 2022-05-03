@@ -241,7 +241,7 @@ assignmentStatement
     ;
 
 intAssigment
-    : IDENTIFIER ASSIGN arithmeticExpression*
+    : IDENTIFIER ASSIGN arithmeticExpression
     ;
 
 booleanAssigment

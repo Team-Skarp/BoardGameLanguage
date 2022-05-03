@@ -6,16 +6,19 @@ import symboltable.types.TypeDenoter;
 
 public class IntegerDeclarationNode implements ASTNode<Object>, Declaration {
 
-    public  String name;
-    public ASTNode value;
+    public String name;
+    // public ASTNode value; // Why does this hava a value? commented out because it doesn't make sense
 
     public IntegerDeclarationNode(String name) {
         this.name = name;
     }
+
+    /*
     public IntegerDeclarationNode(String name, ASTNode value) {
         this.name = name;
         this.value = value;
     }
+    */
 
     @Override
     public Object accept(ASTvisitor v) {

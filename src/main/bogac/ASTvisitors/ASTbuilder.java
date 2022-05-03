@@ -101,13 +101,15 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitNormalDeclaration(BoardParser.NormalDeclarationContext ctx) {
         if (ctx.integerDeclaration() != null) {
             return ctx.integerDeclaration().accept(this);
-        }else if(ctx.booleanDeclaration() != null){
+        } else if(ctx.booleanDeclaration() != null){
             return ctx.booleanDeclaration().accept(this);
-        }else if (ctx.stringDeclaration() != null){
+        } else if (ctx.stringDeclaration() != null){
             return ctx.stringDeclaration().accept(this);
-        }else if (ctx.listDeclaration() != null){
+        } else if (ctx.listDeclaration() != null){
             return ctx.listDeclaration().accept(this);
-        }else if (ctx.sequentialDeclaration() != null){
+        } else if (ctx.designDeclaration() != null){
+            return ctx.designDeclaration().accept(this);
+        } else if (ctx.sequentialDeclaration() != null){
             return ctx.sequentialDeclaration().accept(this);
         }
         return null;
@@ -213,12 +215,27 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
-        return null;
+
+        String name = ctx.IDENTIFIER().getText();
+        ASTNode aexpr = ctx.arithmeticExpression().accept(this);
+
+        if (name != null && aexpr != null) {
+            return new IntegerAssignmentNode(name, aexpr);
+        } else throw new RuntimeException("Integer assignment node creation failed");
+
+       // return null;
     }
 
     @Override
     public ASTNode visitBooleanAssigment(BoardParser.BooleanAssigmentContext ctx) {
-        return null;
+
+        String name = ctx.IDENTIFIER().getText();
+        ASTNode bexpr = ctx.booleanExpression().accept(this);
+
+        if (name != null && bexpr != null) {
+            return new BooleanAssignmentNode(name, bexpr);
+        } else throw new RuntimeException("Boolean assignment node creation failed");
+
     }
 
     @Override
@@ -304,15 +321,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitIntegerDeclaration(BoardParser.IntegerDeclarationContext ctx) {
         if (ctx.ASSIGN() != null) {
-            return new IntegerDeclarationNode(
-                    ctx.getChild(0).getText(),
-                    ctx.getChild(2).accept(this));
+            return new IntegerAssignDeclarationNode(
+                    ctx.IDENTIFIER().getText(),
+                    (ArithmeticExpression) ctx.arithmeticExpression().accept(this));
         }
 
         else if (ctx.IDENTIFIER() != null) {
             return new IntegerDeclarationNode(
-                    ctx.getChild(0).getText()
-            );
+                    ctx.IDENTIFIER().getText());
         }
         return null;
     }
@@ -362,13 +378,13 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitBooleanDeclaration(BoardParser.BooleanDeclarationContext ctx) {
         if(ctx.IDENTIFIER() != null && ctx.ASSIGN() != null){
-            return new BooleanDeclarationNode(
-                    ctx.getChild(0).getText(),
-                    ctx.getChild(2).accept(this));
+            return new BooleanAssignDeclarationNode(
+                    ctx.IDENTIFIER().getText(),
+                    (BooleanExpression) ctx.booleanExpression().accept(this));
         }
         else if(ctx.IDENTIFIER() != null){
             return new BooleanDeclarationNode(
-                    ctx.getChild(0).getText()
+                    ctx.IDENTIFIER().getText()
             );
         }
         return null;
@@ -377,7 +393,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitStringDeclaration(BoardParser.StringDeclarationContext ctx) {
         if(ctx.IDENTIFIER() != null && ctx.ASSIGN() != null){
-            return new StringDeclarationNode(
+            return new StringDeclarationNode(//Todo: needs a StringAssignDeclarationNode
                     ctx.getChild(0).getText(),
                     new StringNode(ctx.STR().getText()));
         }
@@ -645,9 +661,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.LTH() != null){
             return new LessThanNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
         }
+        /* grammar rule changed Todo: implement in correct Visit"node"
         else if (ctx.arithmeticExpression() != null){
             return ctx.getChild(0).accept(this);
-        }
+        }*/
         else if (ctx.negation() != null){
             return ctx.getChild(0).accept(this);
         }
