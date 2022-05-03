@@ -356,14 +356,18 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
                 if(symbol.type instanceof IntType){
                     str +="%d";
+                    endPart += (","+((IdNode) p).name);
+
                 }else if(symbol.type instanceof StringType){
                     str +="%s";
+                    endPart += (","+((IdNode) p).name);
+
                 }else if(symbol.type instanceof BoolType){
                     str +="%s";
+                    endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
+
                 }
-                //variables
-                //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
-                endPart += (","+((IdNode) p).name);
+
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
                 str +="%d";
