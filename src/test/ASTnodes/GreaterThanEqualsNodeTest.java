@@ -3,9 +3,9 @@ package ASTnodes;
 import ASTvisitors.Evaluator;
 import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.Test;
-import symboltable.SymbolTable;
-import symboltable.TypeChecker;
-import symboltable.TypeErrorException;
+import SymbolTable.SymbolTable;
+import SymbolTable.TypeChecker;
+import SymbolTable.TypeErrorException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

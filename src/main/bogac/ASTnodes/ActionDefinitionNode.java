@@ -1,8 +1,8 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.ActionType;
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.ActionType;
+import SymbolTable.types.TypeDenoter;
 
 import java.util.List;
 

@@ -1,9 +1,8 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.DesignRef;
-import symboltable.types.PathType;
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.PathType;
+import SymbolTable.types.TypeDenoter;
 
 public class PathDeclarationNode implements ASTNode<Object>, Declaration {
 

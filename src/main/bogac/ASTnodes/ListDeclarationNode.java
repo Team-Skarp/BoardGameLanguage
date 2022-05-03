@@ -1,8 +1,8 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.ListType;
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.ListType;
+import SymbolTable.types.TypeDenoter;
 
 public class ListDeclarationNode implements ASTNode<Object>, Declaration {
 

@@ -3,10 +3,10 @@ package ASTnodes;
 import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import symboltable.SymbolTable;
-import symboltable.attributes.PrimitiveAttributes;
-import symboltable.types.BoolType;
-import symboltable.types.IntType;
+import SymbolTable.SymbolTable;
+import SymbolTable.attributes.PrimitiveAttributes;
+import SymbolTable.types.BoolType;
+import SymbolTable.types.IntType;
 
 import static org.junit.jupiter.api.Assertions.*;
 

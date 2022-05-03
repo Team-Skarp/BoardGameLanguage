@@ -1,7 +1,7 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.SequentiallyDeclared;
+import SymbolTable.types.SequentiallyDeclared;
 import java.util.List;
 
 public class SequentialDeclaration implements ASTNode<Object> {

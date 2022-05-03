@@ -1,9 +1,8 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.DesignRef;
-import symboltable.types.GridType;
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.GridType;
+import SymbolTable.types.TypeDenoter;
 
 public class GridDeclarationNode implements ASTNode<Object>, Declaration {
     public final String name;

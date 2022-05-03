@@ -3,8 +3,8 @@ package ASTnodes;
 import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import symboltable.SymbolTable;
-import symboltable.TypeChecker;
+import SymbolTable.SymbolTable;
+import SymbolTable.TypeChecker;
 
 import static org.junit.jupiter.api.Assertions.*;
 

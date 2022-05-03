@@ -3,10 +3,10 @@ package ASTnodes;
 import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import symboltable.types.ActionType;
-import symboltable.types.BoolType;
-import symboltable.types.IntType;
-import symboltable.types.StringType;
+import SymbolTable.types.ActionType;
+import SymbolTable.types.BoolType;
+import SymbolTable.types.IntType;
+import SymbolTable.types.StringType;
 
 import java.util.ArrayList;
 import java.util.List;

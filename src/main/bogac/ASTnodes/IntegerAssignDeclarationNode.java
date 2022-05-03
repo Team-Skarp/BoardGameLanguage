@@ -1,8 +1,8 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.IntType;
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.IntType;
+import SymbolTable.types.TypeDenoter;
 
 public class IntegerAssignDeclarationNode implements ASTNode<Object>, Assignment, Declaration {
 

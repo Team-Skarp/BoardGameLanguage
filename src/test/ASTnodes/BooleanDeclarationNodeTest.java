@@ -3,7 +3,7 @@ package ASTnodes;
 import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import symboltable.types.BoolType;
+import SymbolTable.types.BoolType;
 
 import static org.junit.jupiter.api.Assertions.*;
 

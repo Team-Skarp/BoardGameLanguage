@@ -1,6 +1,6 @@
 package ASTnodes;
 
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.TypeDenoter;
 
 public interface Declaration extends ASTNode<Object> {
 

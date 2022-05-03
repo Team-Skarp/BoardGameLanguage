@@ -1,9 +1,8 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import symboltable.types.DesignRef;
-import symboltable.types.DesignType;
-import symboltable.types.TypeDenoter;
+import SymbolTable.types.DesignRef;
+import SymbolTable.types.TypeDenoter;
 
 /**
  * Specifies the declaration of a custom design type

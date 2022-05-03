@@ -10,10 +10,10 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
-import symboltable.SymbolTable;
-import symboltable.TypeChecker;
-import symboltable.types.BoolType;
-import symboltable.types.IntType;
+import SymbolTable.SymbolTable;
+import SymbolTable.TypeChecker;
+import SymbolTable.types.BoolType;
+import SymbolTable.types.IntType;
 
 import java.util.List;
 

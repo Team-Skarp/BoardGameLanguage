@@ -3,7 +3,7 @@ package ASTnodes;
 import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import symboltable.types.ActionType;
+import SymbolTable.types.ActionType;
 
 import java.util.ArrayList;
 import java.util.List;
