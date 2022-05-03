@@ -16,9 +16,6 @@ public class ElifConditionalNode implements ASTNode {
     }
 
     //empty, used for population in if node
-    /**
-     * Skal det her slettes??? Hilsen Hans og Ming
-     */
     public ElifConditionalNode() {
         this.predicate = null;
         this.ifBlock = null;

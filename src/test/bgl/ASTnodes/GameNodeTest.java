@@ -1,13 +1,9 @@
 package ASTnodes;
 
-import ASTnodes.BlockNode;
-import ASTnodes.GameNode;
+
+import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class GameNodeTest {
     GameNode gameNode;
@@ -17,13 +13,15 @@ class GameNodeTest {
 
     @BeforeEach
     void setup() {
-        setup = new BlockNode();
-        rules = new BlockNode();
-        gameLoop = new BlockNode();
+        setup = new BlockNode(new StringNode("\"setupBlock\""));
+        rules = new BlockNode(new StringNode("\"rulesBlock\""));
+        gameLoop = new BlockNode(new StringNode("\"gameLoopBlock\""));
     }
 
     @Test
     void accept() {
+        gameNode = new GameNode(setup, rules, gameLoop);
 
+        gameNode.accept(new PrettyPrinter());
     }
 }

@@ -1,17 +1,11 @@
-package bogac.ASTnodes;
+package ASTnodes;
 
-import ASTnodes.BlockNode;
-import ASTnodes.BooleanNode;
-import ASTnodes.ElifConditionalNode;
-import ASTnodes.PredicateNode;
 import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ElifConditionalNodeTest {
     ElifConditionalNode elifConditionalNode;
-    BlockNode blockNode;
+    BlockNode elseIfBlockNode;
     PredicateNode predicateNode;
     BooleanNode booleanNode;
 
@@ -19,8 +13,14 @@ class ElifConditionalNodeTest {
     void acceptElifConditionalWithParameters() {
         booleanNode = new BooleanNode(true);
         predicateNode = new PredicateNode(booleanNode);
-        blockNode = new BlockNode();
-        elifConditionalNode = new ElifConditionalNode(predicateNode, blockNode);
+        elseIfBlockNode = new BlockNode(new StringNode("\"elseIfBlock\""));
+        elifConditionalNode = new ElifConditionalNode(predicateNode, elseIfBlockNode);
         elifConditionalNode.accept(new PrettyPrinter());
     }
+
+    /*@Test
+    void acceptElifConditionalWithOutParameters() {
+        elifConditionalNode = new ElifConditionalNode();
+        elifConditionalNode.accept(new PrettyPrinter());
+    }*/
 }
