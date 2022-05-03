@@ -12,11 +12,13 @@ import java.util.Map;
  *
  * Scopes are only initialised by the {@link SymbolTable} class
  */
-class Block {
+public class Block {
 
     private Block                parent;
     private Map<String, Symbol>  symbols = new HashMap<String, Symbol>();
     private List<Block>          children = new ArrayList<>();
+
+    public Block(){};
 
     void addSymbol(Symbol sym) {
         symbols.put(sym.name, sym);
@@ -33,6 +35,10 @@ class Block {
 
     Block getParent() {
         return parent;
+    }
+
+    public List<Block> getChildren() {
+        return children;
     }
 
     void setParent(Block block) {

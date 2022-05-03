@@ -76,11 +76,28 @@ public class SymbolTable {
     }
 
     /**
+     * Sets the active block to be the first child in the list of blocks inside currently active block
+     */
+    public void dive() {
+        if (activeBlock.getChildren().size() != 0)
+            this.activeBlock = this.activeBlock.getChildren().get(0);
+    }
+
+    /**
+     * Sets the active block to be that of the parrent block and pops itself
+     */
+    public void climb() {
+        Block oldBlock = activeBlock;
+        activeBlock = activeBlock.getParent();
+        activeBlock.getChildren().remove(oldBlock);
+    }
+
+    /**
      * Check that a symbol is declared in the current scope
      * @param name of the symbol
      * @return
      */
-    public boolean declaredLocally(String name) {
+    private boolean declaredLocally(String name) {
         Symbol sym = activeBlock.getSymbolWith(name);
         if (sym != null) {
             return true;
@@ -90,4 +107,7 @@ public class SymbolTable {
         }
     }
 
+    public Block getActiveBlock() {
+        return activeBlock;
+    }
 }

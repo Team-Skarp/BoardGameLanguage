@@ -1,4 +1,4 @@
-package SymbolTable.designs;
+package STDLIB;
 
 import ASTnodes.ActionDefinitionNode;
 import ASTnodes.DesignDefinitionNode;

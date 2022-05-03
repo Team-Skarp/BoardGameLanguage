@@ -3,6 +3,11 @@ package CodeGeneration;
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import Logging.Logger;
+import SymbolTable.SymbolTable;
+import SymbolTable.Block;
+
+import java.util.List;
+
 
 /**
  * Class for generating C code.
@@ -10,10 +15,15 @@ import Logging.Logger;
  */
 public class CCodeGenerator implements ASTvisitor<String> {
 
+    private SymbolTable     ST;
     private int             indent = 0;
     private final String    TAB = "\t";
-    Logger lo = new Logger();
+    Logger lo =             new Logger();
     private final String EOL = ";\n";
+
+    public CCodeGenerator(SymbolTable ST) {
+        this.ST = ST;
+    }
 
     @Override
     public String visit(GameNode n) {
@@ -164,11 +174,31 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BlockNode n) {
-        String str = "{\n";
-        for (ASTNode c: n.children){
-            str += (String) c.accept(this);
+        String str = "";
+        List<Block> childBlocks = ST.getActiveBlock().getChildren();
+
+        if (childBlocks.size() > 0) {
+            for (Block block : childBlocks) {
+
+                ST.dive();
+
+                str = "{\n";
+                for (ASTNode c: n.children){
+                    str += (String) c.accept(this);
+                }
+                str += "}";
+
+            }
+        } else {
+            str = "{\n";
+            for (ASTNode c: n.children){
+                str += (String) c.accept(this);
+            }
+            str += "}";
         }
-        str += "}";
+
+        ST.climb();
+
         return str;
     }
 

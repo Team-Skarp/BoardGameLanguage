@@ -1,8 +1,8 @@
 package SymbolTable;
 
 import SymbolTable.types.DesignType;
-import SymbolTable.designs.PredefinedDesign;
-import SymbolTable.designs.Tile;
+import STDLIB.PredefinedDesign;
+import STDLIB.Tile;
 
 import java.util.HashMap;
 import java.util.List;

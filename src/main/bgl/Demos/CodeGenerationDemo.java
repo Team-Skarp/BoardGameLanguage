@@ -1,15 +1,14 @@
 package Demos;
 
-import ASTnodes.*;
-
-import CodeGeneration.CCodeGenerator;
+import ASTnodes.ASTNode;
+import ASTvisitors.ASTbuilder;
+import CodeGeneration.Assemblyx86CodeGenerator;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import Logging.Logger;
-import SymbolTable.designs.Tile;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class CodeGenerationDemo {
         parser = new BoardParser(tokens);
 
         BoardParser.GameContext cst = parser.game();
-
+        ASTNode ast = new ASTbuilder().visitGame(cst);
 
         //CCodeGenerator pp = new CCodeGenerator();
         //String outputName = "out.c";
