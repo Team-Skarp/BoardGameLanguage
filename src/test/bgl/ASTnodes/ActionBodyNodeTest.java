@@ -1,15 +1,20 @@
 package ASTnodes;
 
-import ASTnodes.ActionBodyNode;
+import ASTvisitors.PrettyPrinter;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ActionBodyNodeTest {
-    ActionBodyNode actionBodyNode;
+    ActionBodyNode fooBody;
 
-
+    /**
+     * **foo()** {int a, bool b}
+     */
     @Test
     void accept() {
+        fooBody = new ActionBodyNode(
+                new IntegerDeclarationNode("a"),
+                new BooleanDeclarationNode("b"));
+
+        fooBody.accept(new PrettyPrinter());
     }
 }

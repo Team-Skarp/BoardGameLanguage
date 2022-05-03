@@ -6,10 +6,10 @@ import java.util.List;
 
 public class ActionBodyNode implements ASTNode<Object> {
 
-    List<ASTNode>   body;
+    List<ASTNode> body;
 
-    public ActionBodyNode(ASTNode... body) {
-        this.body = List.of(body);
+    public ActionBodyNode(ASTNode... node) {
+        this.body = List.of(node);
     }
 
     @Override

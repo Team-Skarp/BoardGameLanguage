@@ -21,112 +21,112 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(GameNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(Expression n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(ArithmeticExpression n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(PlusNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(MinusNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(UnaryMinusNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(MultNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(DivNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(ModNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(PowNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(IdNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(IntNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(EqualNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(NotEqualNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(LessThanNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(GreaterThanNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(GreaterThanEqualsNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(LessThanEqualsNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(NegationNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(OrNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(AndNode n) {
-        return null;
+        return ST;
     }
 
     @Override
@@ -146,7 +146,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ActionBodyNode n) {
-        return null;
+        return ST;
     }
 
     @Override
@@ -193,7 +193,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ActionDefinitionNode n) {
-        return null;
+        return ST;
     }
 
     @Override
@@ -204,7 +204,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ActionDeclarationNode n) {
-        return null;
+        return ST;
     }
 
     @Override
@@ -242,12 +242,12 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(StringNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanExpression n) {
-        return null;
+        return ST;
     }
 
     @Override
@@ -340,46 +340,46 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ConditionalNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(ElifConditionalNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(ElseNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(PredicateNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(WhileNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(ForeachNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(PrintNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(ActionCallNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(ReturnNode n) {
-        return null;
+        return ST;
     }
 }

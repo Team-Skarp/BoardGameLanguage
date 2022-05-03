@@ -9,7 +9,7 @@ class ElseNodeTest {
 
     @Test
     void accept() {
-        blockNode = new BlockNode();
+        blockNode = new BlockNode(new StringNode("\"elseBlock\""));
         elseNode = new ElseNode(blockNode);
 
         elseNode.accept(new PrettyPrinter());
