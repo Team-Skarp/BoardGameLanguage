@@ -52,7 +52,7 @@ public class CodeGenerationDemo {
         String code = (String) ast.accept(pp);
 
         try{
-            FileWriter fw = new FileWriter("./src/main/bogac/"+outputName,false);
+            FileWriter fw = new FileWriter("./src/main/bogac/CodeGeneration/GeneratedFiles/"+outputName,false);
             fw.write(code);
             fw.close();
         }catch (IOException ex) {
