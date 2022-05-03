@@ -2,6 +2,8 @@ package Demos;
 
 import ASTnodes.*;
 
+import ASTvisitors.ASTbuilder;
+import CodeGeneration.Assemblyx86CodeGenerator;
 import CodeGeneration.CCodeGenerator;
 import antlr.BoardLexer;
 import antlr.BoardParser;
@@ -35,6 +37,7 @@ public class CodeGenerationDemo {
                 "        a = a+1;\n" +
                 "    }  " +
                 "}RULES{}GAMELOOP{}";
+
         input = CharStreams.fromString(testString);
         lo.g("input: "+input);
         lexer = new BoardLexer(input);
@@ -42,10 +45,13 @@ public class CodeGenerationDemo {
         parser = new BoardParser(tokens);
 
         BoardParser.GameContext cst = parser.game();
+        ASTNode ast = new ASTbuilder().visitGame(cst);
 
-
+        /* C - code generation */
         //CCodeGenerator pp = new CCodeGenerator();
         //String outputName = "out.c";
+
+        /* Assembly - code generation */
         Assemblyx86CodeGenerator pp = new Assemblyx86CodeGenerator();
         String outputName = "out.asm";
 
