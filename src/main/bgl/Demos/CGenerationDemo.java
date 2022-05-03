@@ -59,6 +59,7 @@ public class CGenerationDemo {
         try {
             FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.c",false);
             fw.write(code);
+            System.out.println("Compiled successfully");
             fw.close();
         } catch (IOException ex) {
             // Print message as exception occurred when

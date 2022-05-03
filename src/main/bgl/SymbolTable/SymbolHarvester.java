@@ -21,6 +21,10 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(GameNode n) {
+        n.setup.accept(this);
+        n.gameloop.accept(this);
+        n.rules.accept(this);
+
         return ST;
     }
 
