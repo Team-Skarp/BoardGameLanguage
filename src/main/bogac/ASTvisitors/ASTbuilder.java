@@ -17,12 +17,17 @@ import java.util.List;
  * Class which converts antlers auto-generated CST into our desired AST
  */
 public class ASTbuilder implements BoardVisitor<ASTNode> {
+
     Logger lo = new Logger();
 
     @Override
     public ASTNode visitGame(BoardParser.GameContext ctx) {
         if(ctx.setup() != null && ctx.rules() != null && ctx.gameloop() != null){
-            return new GameNode(ctx.setup().accept(this),ctx.rules().accept(this),ctx.gameloop().accept(this));
+            return new GameNode(
+                    ctx.setup().accept(this),
+                    ctx.rules().accept(this),
+                    ctx.gameloop().accept(this)
+            );
         }
         return null;
     }
@@ -48,17 +53,18 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if(ctx.gameloopBlock() != null){
             return ctx.gameloopBlock().accept(this);
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) {
+
         List<ASTNode> children = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
-
             if (astNode != null) {
-
                 children.add(astNode);
             }
         }
@@ -68,12 +74,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSetupBlock(BoardParser.SetupBlockContext ctx) {
+
         List<ASTNode> children = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
-
             if (astNode != null) {
-
                 children.add(astNode);
             }
         }
@@ -84,12 +90,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
+
         List<ASTNode> children = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
-
             if (astNode != null) {
-
                 children.add(astNode);
             }
         }
@@ -101,15 +107,20 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitNormalDeclaration(BoardParser.NormalDeclarationContext ctx) {
         if (ctx.integerDeclaration() != null) {
             return ctx.integerDeclaration().accept(this);
-        }else if(ctx.booleanDeclaration() != null){
+        }
+        else if(ctx.booleanDeclaration() != null) {
             return ctx.booleanDeclaration().accept(this);
-        }else if (ctx.stringDeclaration() != null){
+        }
+        else if (ctx.stringDeclaration() != null) {
             return ctx.stringDeclaration().accept(this);
-        }else if (ctx.listDeclaration() != null){
+        }
+        else if (ctx.listDeclaration() != null) {
             return ctx.listDeclaration().accept(this);
-        }else if (ctx.sequentialDeclaration() != null){
+        }
+        else if (ctx.sequentialDeclaration() != null) {
             return ctx.sequentialDeclaration().accept(this);
         }
+
         return null;
     }
 
@@ -122,11 +133,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitRulesBlock(BoardParser.RulesBlockContext ctx) {
 
         List<ASTNode> children = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
             ASTNode astNode = node.accept(this);
-
             if (astNode != null) {
-
                 children.add(astNode);
             }
         }
@@ -148,12 +158,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitDesignDefinition(BoardParser.DesignDefinitionContext ctx) {
 
         DesignDefinitionNode dd;
-
         List<Declaration> fields = new ArrayList<>();
+
         for (ParseTree field : ctx.designBody().fieldRow()) {
             fields.add((Declaration) field.accept(this));
         }
-
 
         if (ctx.FROM() != null) {
             return new DesignDefinitionNode(
@@ -183,7 +192,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionDeclaration(BoardParser.ActionDeclarationContext ctx) {
-
         //Spawn new ActionDeclartionNode()
         return null;
     }
@@ -205,9 +213,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitAssignmentStatement(BoardParser.AssignmentStatementContext ctx) {
+
         if(ctx.children != null){
             return ctx.getChild(0).accept(this);
         }
+
         return null;
     }
 
@@ -258,6 +268,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitPathDeclaration(BoardParser.PathDeclarationContext ctx) {
+
         if (ctx.IDENTIFIER() != null && ctx.INT() != null) {
             if (ctx.UNI_DIR() != null) {
                 return new PathDeclarationNode(
@@ -265,44 +276,53 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                         Integer.parseInt(ctx.INT().getText()),
                         ctx.UNI_DIR().getText()
                 );
-            } else if (ctx.BI_DIR() != null) {
+            }
+            else if (ctx.BI_DIR() != null) {
                 return new PathDeclarationNode(
                         ctx.IDENTIFIER().get(0).getText(),
                         Integer.parseInt(ctx.INT().getText()),
                         ctx.BI_DIR().getText()
                 );
-            } else if (ctx.STATIC_DIR() != null) {
+            }
+            else if (ctx.STATIC_DIR() != null) {
                 return new PathDeclarationNode(
                         ctx.IDENTIFIER().get(0).getText(),
                         Integer.parseInt(ctx.INT().getText()),
                         ctx.STATIC_DIR().getText()
                 );
-            } else {
+            }
+            else {
                 return new PathDeclarationNode(
                         ctx.IDENTIFIER().get(0).getText(),
                         Integer.parseInt(ctx.INT().getText())
                 );
             }
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     @Override
     public ASTNode visitGridDeclaration(BoardParser.GridDeclarationContext ctx) {
-        if (ctx.IDENTIFIER() != null && ctx.INT().get(0) != null && ctx.INT().get(1) != null) {
+
+        if (
+                ctx.IDENTIFIER() != null &&
+                ctx.INT().get(0) != null &&
+                ctx.INT().get(1) != null
+        ) {
             return new GridDeclarationNode(
                     ctx.IDENTIFIER().get(0).getText(),
                     Integer.parseInt(ctx.INT().get(0).getText()),
                     Integer.parseInt(ctx.INT().get(1).getText())
             );
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     @Override
     public ASTNode visitIntegerDeclaration(BoardParser.IntegerDeclarationContext ctx) {
+
         if (ctx.ASSIGN() != null) {
             return new IntegerDeclarationNode(
                     ctx.getChild(0).getText(),
@@ -342,9 +362,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
         else if (ctx.IDENTIFIER() != null) {
-            type = new DesignRef(
-                    ctx.IDENTIFIER().getText()
-            );
+            type = new DesignRef(ctx.IDENTIFIER().getText());
 
             for (BoardParser.StringDeclarationContext node : ctx.stringDeclaration()) {
                 declarations.add( (Declaration) node.accept(this) );
@@ -361,15 +379,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     //TODO: change "bool" to booldcl
     @Override
     public ASTNode visitBooleanDeclaration(BoardParser.BooleanDeclarationContext ctx) {
+
         if(ctx.IDENTIFIER() != null && ctx.ASSIGN() != null){
             return new BooleanDeclarationNode(
                     ctx.getChild(0).getText(),
                     ctx.getChild(2).accept(this));
         }
         else if(ctx.IDENTIFIER() != null){
-            return new BooleanDeclarationNode(
-                    ctx.getChild(0).getText()
-            );
+            return new BooleanDeclarationNode(ctx.getChild(0).getText());
         }
         return null;
     }
@@ -382,9 +399,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                     new StringNode(ctx.STR().getText()));
         }
         else if(ctx.IDENTIFIER() != null){
-            return new StringDeclarationNode(
-                    ctx.getChild(0).getText()
-            );
+            return new StringDeclarationNode(ctx.getChild(0).getText());
         }
 
         return null;
@@ -421,7 +436,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new ListDeclarationNode(
                     getListType(ctx.listType()),
                     ctx.IDENTIFIER(0).getText());
-
         }
         else if (ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null) {
             return new DesignDeclarationNode(
@@ -516,11 +530,16 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitAdditive(BoardParser.AdditiveContext ctx) {
         if (ctx.PLUS() != null) {
-           return new PlusNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+           return new PlusNode(
+                   ctx.getChild(0).accept(this),
+                   ctx.getChild(2).accept(this)
+           );
         }
         else if (ctx.MINUS() != null) {
-
-            return new MinusNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+            return new MinusNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.multiplicative() != null) {
             return ctx.getChild(0).accept(this);
@@ -534,15 +553,24 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitMultiplicative(BoardParser.MultiplicativeContext ctx) {
         if (ctx.MULT() != null) {
-            return new MultNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+            return new MultNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.DIV() != null) {
 
-            return new DivNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+            return new DivNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.MOD() != null) {
 
-            return new ModNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+            return new ModNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.pow() != null) {
             return ctx.getChild(0).accept(this);
@@ -557,10 +585,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitPow(BoardParser.PowContext ctx) {
 
         if (ctx.EXP() != null) {
-            return new PowNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+            return new PowNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.unaryMinus() != null) {
-
             return ctx.getChild(0).accept(this);
         }
         else {
@@ -571,79 +601,109 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitUnaryMinus(BoardParser.UnaryMinusContext ctx) {
+
         if(ctx.MINUS() != null){
             return new UnaryMinusNode(ctx.getChild(1).accept(this));
-        }else if(ctx.arithmeticAtom() != null){
+        }
+        else if(ctx.arithmeticAtom() != null){
             return ctx.getChild(0).accept(this);
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitArithmeticAtom(BoardParser.ArithmeticAtomContext ctx) {
+
         if (ctx.INT() != null) {
             return new IntNode(Integer.parseInt(ctx.INT().getText()));
         }
         else if (ctx.IDENTIFIER() != null) {
             return new IdNode(ctx.IDENTIFIER().getText());
-        }else if(ctx.arithmeticExpression() != null){
+        }
+        else if(ctx.arithmeticExpression() != null){
             return ctx.getChild(1).accept(this);
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitLogor(BoardParser.LogorContext ctx) {
         if (ctx.OR() != null) {
-            return new OrNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+            return new OrNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.logand() != null) {
-
             return ctx.getChild(0).accept(this);
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitLogand(BoardParser.LogandContext ctx) {
         if (ctx.AND() != null) {
-            return new AndNode(ctx.getChild(0).accept(this), ctx.getChild(2).accept(this));
+            return new AndNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.equality() != null) {
-
             return ctx.getChild(0).accept(this);
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitEquality(BoardParser.EqualityContext ctx) {
         if (ctx.EQL() != null){
-            return new EqualNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+            return new EqualNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.NEQL() != null){
-            return new NotEqualNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+            return new NotEqualNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.relational() != null){
-
             return ctx.getChild(0).accept(this);
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitRelational(BoardParser.RelationalContext ctx) {
         if (ctx.GTHEQL() != null){
-            return new GreaterThanEqualsNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+            return new GreaterThanEqualsNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.LTHEQL() != null){
-            return new LessThanEqualsNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+            return new LessThanEqualsNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.GTH() != null){
-            return new GreaterThanNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+            return new GreaterThanNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.LTH() != null){
-            return new LessThanNode(ctx.getChild(0).accept(this),ctx.getChild(2).accept(this));
+            return new LessThanNode(
+                    ctx.getChild(0).accept(this),
+                    ctx.getChild(2).accept(this)
+            );
         }
         else if (ctx.arithmeticExpression() != null){
             return ctx.getChild(0).accept(this);
@@ -651,6 +711,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.negation() != null){
             return ctx.getChild(0).accept(this);
         }
+
         return null;
     }
 
@@ -658,9 +719,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitNegation(BoardParser.NegationContext ctx) {
         if(ctx.NOT() != null){
             return new NegationNode(ctx.getChild(1).accept(this));
-        }else if (ctx.booleanAtom() != null){
+        }
+        else if (ctx.booleanAtom() != null){
             return ctx.getChild(0).accept(this);
         }
+
         return null;
     }
 
@@ -668,9 +731,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitBooleanAtom(BoardParser.BooleanAtomContext ctx) {
         if (ctx.BOOL() != null){
             return new BooleanNode(Boolean.parseBoolean(ctx.BOOL().getText()));
-        }else if (ctx.IDENTIFIER() != null) {
+        }
+        else if (ctx.IDENTIFIER() != null) {
             return new IdNode(ctx.IDENTIFIER().getText());
-        }else if(ctx.booleanExpression() != null){
+        }
+        else if(ctx.booleanExpression() != null){
             return ctx.getChild(1).accept(this);
         }
 
@@ -684,6 +749,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if (ctx.booleanExpression() != null && ctx.normalBlock() != null){
             //loop to get all elseif blocks
             List<ASTNode> elseifBlocks = new ArrayList<>();
+
             //Loop through every ast node and add it as child to block node
             for (ParseTree node : ctx.children) {
                 ASTNode astNode = node.accept(this);
@@ -695,22 +761,24 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
             }
             //if elseif else
-            if(ctx.elseStatement() != null && ctx.elseifStatement() != null){
+            if (ctx.elseStatement() != null && ctx.elseifStatement() != null){
                 return new ConditionalNode(
                         ctx.getChild(2).accept(this),
                         ctx.getChild(4).accept(this),
                         elseifBlocks,
-                        ctx.getChild(ctx.children.size()-1).getChild(1).accept(this));
+                        ctx.getChild(ctx.children.size()-1).getChild(1).accept(this)
+                );
             }
             //if else
-            else if(ctx.elseStatement() != null){
+            else if (ctx.elseStatement() != null){
                 return new ConditionalNode(
                         ctx.getChild(2).accept(this),
                         ctx.getChild(4).accept(this),
-                        ctx.getChild(ctx.children.size()-1).getChild(1).accept(this));
+                        ctx.getChild(ctx.children.size()-1).getChild(1).accept(this)
+                );
             }
             //if elseif
-            else if(ctx.elseifStatement() != null){
+            else if (ctx.elseifStatement() != null){
                 return new ConditionalNode(
                         ctx.getChild(2).accept(this),
                         ctx.getChild(4).accept(this),
@@ -718,8 +786,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
             //if
             else{
-                return new ConditionalNode(ctx.getChild(2).accept(this),
-                        ctx.getChild(4).accept(this));
+                return new ConditionalNode(
+                        ctx.getChild(2).accept(this),
+                        ctx.getChild(4).accept(this)
+                );
             }
         }
 
@@ -733,47 +803,63 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitElseifStatement(BoardParser.ElseifStatementContext ctx) {
+
         if(ctx.booleanExpression() != null && ctx.normalBlock() != null){
-            return new ElifConditionalNode(ctx.getChild(2).accept(this),
-                    ctx.getChild(4).accept(this));
+            return new ElifConditionalNode(
+                    ctx.getChild(2).accept(this),
+                    ctx.getChild(4).accept(this)
+            );
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitWhileStatement(BoardParser.WhileStatementContext ctx) {
+
         if(ctx.booleanExpression() != null && ctx.normalBlock() != null){
-            return new WhileNode(ctx.getChild(2).accept(this),ctx.getChild(4).accept(this));
+            return new WhileNode(
+                    ctx.getChild(2).accept(this),
+                    ctx.getChild(4).accept(this)
+            );
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitForeach(BoardParser.ForeachContext ctx) {
+
         if(ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null && ctx.normalBlock() != null){
-            return new ForeachNode(new IdNode(ctx.IDENTIFIER(0).getText()),
-                    new IdNode(ctx.IDENTIFIER(1).getText())
-                    ,ctx.getChild(6).accept(this));
+            return new ForeachNode(
+                    new IdNode(ctx.IDENTIFIER(0).getText()),
+                    new IdNode(ctx.IDENTIFIER(1).getText()),
+                    ctx.getChild(6).accept(this)
+            );
         }
+
         return null;
     }
 
     @Override
     public ASTNode visitPrint(BoardParser.PrintContext ctx) {
+
         if(ctx.PRINT() != null){
             List<ASTNode> prints = new ArrayList<>();
-            //horrible forloop to only get elements between commas in the print statement
-            for(int i = 0; i < ctx.children.size()-4; i+=2){
+
+            // horrible forloop to only get elements between commas in the print statement
+            for (int i = 0; i < ctx.children.size()-4; i+=2){
                 ASTNode astNode = ctx.getChild(i+2).accept(this);
                 //if astnode is null, that means its a simple string
                 if(astNode == null){
                     prints.add(new StringNode(ctx.getChild(i+2).getText()));
-                }else{
+                } else {
                     prints.add(astNode);
                 }
             }
             return new PrintNode(prints);
         }
+
         return null;
     }
 
