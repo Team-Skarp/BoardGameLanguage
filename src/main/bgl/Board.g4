@@ -240,6 +240,8 @@ assignmentStatement
     | choiceAssignment
     ;
 
+//Todo: find out why a = 2 + 2 2 + 2; is a legal input;
+// removing * does not seem to help, neither does removing + from additive rule
 intAssigment
     : IDENTIFIER ASSIGN arithmeticExpression*
     ;
