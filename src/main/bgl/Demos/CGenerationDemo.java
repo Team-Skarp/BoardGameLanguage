@@ -30,9 +30,7 @@ public class CGenerationDemo {
         String bglCodeExample = """
                 SETUP {
                     str a = \"hej\";
-                    int b = 64*5;
-                    bool c = true and false;
-                    print(a,b,c);
+                    print(a);
                 }
                 RULES{}
                 GAMELOOP{}
