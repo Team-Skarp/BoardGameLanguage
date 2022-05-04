@@ -31,7 +31,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(GameNode n) {
-        String str = "#include <stdio.h>\n#include<stdbool.h>\n" +
+        String str = "#include <stdio.h>\n#include<stdbool.h>\n#include<math.h>\n#include <string.h>\n#include <stdlib.h>\n" +
                 "\n" +
                 "int main(int argc, char *argv[])";
         str += (String) n.setup.accept(this);
@@ -88,8 +88,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PowNode n) {
-        //TODO: fix **, as i dont think it works in c
-        String str = " ( "+n.left.accept(this)+" ** "+n.right.accept(this)+" ) ";
+        String str = " ( (int)pow("+n.left.accept(this)+", "+n.right.accept(this)+") ) ";
         return str;
     }
 
@@ -245,13 +244,19 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(SequentialDeclaration n) {
-        return null;
+        String str = "";
+        for(ASTNode decl: n.declarations){
+            str+=decl.accept(this);
+        }
+        return str;
     }
 
     @Override
     public String visit(IntegerDeclarationNode n) {
-        String str = n.type() +" "+n.name+" = ";
-        str += n.value.accept(this);
+        String str = n.type() +" "+n.name;
+        if(n.value != null){
+            str += " = "+n.value.accept(this);
+        }
         str += EOL;
         return str;
     }
@@ -263,20 +268,33 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BooleanDeclarationNode n) {
-        String str = "bool "+n.name+" = ";
-        str += n.value.accept(this);
+        String str = "bool "+n.name;
+        if(n.value != null){
+            str += " = "+n.value.accept(this);
+        }
         str += EOL;
         return str;
     }
 
     @Override
     public String visit(StringDeclarationNode n) {
-        String str = "char "+n.name;
-        String end = (String) n.value.accept(this);
-        str += "["+end.length()+"] = "+end;
-        str += EOL;
+
+        String str = "char* "+n.name+EOL;
+        if(n.value != null){
+            String end = (String) n.value.accept(this);
+
+            str += n.name+" = (char *) malloc("+end.length()+")"+EOL;
+            str += "strcpy("+n.name+","+end+")"+EOL;
+        }else{
+            str += n.name+" = (char *) malloc(2)"+EOL;
+        }
         return str;
+
+        //TODO: when assignment needs to be done for strings. use this:
+        //n.name+" = (char *) realloc("+n.name+","+end.length()+")"+EOL;
+        //"strcpy("+n.name+", "+end+")"+EOL;
     }
+
 
     @Override
     public String visit(PathDeclarationNode n) {
@@ -340,7 +358,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ForeachNode n) {
-        return null;
+        //TODO: await jakob on functions
+        String str = "";
+        /*str +="for(int i = 0; i < sizeof("+n.mainId+")/sizeof("+n.mainId+"[0]); i++)";
+        str +=n.foreachBlock.accept(this);*/
+        return str;
     }
 
     @Override
