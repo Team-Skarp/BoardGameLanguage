@@ -2,12 +2,102 @@ package CodeGeneration;
 
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
+import Logging.Logger;
+import SymbolTable.Block;
+import SymbolTable.Symbol;
+import SymbolTable.SymbolTable;
+import SymbolTable.types.BoolType;
+import SymbolTable.types.IntType;
+import SymbolTable.types.StringType;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class GNUASMCodeGenerator implements ASTvisitor<String> {
+    private SymbolTable ST;
+    private int             indent = 0;
+    private final String    TAB = "\t";
+    Logger lo =             new Logger();
+    private final String EOL = ";\n";
+    private PrintNode printNode;
+    String data;
+    String footer;
+    //indicates how many variables have been declared in data section
+    int dataAmount = 2;
+    //pointer offset for the register
+    int pointerOffset = 20;
+    //indicates how many LC parts there has been. L is places you commonly jmp to
+    int LAmount = 2;
+    //creates a hashmap between a symbol from the symbol table and its pointer for assembly
+    HashMap<Integer,Integer> ptrTable = new HashMap<Integer, Integer>();
+
+    public GNUASMCodeGenerator(SymbolTable ST) {
+        this.ST = ST;
+    }
+
+
     @Override
     public String visit(GameNode n) {
-        String str = "";
-        return str;
+                data = """
+                	.file	"out.c"
+                	.intel_syntax noprefix
+                	.text
+                	.globl	main
+                	.section	.rodata
+                .LC0:
+                    .string	"true"
+                .LC1:
+                    .string	"false"
+                """;
+                footer = """
+                  	leave
+                 	mov	eax, 0
+                	.cfi_def_cfa 7, 8
+                	ret
+                	.cfi_endproc
+                .LFE6:
+                	.size	main, .-main
+                	.ident	"GCC: (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0"
+                	.section	.note.GNU-stack,"",@progbits
+                	.section	.note.gnu.property,"a"
+                	.align 8
+                	.long	 1f - 0f
+                	.long	 4f - 1f
+                	.long	 5
+                0:
+                	.string	 "GNU"
+                1:
+                	.align 8
+                	.long	 0xc0000002
+                	.long	 3f - 2f
+                2:
+                	.long	 0x3
+                3:
+                	.align 8
+                4:
+                """;
+        String str = n.setup.accept(this)+"";
+
+        String initialize = """
+                main:
+                .LFB6:
+                	.cfi_startproc
+                	endbr64
+                	push	rbp
+                	.cfi_def_cfa_offset 16
+                	.cfi_offset 6, -16
+                	mov	rbp, rsp
+                	.cfi_def_cfa_register 6
+                	sub	rsp, 16
+                	mov	DWORD PTR -%d[rbp], edi
+                 	mov	QWORD PTR -%d[rbp], rsi
+                """.formatted(pointerOffset,pointerOffset+12);
+        data += """
+                        .text
+                        .type	main, @function
+                        """;
+        lo.g(data);
+        return data+initialize+str+footer;
     }
 
     @Override
@@ -22,39 +112,45 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PlusNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(MinusNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(UnaryMinusNode n) {
-        return null;
+        String str = " ( -( "+n.operand.accept(this)+" ) ) ";
+        return str;
     }
 
     @Override
     public String visit(MultNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(DivNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(ModNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(PowNode n) {
-        return null;
+        String str = ""; //TODO: figure out how to integrate a power function. use loop to increment?
+        return str;
     }
-
     @Override
     public String visit(IdNode n) {
         return null;
@@ -62,12 +158,17 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntNode n) {
-        return null;
+        String str = n.value+"";
+        return str;
     }
 
     @Override
     public String visit(BooleanNode n) {
-        return null;
+        if(n.value == true){
+            return "1";
+        }else{
+            return "0";
+        }
     }
 
     @Override
@@ -82,52 +183,103 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(EqualNode n) {
-        return null;
+        String a = n.left.accept(this)+"";
+        String b = n.right.accept(this)+"";
+        String str = "(!("+a+">"+b+")&&!("+a+"<"+b+"))";
+        return str;
     }
 
     @Override
     public String visit(NotEqualNode n) {
-        return null;
+        String a = n.left.accept(this)+"";
+        String b = n.right.accept(this)+"";
+        String str = "(("+a+">"+b+")||("+a+"<"+b+"))";
+        return str;
     }
 
     @Override
     public String visit(LessThanNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(GreaterThanNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(GreaterThanEqualsNode n) {
-        return null;
+        String a = n.left.accept(this)+"";
+        String b = n.right.accept(this)+"";
+        String str = "((!("+a+">"+b+")&&!("+a+"<"+b+"))||("+a+">"+b+"))";
+        return str;
     }
 
     @Override
     public String visit(LessThanEqualsNode n) {
-        return null;
+        String a = n.left.accept(this)+"";
+        String b = n.right.accept(this)+"";
+        String str = "((!("+a+">"+b+")&&!("+a+"<"+b+"))||("+a+"<"+b+"))";
+        return str;
     }
 
     @Override
     public String visit(NegationNode n) {
-        return null;
+        String str = " ( !( "+n.child.accept(this)+" ) )";
+        return str;
     }
 
     @Override
     public String visit(OrNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(AndNode n) {
-        return null;
+        String str = " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
+        return str;
     }
 
     @Override
     public String visit(BlockNode n) {
-        return null;
+        String str = "\n";
+        List<Block> childBlocks = ST.getActiveBlock().getChildren();
+
+        if (childBlocks.size() > 0) {
+            int cnt = 0;
+            for (Block block : childBlocks) {
+                ST.dive();
+                String dataCpy = data;
+                String strCpy = str;
+                int dataAmountCpy = dataAmount;
+                int pointerOffsetCpy = pointerOffset;
+                int LAmountCpy = LAmount;
+                HashMap<Integer,Integer> ptrTableCpy = ptrTable;
+
+                cnt++;
+                for (ASTNode c: n.children){
+
+                    str += (String) c.accept(this);
+                }
+                if(cnt != 2){
+                    data = dataCpy;
+                    str = strCpy;
+                    pointerOffset = pointerOffsetCpy;
+                    dataAmount = dataAmountCpy;
+                    ptrTable = ptrTableCpy;
+                    LAmount = LAmountCpy;
+                }
+            }
+        } else {
+            for (ASTNode c: n.children){
+                str += (String) c.accept(this);
+            }
+        }
+        ST.climb();
+        return str;
     }
 
     @Override
@@ -172,12 +324,24 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(SequentialDeclaration n) {
-        return null;
+        String str = "";
+        for(ASTNode decl: n.declarations){
+            str+=decl.accept(this);
+        }
+        return str;
     }
 
     @Override
     public String visit(IntegerDeclarationNode n) {
-        return null;
+        pointerOffset += 4;
+        int ptr = pointerOffset-16;
+        String str = """
+                    mov	DWORD PTR -%d[rbp], %s
+                """.formatted(ptr,n.value.accept(this));
+        Symbol symbol = ST.retrieveSymbol(n.name);
+        lo.g(symbol.hashCode());
+        ptrTable.put(symbol.hashCode(),ptr);
+        return str;
     }
 
     @Override
@@ -187,7 +351,15 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BooleanDeclarationNode n) {
-        return null;
+        pointerOffset += 1;
+        int ptr = pointerOffset-16;
+        String str = """
+                    mov	BYTE PTR -%d[rbp], %s
+                """.formatted(ptr,n.value.accept(this));
+        Symbol symbol = ST.retrieveSymbol(n.name);
+        lo.g(symbol.hashCode());
+        ptrTable.put(symbol.hashCode(),ptr);
+        return str;
     }
 
     @Override
@@ -247,7 +419,68 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PrintNode n) {
-        return null;
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        lo.g(stackTraceElements);
+        //TODO: implement symbol table, implement all idnodes, implement the rest of the nodes. retrieve pointer loc.
+        printNode = n;
+        String str = "";
+        String EOL = "";
+        int printCount = 1;
+        for (ASTNode p : n.prints){
+            if(printCount == n.prints.size()){
+                EOL = "\\n";
+            }
+            if(p.getClass() == StringNode.class){
+                //STRING
+                data +="""
+                        .LC%d:
+                            .string	"%s"
+                        """.formatted(dataAmount,((StringNode) p).value+EOL);
+                str += "    mov	esi, eax";
+
+            }else if(p.getClass() == IdNode.class){
+                //ID NODES
+                Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
+                if(symbol.type instanceof IntType){
+                    //ID TYPE INT
+                    data +="""
+                        .LC%d:
+                            .string	"%s"
+                        """.formatted(dataAmount,"%d"+EOL);
+                    str += "    mov eax, DWORD PTR -%d[rbp]\n".formatted(ptrTable.get(symbol.hashCode()));
+                    str += "    mov	esi, eax\n";
+                }else if(symbol.type instanceof BoolType){
+                    //ID TYPE BOOL
+                    data +="""
+                        .LC%d:
+                            .string	"%s"
+                        """.formatted(dataAmount,"%s"+EOL);
+                    str += """
+                        	cmp	BYTE PTR -%d[rbp], 0	
+                        	je	.L%d
+                        	lea	rax, .LC0[rip]
+                        	jmp	.L%d
+                        .L%d:
+                        	lea	rax, .LC1[rip]
+                        .L%d:
+                            mov rsi, rax
+                        """.formatted(ptrTable.get(symbol.hashCode()),LAmount,LAmount+1,LAmount,LAmount+1);
+                    LAmount+=2;
+                }
+            }else if(p.getClass() == BooleanNode.class){
+                //Boolean
+
+            }
+            str +="""
+                    \n
+                    lea	rdi, .LC%d[rip]
+                	mov	eax, 0
+                	call	printf@PLT
+                """.formatted(dataAmount);
+            dataAmount++;
+            printCount++;
+        }
+        return str;
     }
 
     @Override
