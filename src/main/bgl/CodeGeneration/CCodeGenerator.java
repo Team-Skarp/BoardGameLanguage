@@ -29,9 +29,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(GameNode n) {
-        String str = "#include <stdio.h>\n#include<stdbool.h>\n#include<math.h>\n#include <string.h>\n#include <stdlib.h>\n" +
-                "\n" +
-                "int main(int argc, char *argv[])";
+        String str = """
+                #include <stdio.h>
+                #include<stdbool.h>
+                #include<math.h>
+                #include <string.h>
+                #include <stdlib.h>
+                
+                #define foreach(item, array)                         \\
+                    for (int keep = 1,                               \\
+                             count = 0,                              \\
+                             size = sizeof(array) / sizeof *(array); \\
+                         keep && count != size;                      \\
+                         keep = !keep, count++)                      \\
+                        for (item = (array) + count; keep; keep = !keep)
+
+                int main(int argc, char *argv[])""";
         str += (String) n.setup.accept(this);
         return str;
     }
