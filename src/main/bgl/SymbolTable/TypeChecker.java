@@ -42,6 +42,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(StringAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(DesignDefinitionNode n) {
         return null;
     }

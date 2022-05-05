@@ -30,7 +30,8 @@ public class CGenerationDemo {
         String bglCodeExample = """
                 SETUP {
                     str msg = "hej";
-                    str asd;
+                    int a = 5;
+                    msg = "helloworld!";
                     
                     print(msg);
                 }

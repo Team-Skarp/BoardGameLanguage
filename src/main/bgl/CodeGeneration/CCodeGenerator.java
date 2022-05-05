@@ -212,8 +212,15 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(Assignment n) {
-        System.out.println("SSSSSSSSSSSSSSSSSSs");
         return null;
+    }
+
+    @Override
+    public String visit(StringAssignmentNode n) {
+        String str = "";
+        str += n.varName+" = (char *) realloc("+n.varName+","+n.literal.length()+")"+EOL;
+        str += "strcpy("+n.varName+", "+n.literal+")"+EOL;
+        return str;
     }
 
     @Override
@@ -266,6 +273,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return null;
     }
 
+
     @Override
     public String visit(BooleanDeclarationNode n) {
         String str = "bool "+n.name;
@@ -289,10 +297,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
             str += n.name+" = (char *) malloc(2)"+EOL;
         }
         return str;
-
-        //TODO: when assignment needs to be done for strings. use this:
-        //n.name+" = (char *) realloc("+n.name+","+end.length()+")"+EOL;
-        //"strcpy("+n.name+", "+end+")"+EOL;
     }
 
 

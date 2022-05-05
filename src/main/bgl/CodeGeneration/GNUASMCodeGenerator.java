@@ -141,6 +141,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(StringAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(DesignDefinitionNode n) {
         return null;
     }

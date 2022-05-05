@@ -3,6 +3,7 @@ package SymbolTable;
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
+import SymbolTable.SymbolTable;
 
 
 /**
@@ -156,6 +157,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(Assignment n) {
         return visit(n);
+    }
+
+    @Override
+    public SymbolTable visit(StringAssignmentNode n) {
+        return null;
     }
 
     @Override
