@@ -29,9 +29,11 @@ public class CGenerationDemo {
         */
         String bglCodeExample = """
                 SETUP {
-                    str a = \"Hello C!\";
-                    bool itsAwesome = true;
-                    print(a, itsAwesome);
+                    str greeting = "Hello C!";
+                    
+                    foreach (a in greeting) {
+                        print(a);
+                    }
                 }
                 RULES{}
                 GAMELOOP{}
