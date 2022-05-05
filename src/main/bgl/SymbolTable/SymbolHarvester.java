@@ -227,6 +227,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(ListDeclarationNode n) {
+        return null;
+    }
+
+    @Override
     public SymbolTable visit(SequentialDeclaration n) {
 
         TC = new TypeChecker(ST, TENV);

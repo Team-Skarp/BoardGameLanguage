@@ -858,7 +858,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if(ctx.PRINT() != null){
             List<ASTNode> prints = new ArrayList<>();
 
-            // horrible forloop to only get elements between commas in the print statement
+            //TODO Fix for loop
             for (int i = 0; i < ctx.children.size()-4; i+=2){
                 ASTNode astNode = ctx.getChild(i+2).accept(this);
                 //if astnode is null, that means its a simple string

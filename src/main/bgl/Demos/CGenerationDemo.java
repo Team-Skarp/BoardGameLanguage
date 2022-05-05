@@ -29,15 +29,13 @@ public class CGenerationDemo {
         */
         String bglCodeExample = """
                 SETUP {
-                    str msg = "hej";
-                    str asd;
-                    
-                    print(msg);
+                    str a = \"Hello C!\";
+                    bool itsAwesome = true;
+                    print(a, itsAwesome);
                 }
                 RULES{}
                 GAMELOOP{}
                 """;
-
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);

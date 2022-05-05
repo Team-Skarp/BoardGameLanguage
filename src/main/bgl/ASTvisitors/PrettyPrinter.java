@@ -341,6 +341,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(ListDeclarationNode n) {
+        return null;
+    }
+
+    @Override
     public Void visit(SequentialDeclaration n) {
 
         System.out.println(TAB.repeat(indent) + "Sequential Declaration of: " + n.type);

@@ -69,6 +69,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(ListDeclarationNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(SequentialDeclaration n) {
 
         TypeDenoter sequenceType = n.type;

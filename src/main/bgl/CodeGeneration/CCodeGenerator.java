@@ -6,9 +6,7 @@ import Logging.Logger;
 import SymbolTable.SymbolTable;
 import SymbolTable.Symbol;
 import SymbolTable.Block;
-import SymbolTable.types.BoolType;
-import SymbolTable.types.IntType;
-import SymbolTable.types.StringType;
+import SymbolTable.types.*;
 
 import java.util.List;
 
@@ -218,7 +216,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDefinitionNode n) {
-        return null;
+
+        String designBody = "";
+        for (Declaration field : n.fields) {
+            designBody += TAB + field.accept(this);
+        }
+
+        return (
+                """
+                struct %s {
+                %s};
+                """.formatted(
+                        n.typeDefinition.name,
+                        designBody,
+                        n.typeDefinition
+        ));
+
     }
 
     @Override
@@ -229,17 +242,89 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(Declaration n) {
         lo.g(n);
-        return null;
+        return (String) n.accept(this);
     }
 
     @Override
     public String visit(ActionDeclarationNode n) {
-        return null;
+
+        String formalParams = "";
+        for (Declaration param : n.formalParameters) {
+            formalParams += param.accept(this);
+        }
+
+        return (
+                """
+                %s (*%s)(%s);
+                """
+                ).formatted(
+                toCString(n.returnType),
+                n.name,
+                formalParams
+        );
     }
 
     @Override
     public String visit(DesignDeclarationNode n) {
-        return null;
+
+        return (
+                """
+                struct %s *%s;
+                """
+                .formatted(
+                n.ref.name,
+                n.name
+        ));
+    }
+
+    @Override
+    public String visit(ListDeclarationNode n) {
+
+        String braces = "[]";
+        TypeDenoter finalType = n.elementType;
+
+        //Algorithm to find the final type of a list
+        while (finalType instanceof ListType) {
+            ListType temp = (ListType) finalType;
+            finalType = temp.elementType;
+            braces += "[]";
+        }
+
+        return (
+                """
+                %s %s%s;
+                """.formatted(
+                        toCString(finalType),
+                        n.name,
+                        braces
+                )
+                );
+    }
+
+    /**
+     * Turns a type denoter into usable C string;
+     * @param type
+     * @return C string of the type
+     */
+    private String toCString(TypeDenoter type) {
+        String string = "";
+        if (type instanceof IntType) {
+            string = "int";
+        }
+        else if (type instanceof StringType) {
+            string = "char[]";
+        }
+        else if (type instanceof BoolType) {
+            string = "bool";
+        }
+        else if (type instanceof DesignRef temp) {
+            string = "struct %s".formatted(temp.name);
+        }
+        else {
+            throw new RuntimeException("Invalid return type '%s'".formatted(type));
+        }
+
+        return string;
     }
 
     @Override
@@ -389,7 +474,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
 
                 }
-
+                else {
+                    System.out.println("Incompatible type for print");
+                }
+                //variables
+                //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
+                endPart += (","+((IdNode) p).name);
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
                 str +="%d";

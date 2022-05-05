@@ -202,6 +202,11 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ListDeclarationNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(SequentialDeclaration n) {
         return null;
     }
