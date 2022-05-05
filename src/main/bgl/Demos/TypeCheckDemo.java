@@ -20,14 +20,14 @@ public class TypeCheckDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("int a, b = false, c;");
+        input = CharStreams.fromString("int a, b = 3, c;");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        BoardParser.AdditiveContext cst = parser.additive();
-        ASTNode ast = new ASTbuilder().visitAdditive(cst);
+        BoardParser.SequentialDeclarationContext cst = parser.sequentialDeclaration();
+        ASTNode ast = new ASTbuilder().visitSequentialDeclaration(cst);
 
         //Give it an empty symbol table and type env
         SymbolTable ST = new SymbolTable();
@@ -36,6 +36,6 @@ public class TypeCheckDemo {
         TypeChecker typeChecker = new TypeChecker(ST, TENV);
         TypeDenoter resultType = (TypeDenoter) ast.accept(typeChecker);
 
-        System.out.println(resultType.getClass().getName());
+        System.out.println(resultType.getClass());
     }
 }
