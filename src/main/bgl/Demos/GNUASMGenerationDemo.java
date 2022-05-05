@@ -2,7 +2,7 @@ package Demos;
 
 import ASTnodes.ASTNode;
 import ASTvisitors.ASTbuilder;
-import CodeGeneration.Assemblyx86CodeGenerator;
+import CodeGeneration.GNUASMCodeGenerator;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class AsmGenerationDemo {
+public class GNUASMGenerationDemo {
     public static void main(String[] args) {
 
         // Setup
@@ -27,13 +27,7 @@ public class AsmGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    int a = 0;
-                    str msg = "looping!";
-                    
-                    while(a<5){
-                        print(a," ",msg);
-                        a = a + 1;
-                    }
+                    print(5);
                 }
                 
                 RULES{}
@@ -52,13 +46,13 @@ public class AsmGenerationDemo {
         ASTNode ast = new ASTbuilder().visitGame(cst);
 
         // Assembly x86 - code generation
-        Assemblyx86CodeGenerator generator = new Assemblyx86CodeGenerator();
+        GNUASMCodeGenerator generator = new GNUASMCodeGenerator();
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);
 
         try {
-            FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.asm", false);
+            FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.s", false);
             fw.write(code);
             fw.close();
         } catch (IOException ex) {

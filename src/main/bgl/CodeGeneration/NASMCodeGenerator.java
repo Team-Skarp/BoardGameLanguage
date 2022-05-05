@@ -11,7 +11,7 @@ import Logging.Logger;
  * "nasm -f elf64 -o out.o out.asm && ld out.o -o out && ./out"
  */
 
-public class Assemblyx86CodeGenerator implements ASTvisitor<String> {
+public class NASMCodeGenerator implements ASTvisitor<String> {
     Logger lo = new Logger();
     private final String EOL = ";\n";
     private final String indent = "    ";
