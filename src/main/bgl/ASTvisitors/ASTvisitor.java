@@ -42,6 +42,9 @@ public interface ASTvisitor<T> {
     T visit(ActionBodyNode n);
 
     T visit(Assignment n);
+    T visit(StringAssignmentNode n);
+    T visit(IntegerAssignmentNode n);
+    T visit(BooleanAssignmentNode n);
 
     //Definitions
     T visit(DesignDefinitionNode n);
@@ -72,6 +75,7 @@ public interface ASTvisitor<T> {
 
     //Misc
     T visit(PrintNode n);
+    T visit(InputNode n);
     T visit(ActionCallNode n);
     T visit(ReturnNode n);
 }

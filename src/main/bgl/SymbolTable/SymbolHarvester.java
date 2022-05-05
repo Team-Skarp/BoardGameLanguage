@@ -161,6 +161,21 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(StringAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(IntegerAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(BooleanAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public SymbolTable visit(DesignDefinitionNode n) {
 
         //Create a seperate symbol table that resides in the design type
@@ -407,6 +422,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(PrintNode n) {
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(InputNode n) {
+        return null;
     }
 
     @Override
