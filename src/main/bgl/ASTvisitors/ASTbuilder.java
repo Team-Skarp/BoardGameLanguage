@@ -157,7 +157,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitDesignDefinition(BoardParser.DesignDefinitionContext ctx) {
 
-        DesignDefinitionNode dd;
+        DesignDefinitionNode dd; // Todo: never used?
         List<Declaration> fields = new ArrayList<>();
 
         for (ParseTree field : ctx.designBody().fieldRow()) {
@@ -223,16 +223,25 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
+        // Todo: how do demos work if this is not implemented?
         return null;
     }
 
     @Override
     public ASTNode visitBooleanAssigment(BoardParser.BooleanAssigmentContext ctx) {
+        // Todo: how do demos work if this is not implemented?
         return null;
     }
 
     @Override
     public ASTNode visitStringAssigment(BoardParser.StringAssigmentContext ctx) {
+
+        if (ctx.ASSIGN() != null) {
+            return new StringAssignmentNode(
+              ctx.IDENTIFIER().getText(),
+              ctx.STR().accept(this).toString());
+        }
+
         return null;
     }
 
@@ -608,8 +617,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.arithmeticAtom() != null){
             return ctx.getChild(0).accept(this);
         }
-
-        return null;
+        else {
+            System.out.println("No rule found for unary minus!");
+            return null;
+        }
     }
 
     @Override
@@ -622,9 +633,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new IdNode(ctx.IDENTIFIER().getText());
         }
         else if(ctx.arithmeticExpression() != null){
-            return ctx.getChild(1).accept(this);
+            return ctx.arithmeticExpression().accept(this);
         }
-
+        //Todo: missing impl for action call
         return null;
     }
 
@@ -738,7 +749,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.booleanExpression() != null){
             return ctx.getChild(1).accept(this);
         }
-
+        //Todo: missing impl for action call
         return null;
     }
 
