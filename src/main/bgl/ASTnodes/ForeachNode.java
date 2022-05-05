@@ -3,15 +3,15 @@ package ASTnodes;
 import ASTvisitors.ASTvisitor;
 
 public class ForeachNode implements ASTNode{
-    public IdNode newId;
-    public IdNode mainId;
-    public ASTNode foreachBlock;
+    public IdNode iterator;
+    public IdNode iterable;
+    public ASTNode body;
 
     //if(){}
-    public ForeachNode(IdNode newId, IdNode mainId, ASTNode foreachBlock) {
-        this.newId = newId;
-        this.mainId = mainId;
-        this.foreachBlock = foreachBlock;
+    public ForeachNode(IdNode iterator, IdNode iterable, ASTNode body) {
+        this.iterator = iterator;
+        this.iterable = iterable;
+        this.body = body;
     }
 
     @Override

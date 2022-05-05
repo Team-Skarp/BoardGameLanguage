@@ -29,7 +29,11 @@ public class CGenerationDemo {
         */
         String bglCodeExample = """
                 SETUP {
-                    str a = \"Hello C!\";
+                    str greeting = "Hello C!";
+                    
+                    foreach (a in greeting) {
+                        print(a);
+                    }
                     str b;
                     bool itsAwesome = true;
                     print(a, itsAwesome);

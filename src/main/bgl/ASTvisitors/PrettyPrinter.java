@@ -610,9 +610,9 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
         indent++;
 
-        n.newId.accept(this);
-        n.mainId.accept(this);
-        n.foreachBlock.accept(this);
+        n.iterator.accept(this);
+        n.iterable.accept(this);
+        n.body.accept(this);
 
         indent--;
 

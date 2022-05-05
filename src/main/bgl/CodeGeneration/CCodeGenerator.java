@@ -30,9 +30,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(GameNode n) {
-        String str = "#include <stdio.h>\n#include <stdbool.h>\n#include <math.h>\n#include <string.h>\n#include <stdlib.h>\n" +
-                "\n" +
-                "int main(int argc, char *argv[])";
+        String str = """
+                #include <stdio.h>
+                #include <stdbool.h>
+                #include <math.h>
+                #include <string.h>
+                #include <stdlib.h>
+                
+                #define foreach(item, array)                         \\
+                    for (int keep = 1,                               \\
+                             count = 0,                              \\
+                             size = sizeof(array) / sizeof *(array); \\
+                         keep && count != size;                      \\
+                         keep = !keep, count++)                      \\
+                        for (item = (array) + count; keep; keep = !keep)
+
+                int main(int argc, char *argv[])""";
         str += (String) n.setup.accept(this);
         return str;
     }
@@ -314,7 +327,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
             string = "bool";
         } else if (type instanceof DesignRef temp) {
             string = "struct %s".formatted(temp.name);
-        } else {
+        }
+        else if (type instanceof VoidType) {
+            string = "void";
+        }
+        else {
             throw new RuntimeException("Invalid return type '%s'".formatted(type));
         }
 
@@ -434,11 +451,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ForeachNode n) {
-        //TODO: await jakob on functions
-        String str = "";
+        Symbol iterableSymbol = ST.retrieveSymbol(n.iterable.name);
+        Symbol iteratorSymbol = ST.retrieveSymbol(n.iterator.name);
+
         /*str +="for(int i = 0; i < sizeof("+n.mainId+")/sizeof("+n.mainId+"[0]); i++)";
         str +=n.foreachBlock.accept(this);*/
-        return str;
+
+        return """
+                foreach (%s *%s, %s) {
+                    %s
+                }
+                """.formatted(
+                        iteratorSymbol.type instanceof StringType ? "char" : toCString(iteratorSymbol.type),
+                        n.iterator.name,
+                        n.iterable.name,
+                        n.body.accept(this)
+                    );
     }
 
     @Override
