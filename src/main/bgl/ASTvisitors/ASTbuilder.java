@@ -1,6 +1,7 @@
 package ASTvisitors;
 
 import ASTnodes.*;
+import SymbolTable.TypeErrorException;
 import antlr.BoardParser;
 import antlr.BoardVisitor;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -198,6 +199,40 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionDefinition(BoardParser.ActionDefinitionContext ctx) {
+
+        //For each formal parameter create declaration
+        List<Declaration> formalParameters = new ArrayList<>();
+        for (BoardParser.FormalParameterContext fp : ctx.formalParameter()) {
+            formalParameters.add((Declaration) fp.accept(this));
+        }
+        
+        if (ctx.type() != null) {
+            //return action def with params & type
+            return new ActionDefinitionNode(
+                    ctx.IDENTIFIER().getText(),
+                    getType(ctx.type()),
+                    new ActionBodyNode(
+                            (BlockNode) ctx.rulesBlock().accept(this)
+                    ),
+                    formalParameters.toArray(new Declaration[0])
+            );
+        }
+        else {
+            //return action def with void type
+            return new ActionDefinitionNode(
+                    ctx.IDENTIFIER().getText(),
+                    new VoidType(),
+                    new ActionBodyNode(
+                            (BlockNode) ctx.rulesBlock().accept(this)
+                    ),
+                    formalParameters.toArray(new Declaration[0])
+            );
+        }
+        
+    }
+
+    @Override
+    public ASTNode visitReturnStatement(BoardParser.ReturnStatementContext ctx) {
         return null;
     }
 
@@ -207,7 +242,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitReturnType(BoardParser.ReturnTypeContext ctx) {
+    public ASTNode visitType(BoardParser.TypeContext ctx) {
         return null;
     }
 
@@ -430,6 +465,34 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitFormalParameter(BoardParser.FormalParameterContext ctx) {
+        
+        TypeDenoter paramType = getType(ctx.type());
+        String      paramName = ctx.IDENTIFIER().getText();
+
+        if (paramType instanceof IntType) {
+            return new IntegerDeclarationNode(paramName);
+        }
+        else if (paramType instanceof StringType) {
+            return new StringDeclarationNode(paramName);
+        }
+        else if (paramType instanceof BoolType) {
+            return new BooleanDeclarationNode(paramName);
+        }
+        else if (paramType instanceof DesignRef design) {
+            return new DesignDeclarationNode(design, paramName);
+        }
+        else if (paramType instanceof ListType list) {
+            return new ListDeclarationNode(list.elementType, paramName);
+        }
+        else {
+            throw new TypeErrorException("type %s is not suitable as a parameter type".formatted(
+                    paramType
+            ));
+        }
+    }
+
+    @Override
     public ASTNode visitFieldRow(BoardParser.FieldRowContext ctx) {
 
         if (ctx.INTDCL() != null) {
@@ -482,9 +545,29 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return null;
         }
     }
-    @Override
-    public ASTNode visitFormalParameters(BoardParser.FormalParametersContext ctx) {
-        return null;
+
+    private TypeDenoter getType(BoardParser.TypeContext type) {
+
+        if (type.INTDCL() != null) {
+            return new IntType();
+        }
+        else if (type.BOOLDCL() != null) {
+            return new BoolType();
+        }
+        else if (type.STRDCL() != null) {
+            return new StringType();
+        }
+        else if (type.IDENTIFIER() != null) {
+            return new DesignRef(type.IDENTIFIER().getText());
+        }
+
+        //If we have nested list types we recursively call getListType on whatever the listtype is
+        else if (type.listType() != null) {
+            return new ListType(getListType(type.listType()));
+        }
+        else {
+            return null;
+        }
     }
 
     @Override

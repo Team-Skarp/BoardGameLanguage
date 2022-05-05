@@ -215,20 +215,27 @@ choiceDeclaration
     ;
 
 actionDeclaration
-    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON returnType)?
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameter)? RPAREN (COLON type)?
     ;
 
 actionDefinition
-    : ACTIONDCL IDENTIFIER LPAREN (formalParameters)? RPAREN (COLON returnType)? rulesBlock
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameter | formalParameter (COMMA formalParameter)+)? RPAREN (COLON type)? rulesBlock
     ;
 
-actionCall //TODO: Not implemented
-    : 'NOT IMPLEMENTED'
+returnStatement
+    : RETURN expression
     ;
 
-returnType
-    : primitiveType
-    | IDENTIFIER
+actionCall
+    : IDENTIFIER LPAREN (expression | expression (COMMA expression )+)? RPAREN
+    ;
+//INTDCL | BOOLDCL | STRDCL
+type
+    : INTDCL
+    | BOOLDCL
+    | STRDCL
+    | IDENTIFIER //Design ref
+    | listType
     ;
 
 assignmentStatement
@@ -294,11 +301,8 @@ primitiveValue
     : INT | BOOL | STR
     ;
 
-formalParameters
-    : primitiveType IDENTIFIER
-    | primitiveType IDENTIFIER COMMA formalParameters
-    | IDENTIFIER IDENTIFIER COMMA formalParameters
-    | IDENTIFIER IDENTIFIER
+formalParameter
+    : type IDENTIFIER
     ;
 
 statement
@@ -308,7 +312,9 @@ statement
     | assignmentStatement
     | print
     | expression EOL
+    | returnStatement EOL
     ;
+
 
 expression
     : booleanExpression
@@ -348,7 +354,6 @@ arithmeticAtom
     : INT
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
-    | actionCall
     ;
 
 logor
@@ -387,10 +392,6 @@ booleanAtom
     | LPAREN booleanExpression RPAREN
     | actionCall
     ;
-
-
-
-
 
 ifStatement
     : IF LPAREN booleanExpression RPAREN normalBlock (elseifStatement)* (elseStatement)?

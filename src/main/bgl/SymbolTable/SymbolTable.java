@@ -85,14 +85,15 @@ public class SymbolTable {
 
     /**
      * Sets the active block to be that of the parrent block and pops itself
+     *
+     * Cannot climb if there is not parrent scope to climb into
      */
     public void climb() {
-
-        Block oldBlock = activeBlock;
         if (activeBlock.getParent() != null) {
+            Block oldBlock = activeBlock;
             activeBlock = activeBlock.getParent();
             activeBlock.getChildren().remove(oldBlock);
-    }
+        }
     }
 
     /**

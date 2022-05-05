@@ -49,7 +49,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/main/bgl/Board.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="C:\programs\semester4\Math-language\src\main\bgl" />
+          <option name="outputDir" value="$PROJECT_DIR$/src/main/bgl" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="antlr" />
