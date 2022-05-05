@@ -215,6 +215,21 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(StringAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(IntegerAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(BooleanAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(DesignDefinitionNode n) {
 
         String designBody = "";
@@ -496,6 +511,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
         //char text[13] = " cars in the ";
         //printf("%d%s%s\n",2*2,text, "garage");
         return str;
+    }
+
+    @Override
+    public String visit(InputNode n) {
+        return null;
     }
 
     @Override

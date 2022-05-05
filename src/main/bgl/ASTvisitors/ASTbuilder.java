@@ -223,13 +223,27 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
-        // Todo: how do demos work if this is not implemented?
+
+        if (ctx.ASSIGN() != null) {
+            return new IntegerAssignmentNode(
+                    new IdNode(ctx.IDENTIFIER().getText()),
+                    (ArithmeticExpression) ctx.arithmeticExpression().accept(this)
+            );
+        }
+
         return null;
     }
 
     @Override
     public ASTNode visitBooleanAssigment(BoardParser.BooleanAssigmentContext ctx) {
-        // Todo: how do demos work if this is not implemented?
+
+        if (ctx.ASSIGN() != null) {
+            return new BooleanAssignmentNode(
+                    ctx.IDENTIFIER().getText(),
+                    (BooleanExpression) ctx.booleanExpression().accept(this)
+            );
+        }
+
         return null;
     }
 
@@ -239,8 +253,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if (ctx.ASSIGN() != null) {
             return new StringAssignmentNode(
               ctx.IDENTIFIER().getText(),
-              ctx.STR().accept(this).toString());
+              ctx.STR().getText());
         }
+        //old ctx.STR().accept(this).toString());
 
         return null;
     }
@@ -507,7 +522,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.expression() != null) {
             return ctx.expression().accept(this);
+        }else if(ctx.input() != null){
+            return ctx.input().accept(this);
         }
+
         return null;
     }
 
@@ -871,6 +889,15 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new PrintNode(prints);
         }
 
+        return null;
+    }
+
+    @Override
+    public ASTNode visitInput(BoardParser.InputContext ctx) {
+
+        if(ctx.IDENTIFIER() != null) {
+            return new InputNode(new IdNode(ctx.IDENTIFIER().getText()));
+        }
         return null;
     }
 

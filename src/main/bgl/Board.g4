@@ -69,6 +69,7 @@ BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
 
 PRINT       : 'print';
+INPUT       : 'input';
 
 //Delimiters
 LPAREN      : '(';
@@ -307,6 +308,7 @@ statement
     | foreach
     | assignmentStatement
     | print
+    | input
     | expression EOL
     ;
 
@@ -388,10 +390,6 @@ booleanAtom
     | actionCall
     ;
 
-
-
-
-
 ifStatement
     : IF LPAREN booleanExpression RPAREN normalBlock (elseifStatement)* (elseStatement)?
     ;
@@ -413,4 +411,8 @@ foreach
 
 print
     : PRINT LPAREN (STR | booleanExpression)? (COMMA (STR | booleanExpression))* RPAREN EOL
+    ;
+
+input
+    : INPUT LPAREN IDENTIFIER RPAREN EOL //TODO consider having an input type for the identifier
     ;

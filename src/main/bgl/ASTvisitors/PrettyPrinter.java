@@ -316,6 +316,48 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(StringAssignmentNode n) {
+        System.out.println(TAB.repeat(indent) + "String assign: ");
+
+        indent++;
+
+        n.getLeft().accept(this);
+        n.getRight().accept(this);
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(IntegerAssignmentNode n) {
+        System.out.println(TAB.repeat(indent) + "Int assign: ");
+
+        indent++;
+
+        n.getLeft().accept(this);
+        n.getRight().accept(this);
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(BooleanAssignmentNode n) {
+        System.out.println(TAB.repeat(indent) + "Bool assign: ");
+
+        indent++;
+
+        n.getLeft().accept(this);
+        n.getRight().accept(this);
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
     public Void visit(DesignDefinitionNode n) {
         return null;
     }
@@ -585,6 +627,20 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         indent++;
 
         n.prints.forEach(print -> print.accept(this));
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
+    public Void visit(InputNode n) {
+
+        System.out.println(TAB.repeat(indent) + "input: ");
+
+        indent++;
+
+        n.inputVariableName.accept(this);
 
         indent--;
 
