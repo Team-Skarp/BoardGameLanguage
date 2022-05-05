@@ -617,8 +617,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.arithmeticAtom() != null){
             return ctx.getChild(0).accept(this);
         }
-
-        return null;
+        else {
+            System.out.println("No rule found for unary minus!");
+            return null;
+        }
     }
 
     @Override
@@ -631,9 +633,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new IdNode(ctx.IDENTIFIER().getText());
         }
         else if(ctx.arithmeticExpression() != null){
-            return ctx.getChild(1).accept(this);
+            return ctx.arithmeticExpression().accept(this);
         }
-
+        //Todo: missing impl for action call
         return null;
     }
 
@@ -747,7 +749,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.booleanExpression() != null){
             return ctx.getChild(1).accept(this);
         }
-
+        //Todo: missing impl for action call
         return null;
     }
 

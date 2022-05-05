@@ -243,7 +243,7 @@ assignmentStatement
 //Todo: find out why a = 2 + 2 2 + 2; is a legal input;
 // removing * does not seem to help, neither does removing + from additive rule
 intAssigment
-    : IDENTIFIER ASSIGN arithmeticExpression*
+    : IDENTIFIER ASSIGN arithmeticExpression
     ;
 
 booleanAssigment
@@ -315,10 +315,10 @@ expression
     ;
 
 arithmeticExpression
-    : additive+
+    : additive
     ;
 booleanExpression
-    : logor+
+    : logor
     ;
 
 additive
