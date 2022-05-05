@@ -2,6 +2,7 @@ package CodeGeneration;
 
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
+import ASTvisitors.PrettyPrinter;
 import Logging.Logger;
 import SymbolTable.SymbolTable;
 import SymbolTable.Symbol;
@@ -17,10 +18,10 @@ import java.util.List;
  */
 public class CCodeGenerator implements ASTvisitor<String> {
 
-    private SymbolTable     ST;
-    private int             indent = 0;
-    private final String    TAB = "\t";
-    Logger lo =             new Logger();
+    private SymbolTable ST;
+    private int indent = 0;
+    private final String TAB = "\t";
+    Logger lo = new Logger();
     private final String EOL = ";\n";
 
     public CCodeGenerator(SymbolTable ST) {
@@ -31,8 +32,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(GameNode n) {
         String str = """
                 #include <stdio.h>
-                #include<stdbool.h>
-                #include<math.h>
+                #include <stdbool.h>
+                #include <math.h>
                 #include <string.h>
                 #include <stdlib.h>
                 
@@ -63,159 +64,136 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PlusNode n) {
-        String str = " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " + " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(MinusNode n) {
-        String str = " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " - " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(UnaryMinusNode n) {
-        lo.g(n.operand.accept(this).toString()+" unary minus");
-        String str = " ( -( "+n.operand.accept(this)+" ) ) ";
-        return str;
+        return "( -( " + n.operand.accept(this) + " ) )";
     }
 
     @Override
     public String visit(MultNode n) {
-        String str = " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " * " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(DivNode n) {
-        String str = " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " / " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(ModNode n) {
-        String str = " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " % " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(PowNode n) {
-        String str = " ( (int)pow("+n.left.accept(this)+", "+n.right.accept(this)+") ) ";
-        return str;
+        return "( (int)pow(" + n.left.accept(this) + ", " + n.right.accept(this) + ") )";
     }
 
     @Override
     public String visit(IdNode n) {
-        String str = ""+n.name;
-        return str;
+        return "" + n.name;
     }
 
     @Override
     public String visit(IntNode n) {
-        String str = n.value+"";
-        return str;
+        return n.value + "";
     }
 
     @Override
     public String visit(BooleanNode n) {
-        String str = ""+n.value;
-        return str;
+        return "" + n.value;
     }
 
     @Override
     public String visit(StringNode n) {
-        String str = "\""+n.value+"\"";
-        return str;
+        return "\"" + n.value + "\"";
     }
 
     @Override
     public String visit(BooleanExpression n) {
-        return null;
+        return (String) n.accept(this);
     }
 
     @Override
     public String visit(EqualNode n) {
-        String str = " ( "+n.left.accept(this)+"=="+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + "==" + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(NotEqualNode n) {
-        String str = " ( "+n.left.accept(this)+" != "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " != " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(LessThanNode n) {
-        String str = " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " < " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(GreaterThanNode n) {
-        String str = " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " > " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(GreaterThanEqualsNode n) {
-        String str = " ( "+n.left.accept(this)+" >= "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " >= " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(LessThanEqualsNode n) {
-        String str = " ( "+n.left.accept(this)+" <= "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " <= " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(NegationNode n) {
-        String str = " ( !( "+n.child.accept(this)+" ) )";
-        return str;
+        return "( !( " + n.child.accept(this) + " ) )";
     }
 
     @Override
     public String visit(OrNode n) {
-        String str = " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " || " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(AndNode n) {
-        String str = " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
-        return str;
+        return "( " + n.left.accept(this) + " && " + n.right.accept(this) + " )";
     }
 
     @Override
     public String visit(BlockNode n) {
-        String str = "";
+        StringBuilder str = new StringBuilder();
         List<Block> childBlocks = ST.getActiveBlock().getChildren();
         if (childBlocks.size() > 0) {
             for (Block block : childBlocks) {
 
                 ST.dive();
- 
-                str = "{\n";
 
-                for (ASTNode c: n.children){
-                    str += (String) c.accept(this);
+                str = new StringBuilder("{\n");
+                for (ASTNode c : n.children) {
+                    str.append((String) c.accept(this));
                 }
-
-                str += "}";
+                str.append("}");
 
             }
         } else {
-            str = "{\n";
-            for (ASTNode c: n.children){
-                str += (String) c.accept(this);
+            str = new StringBuilder("{\n");
+            for (ASTNode c : n.children) {
+                str.append((String) c.accept(this));
             }
-            str += "}";
+            str.append("}");
         }
 
         ST.climb();
 
-        return str;
+        return str.toString();
     }
 
     @Override
@@ -252,20 +230,20 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(DesignDefinitionNode n) {
 
-        String designBody = "";
+        StringBuilder designBody = new StringBuilder();
         for (Declaration field : n.fields) {
-            designBody += TAB + field.accept(this);
+            designBody.append(TAB).append(field.accept(this));
         }
 
         return (
                 """
-                struct %s {
-                %s};
-                """.formatted(
+                        struct %s {
+                        %s};
+                        """.formatted(
                         n.typeDefinition.name,
-                        designBody,
+                        designBody.toString(),
                         n.typeDefinition
-        ));
+                ));
 
     }
 
@@ -283,19 +261,19 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ActionDeclarationNode n) {
 
-        String formalParams = "";
+        StringBuilder formalParams = new StringBuilder();
         for (Declaration param : n.formalParameters) {
-            formalParams += param.accept(this);
+            formalParams.append(param.accept(this));
         }
 
         return (
                 """
-                %s (*%s)(%s);
-                """
-                ).formatted(
+                        %s (*%s)(%s);
+                        """
+        ).formatted(
                 toCString(n.returnType),
                 n.name,
-                formalParams
+                formalParams.toString()
         );
     }
 
@@ -304,40 +282,41 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         return (
                 """
-                struct %s *%s;
-                """
-                .formatted(
-                n.ref.name,
-                n.name
-        ));
+                        struct %s *%s;
+                        """
+                        .formatted(
+                                n.ref.name,
+                                n.name
+                        ));
     }
 
     @Override
     public String visit(ListDeclarationNode n) {
 
-        String braces = "[]";
+        StringBuilder braces = new StringBuilder("[]");
         TypeDenoter finalType = n.elementType;
 
         //Algorithm to find the final type of a list
         while (finalType instanceof ListType) {
             ListType temp = (ListType) finalType;
             finalType = temp.elementType;
-            braces += "[]";
+            braces.append("[]");
         }
 
         return (
                 """
-                %s %s%s;
-                """.formatted(
+                        %s %s%s;
+                        """.formatted(
                         toCString(finalType),
                         n.name,
-                        braces
+                        braces.toString()
                 )
-                );
+        );
     }
 
     /**
      * Turns a type denoter into usable C string;
+     *
      * @param type
      * @return C string of the type
      */
@@ -345,14 +324,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String string = "";
         if (type instanceof IntType) {
             string = "int";
-        }
-        else if (type instanceof StringType) {
+        } else if (type instanceof StringType) {
             string = "char[]";
-        }
-        else if (type instanceof BoolType) {
+        } else if (type instanceof BoolType) {
             string = "bool";
-        }
-        else if (type instanceof DesignRef temp) {
+        } else if (type instanceof DesignRef temp) {
             string = "struct %s".formatted(temp.name);
         }
         else if (type instanceof VoidType) {
@@ -367,18 +343,18 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(SequentialDeclaration n) {
-        String str = "";
-        for(ASTNode decl: n.declarations){
-            str+=decl.accept(this);
+        StringBuilder str = new StringBuilder();
+        for (ASTNode decl : n.declarations) {
+            str.append(decl.accept(this));
         }
-        return str;
+        return str.toString();
     }
 
     @Override
     public String visit(IntegerDeclarationNode n) {
-        String str = n.type() +" "+n.name;
-        if(n.value != null){
-            str += " = "+n.value.accept(this);
+        String str = n.type() + " " + n.name;
+        if (n.value != null) {
+            str += " = " + n.value.accept(this);
         }
         str += EOL;
         return str;
@@ -392,9 +368,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BooleanDeclarationNode n) {
-        String str = "bool "+n.name;
-        if(n.value != null){
-            str += " = "+n.value.accept(this);
+        String str = "bool " + n.name;
+        if (n.value != null) {
+            str += " = " + n.value.accept(this);
         }
         str += EOL;
         return str;
@@ -403,14 +379,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(StringDeclarationNode n) {
 
-        String str = "char* "+n.name+EOL;
-        if(n.value != null){
+        String str = "char* " + n.name + EOL;
+        if (n.value != null) {
             String end = (String) n.value.accept(this);
 
-            str += n.name+" = (char *) malloc("+end.length()+")"+EOL;
-            str += "strcpy("+n.name+","+end+")"+EOL;
-        }else{
-            str += n.name+" = (char *) malloc(2)"+EOL;
+            str += n.name + " = (char *) malloc(" + end.length() + ")" + EOL;
+            str += "strcpy(" + n.name + "," + end + ")" + EOL;
+        } else {
+            str += n.name + " = (char *) malloc(2)" + EOL;
         }
         return str;
     }
@@ -438,24 +414,23 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ConditionalNode n) {
-        String str = "if("+n.predicate.accept(this)+")"+n.ifBlock.accept(this);
+        StringBuilder str = new StringBuilder("if(" + n.predicate.accept(this) + ")" + n.ifBlock.accept(this));
 
-        if(n.elseifBlocks != null){
-            for(ASTNode elif : n.elseifBlocks){
-                str += (String) elif.accept(this);
+        if (n.elseifBlocks != null) {
+            for (ASTNode elif : n.elseifBlocks) {
+                str.append((String) elif.accept(this));
             }
         }
-        if(n.elseBlock != null){
-            str+="else"+n.elseBlock.accept(this);
+        if (n.elseBlock != null) {
+            str.append("else").append(n.elseBlock.accept(this));
         }
-        return str;
+        return str.toString();
     }
 
     @Override
     public String visit(ElifConditionalNode n) {
-        String str = "else if("+n.predicate.accept(this)+")"+n.ifBlock.accept(this);
 
-        return str;
+        return "else if(" + n.predicate.accept(this) + ")" + n.ifBlock.accept(this);
     }
 
     @Override
@@ -466,8 +441,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PredicateNode n) {
-        String str = n.value.accept(this)+"";
-        return str;
+        return n.value.accept(this) + "";
     }
 
     @Override
@@ -507,13 +481,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
             if(p.getClass() == IdNode.class){
                 Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
-                if(symbol.type instanceof IntType){
-                    str +="%d";
-                    endPart += (","+((IdNode) p).name);
+                if (symbol.type instanceof IntType) {
+                    str.append("%d");
+                    endPart.append(",").append(((IdNode) p).name);
 
-                }else if(symbol.type instanceof StringType){
-                    str +="%s";
-                    endPart += (","+((IdNode) p).name);
+                } else if (symbol.type instanceof StringType) {
+                    str.append("%s");
+                    endPart.append(",").append(((IdNode) p).name);
 
                 }else if(symbol.type instanceof BoolType){
                     str +="%s";
@@ -525,9 +499,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 //variables
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
-                str +="%d";
-                endPart += ","+p.accept(this);
-            }else if(p instanceof BooleanExpression){
+                str.append("%d");
+                endPart.append(",").append(p.accept(this));
+            } else if (p instanceof BooleanExpression) {
                 //boolean
                 str +="%s";
                 endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
@@ -536,17 +510,37 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 str +="%s";
                 endPart += ", \""+((StringNode) p).value+"\"";}
 
-        };
-        str += "\\n\""+endPart+")"+EOL;
+        }
+        ;
+        str.append("\\n\"").append(endPart).append(")").append(EOL);
 
         //char text[13] = " cars in the ";
         //printf("%d%s%s\n",2*2,text, "garage");
-        return str;
+        return str.toString();
     }
 
     @Override
     public String visit(InputNode n) {
-        return null;
+        String str = "scanf(\"";
+        IdNode variableName = n.inputVariableName;
+        if (variableName.getClass() == IdNode.class) {
+            Symbol symbol = ST.retrieveSymbol(variableName.name);
+            if (symbol.type instanceof IntType) {
+                str += ("%d, &" + variableName.name);
+
+            } else if (symbol.type instanceof StringType) {
+                str += ("%s, &" + variableName.name);
+
+            } else if (symbol.type instanceof BoolType) {
+                str += ("%s, &" + variableName.name);
+
+            } else {
+                System.out.println("Incompatible type for input");
+            }
+
+            str += ")" + EOL;
+        }
+        return str;
     }
 
     @Override
