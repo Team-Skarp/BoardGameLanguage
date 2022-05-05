@@ -31,7 +31,8 @@ public class GNUASMGenerationDemo {
                 SETUP {
                     bool c = (2>=1 or 2<=1) and !(true and false) and (2==2)and(3>2);
                     int a = 2*2+5;
-                    print(c,a," sooo cool");
+                    bool gha = false;
+                    print(c,a,gha," sooo cool");
                 }
                 
                 RULES{}

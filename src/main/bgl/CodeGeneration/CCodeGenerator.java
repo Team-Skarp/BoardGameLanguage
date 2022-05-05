@@ -75,6 +75,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(UnaryMinusNode n) {
+        lo.g(n.operand.accept(this).toString()+" unary minus");
         String str = " ( -( "+n.operand.accept(this)+" ) ) ";
         return str;
     }
@@ -190,7 +191,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(BlockNode n) {
         String str = "";
         List<Block> childBlocks = ST.getActiveBlock().getChildren();
-
         if (childBlocks.size() > 0) {
             for (Block block : childBlocks) {
 
@@ -237,18 +237,16 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
-    public String visit(DesignDefinitionNode n) {
-        return null;
-    }
-
-    @Override
     public String visit(IntegerAssignmentNode n) {
-        return null;
+
+        String str = n.id.name+" = "+n.aexpr.accept(this)+EOL;
+        return str;
     }
 
     @Override
     public String visit(BooleanAssignmentNode n) {
-        return null;
+        String str = n.varName+" = "+n.bexpr.accept(this)+EOL;
+        return str;
     }
 
     @Override
@@ -474,7 +472,10 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(WhileNode n) {
+        lo.g(n.predicate.accept(this));
         String str = "while("+n.predicate.accept(this)+")"+n.whileBlock.accept(this);
+        n.whileBlock.accept(this);
+        lo.g("whlenode");
         return str;
     }
 
@@ -503,11 +504,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String str = "printf(\"";
         String endPart = "";
         for(ASTNode p : n.prints){
-            if(p.getClass() == StringNode.class){
-                //string literals
-                str +="%s";
-                endPart += ", \""+((StringNode) p).value+"\"";
-            }else if(p.getClass() == IdNode.class){
+
+            if(p.getClass() == IdNode.class){
                 Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
                 if(symbol.type instanceof IntType){
                     str +="%d";
@@ -520,14 +518,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 }else if(symbol.type instanceof BoolType){
                     str +="%s";
                     endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
-
                 }
                 else {
                     System.out.println("Incompatible type for print");
                 }
                 //variables
-                //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
-                endPart += (","+((IdNode) p).name);
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
                 str +="%d";
@@ -536,7 +531,10 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 //boolean
                 str +="%s";
                 endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
-            }
+            }else if(p.getClass() == StringNode.class){
+                //string literals
+                str +="%s";
+                endPart += ", \""+((StringNode) p).value+"\"";}
 
         };
         str += "\\n\""+endPart+")"+EOL;

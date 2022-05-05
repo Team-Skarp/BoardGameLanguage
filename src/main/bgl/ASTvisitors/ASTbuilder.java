@@ -90,7 +90,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
-
+        lo.g(ctx.children);
         List<ASTNode> children = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {

@@ -4,6 +4,7 @@
 **/.DS_Store
 out.asm
 out.c
+out.s
 .idea
 
 .classpath

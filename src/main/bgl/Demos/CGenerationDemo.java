@@ -29,10 +29,9 @@ public class CGenerationDemo {
         */
         String bglCodeExample = """
                 SETUP {
-                    str greeting = "Hello C!";
-                    
-                    foreach (a in greeting) {
-                        print(a);
+                    int i = 0;                    
+                    while(true){
+                       print("hej");
                     }
                 }
                 RULES{}
