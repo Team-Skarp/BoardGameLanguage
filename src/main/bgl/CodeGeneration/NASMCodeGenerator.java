@@ -182,6 +182,16 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(IntegerAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(BooleanAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(DesignDefinitionNode n) {
         return null;
     }
@@ -203,6 +213,11 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDeclarationNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(ListDeclarationNode n) {
         return null;
     }
 
@@ -308,6 +323,11 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
                 "    call      print                             ";
         data+=indent+varName+" db "+varLiteral+"10\n";
         return str;
+    }
+
+    @Override
+    public String visit(InputNode n) {
+        return null;
     }
 
     @Override

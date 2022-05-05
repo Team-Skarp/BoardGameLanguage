@@ -2,14 +2,14 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class StringAssignmentNode implements ASTNode<Object>, Assignment{
+public class BooleanAssignmentNode implements ASTNode<Object>, Assignment{
 
     public String varName;
-    public String literal; //TODO Should this be an expression? So a function call can be the assign value
+    public BooleanExpression bexpr;
 
-    public StringAssignmentNode(String varName, String literal) {
+    public BooleanAssignmentNode(String varName, BooleanExpression bexpr) {
         this.varName = varName;
-        this.literal = literal;
+        this.bexpr = bexpr;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class StringAssignmentNode implements ASTNode<Object>, Assignment{
 
     @Override
     public ASTNode getRight() {
-        return new IdNode(literal);
+        return bexpr;
     }
 }

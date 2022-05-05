@@ -5,6 +5,8 @@ import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
 import SymbolTable.SymbolTable;
 
+import java.util.List;
+
 
 /**
  * Class used to handle declarations and definitions to do contextual analysis
@@ -165,6 +167,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(IntegerAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public SymbolTable visit(BooleanAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public SymbolTable visit(DesignDefinitionNode n) {
 
         //Create a seperate symbol table that resides in the design type
@@ -230,6 +242,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
         ST.enterSymbol(sym);
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ListDeclarationNode n) {
+        return null;
     }
 
     @Override
@@ -375,12 +392,42 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ForeachNode n) {
+
+        // Look-up for iterable
+        Symbol iterableSymbol = ST.retrieveSymbol(n.iterable.name);
+
+        if ( !((iterableSymbol.type instanceof ListType) || iterableSymbol.type instanceof StringType)) {
+            throw new TypeErrorException("%s of type '%s' is not iterable".formatted(
+                    iterableSymbol.name,
+                    iterableSymbol.type
+            ));
+        }
+
+        TypeDenoter iteratorElementType;
+
+        if (iterableSymbol.type instanceof ListType list) {
+            iteratorElementType = list.elementType;
+        } else {
+            iteratorElementType = (StringType) iterableSymbol.type;
+        }
+
+        // Create new symbol for iterator
+        ST.enterSymbol(new Symbol(
+                n.iterator.name,
+                iteratorElementType
+        ));
+
         return ST;
     }
 
     @Override
     public SymbolTable visit(PrintNode n) {
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(InputNode n) {
+        return null;
     }
 
     @Override

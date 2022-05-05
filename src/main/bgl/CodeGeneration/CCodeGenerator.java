@@ -6,9 +6,7 @@ import Logging.Logger;
 import SymbolTable.SymbolTable;
 import SymbolTable.Symbol;
 import SymbolTable.Block;
-import SymbolTable.types.BoolType;
-import SymbolTable.types.IntType;
-import SymbolTable.types.StringType;
+import SymbolTable.types.*;
 
 import java.util.List;
 
@@ -31,9 +29,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(GameNode n) {
-        String str = "#include <stdio.h>\n#include<stdbool.h>\n#include<math.h>\n#include <string.h>\n#include <stdlib.h>\n" +
-                "\n" +
-                "int main(int argc, char *argv[])";
+        String str = """
+                #include <stdio.h>
+                #include<stdbool.h>
+                #include<math.h>
+                #include <string.h>
+                #include <stdlib.h>
+                
+                #define foreach(item, array)                         \\
+                    for (int keep = 1,                               \\
+                             count = 0,                              \\
+                             size = sizeof(array) / sizeof *(array); \\
+                         keep && count != size;                      \\
+                         keep = !keep, count++)                      \\
+                        for (item = (array) + count; keep; keep = !keep)
+
+                int main(int argc, char *argv[])""";
         str += (String) n.setup.accept(this);
         return str;
     }
@@ -184,11 +195,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
             for (Block block : childBlocks) {
 
                 ST.dive();
-
+ 
                 str = "{\n";
+
                 for (ASTNode c: n.children){
                     str += (String) c.accept(this);
                 }
+
                 str += "}";
 
             }
@@ -229,6 +242,36 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(IntegerAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(BooleanAssignmentNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(DesignDefinitionNode n) {
+
+        String designBody = "";
+        for (Declaration field : n.fields) {
+            designBody += TAB + field.accept(this);
+        }
+
+        return (
+                """
+                struct %s {
+                %s};
+                """.formatted(
+                        n.typeDefinition.name,
+                        designBody,
+                        n.typeDefinition
+        ));
+
+    }
+
+    @Override
     public String visit(ActionDefinitionNode n) {
         return null;
     }
@@ -236,17 +279,92 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(Declaration n) {
         lo.g(n);
-        return null;
+        return (String) n.accept(this);
     }
 
     @Override
     public String visit(ActionDeclarationNode n) {
-        return null;
+
+        String formalParams = "";
+        for (Declaration param : n.formalParameters) {
+            formalParams += param.accept(this);
+        }
+
+        return (
+                """
+                %s (*%s)(%s);
+                """
+                ).formatted(
+                toCString(n.returnType),
+                n.name,
+                formalParams
+        );
     }
 
     @Override
     public String visit(DesignDeclarationNode n) {
-        return null;
+
+        return (
+                """
+                struct %s *%s;
+                """
+                .formatted(
+                n.ref.name,
+                n.name
+        ));
+    }
+
+    @Override
+    public String visit(ListDeclarationNode n) {
+
+        String braces = "[]";
+        TypeDenoter finalType = n.elementType;
+
+        //Algorithm to find the final type of a list
+        while (finalType instanceof ListType) {
+            ListType temp = (ListType) finalType;
+            finalType = temp.elementType;
+            braces += "[]";
+        }
+
+        return (
+                """
+                %s %s%s;
+                """.formatted(
+                        toCString(finalType),
+                        n.name,
+                        braces
+                )
+                );
+    }
+
+    /**
+     * Turns a type denoter into usable C string;
+     * @param type
+     * @return C string of the type
+     */
+    private String toCString(TypeDenoter type) {
+        String string = "";
+        if (type instanceof IntType) {
+            string = "int";
+        }
+        else if (type instanceof StringType) {
+            string = "char[]";
+        }
+        else if (type instanceof BoolType) {
+            string = "bool";
+        }
+        else if (type instanceof DesignRef temp) {
+            string = "struct %s".formatted(temp.name);
+        }
+        else if (type instanceof VoidType) {
+            string = "void";
+        }
+        else {
+            throw new RuntimeException("Invalid return type '%s'".formatted(type));
+        }
+
+        return string;
     }
 
     @Override
@@ -362,11 +480,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ForeachNode n) {
-        //TODO: await jakob on functions
-        String str = "";
+        Symbol iterableSymbol = ST.retrieveSymbol(n.iterable.name);
+        Symbol iteratorSymbol = ST.retrieveSymbol(n.iterator.name);
+
         /*str +="for(int i = 0; i < sizeof("+n.mainId+")/sizeof("+n.mainId+"[0]); i++)";
         str +=n.foreachBlock.accept(this);*/
-        return str;
+
+        return """
+                foreach (%s *%s, %s) {
+                    %s
+                }
+                """.formatted(
+                        iteratorSymbol.type instanceof StringType ? "char" : toCString(iteratorSymbol.type),
+                        n.iterator.name,
+                        n.iterable.name,
+                        n.body.accept(this)
+                    );
     }
 
     @Override
@@ -393,7 +522,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
 
                 }
-
+                else {
+                    System.out.println("Incompatible type for print");
+                }
+                //variables
+                //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
+                endPart += (","+((IdNode) p).name);
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
                 str +="%d";
@@ -410,6 +544,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
         //char text[13] = " cars in the ";
         //printf("%d%s%s\n",2*2,text, "garage");
         return str;
+    }
+
+    @Override
+    public String visit(InputNode n) {
+        return null;
     }
 
     @Override

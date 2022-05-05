@@ -29,12 +29,15 @@ public class CGenerationDemo {
         */
         String bglCodeExample = """
                 SETUP {
-                    print("hello");
+                    str greeting = "Hello C!";
+                    
+                    foreach (a in greeting) {
+                        print(a);
+                    }
                 }
                 RULES{}
                 GAMELOOP{}
                 """;
-
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);

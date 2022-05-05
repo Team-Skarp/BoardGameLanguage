@@ -222,13 +222,27 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
-        // Todo: how do demos work if this is not implemented?
+
+        if (ctx.ASSIGN() != null) {
+            return new IntegerAssignmentNode(
+                    new IdNode(ctx.IDENTIFIER().getText()),
+                    (ArithmeticExpression) ctx.arithmeticExpression().accept(this)
+            );
+        }
+
         return null;
     }
 
     @Override
     public ASTNode visitBooleanAssigment(BoardParser.BooleanAssigmentContext ctx) {
-        // Todo: how do demos work if this is not implemented?
+
+        if (ctx.ASSIGN() != null) {
+            return new BooleanAssignmentNode(
+                    ctx.IDENTIFIER().getText(),
+                    (BooleanExpression) ctx.booleanExpression().accept(this)
+            );
+        }
+
         return null;
     }
 
@@ -239,6 +253,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
               ctx.IDENTIFIER().getText(),
               ctx.STR().getText());
         }
+        //old ctx.STR().accept(this).toString());
 
         return null;
     }
@@ -505,7 +520,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.expression() != null) {
             return ctx.expression().accept(this);
+        }else if(ctx.input() != null){
+            return ctx.input().accept(this);
         }
+
         return null;
     }
 
@@ -856,7 +874,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if(ctx.PRINT() != null){
             List<ASTNode> prints = new ArrayList<>();
 
-            // horrible forloop to only get elements between commas in the print statement
+            //TODO Fix for loop
             for (int i = 0; i < ctx.children.size()-4; i+=2){
                 ASTNode astNode = ctx.getChild(i+2).accept(this);
                 //if astnode is null, that means its a simple string
@@ -869,6 +887,15 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new PrintNode(prints);
         }
 
+        return null;
+    }
+
+    @Override
+    public ASTNode visitInput(BoardParser.InputContext ctx) {
+
+        if(ctx.IDENTIFIER() != null) {
+            return new InputNode(new IdNode(ctx.IDENTIFIER().getText()));
+        }
         return null;
     }
 

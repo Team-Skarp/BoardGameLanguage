@@ -1,4 +1,4 @@
-package bogac;
+package Parser;
 
 import antlr.*;
 

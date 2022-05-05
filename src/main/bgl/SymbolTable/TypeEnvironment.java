@@ -36,8 +36,6 @@ public class TypeEnvironment {
         return new TypeEnvironment();
     }
 
-
-
     /**
      * Should create a design type of the given build-in type
      * @param type
