@@ -15,6 +15,8 @@ class IntegerAssignmentNodeTest {
 
     @BeforeEach
     void setup() {
+        intNodeLeft = new IntNode(1);
+        intNodeRight = new IntNode(2);
         plusNode = new PlusNode(intNodeLeft, intNodeRight);
         idNode = new IdNode("pieceCounter");
     }
