@@ -29,17 +29,13 @@ public class CGenerationDemo {
         */
         String bglCodeExample = """
                 SETUP {
-                    int i = 0;                    
-                    while(true){
-                       print("hej");
+                    int i = 0; 
+                    
+                    while(i<10){
+                        print("hej");
+                        i = i+1;
                     }
-                    str b;
-                    bool itsAwesome = true;
-                    print(a, itsAwesome);
-                    input(b);
-                    i = 4+8*3-2;
-                    s = \"Hej\";
-                    b = true;
+                    
                 }
                 RULES{}
                 GAMELOOP{}

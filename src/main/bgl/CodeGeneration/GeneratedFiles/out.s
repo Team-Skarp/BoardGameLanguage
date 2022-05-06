@@ -2,13 +2,7 @@
 	.text
 	.section	.rodata
 .LC0:
-	.string	"true"
-.LC1:
-	.string	"false"
-.LC2:
-	.string	"%s%d%s\n"
-.LC3:
-	.string	"%s%d%s\n\n\n"
+	.string	"hej"
 	.text
 	.globl	main
 	.type	main, @function
@@ -21,98 +15,18 @@ main:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-	subq	$48, %rsp
-	movl	%edi, -36(%rbp)
-	movq	%rsi, -48(%rbp)
-	movb	$1, -26(%rbp)
-	movb	$0, -25(%rbp)
-	movzbl	-25(%rbp), %eax
-	movb	%al, -26(%rbp)
-	movl	$5, -24(%rbp)
-	movl	$10, -20(%rbp)
-	movl	-20(%rbp), %eax
-	movl	%eax, -24(%rbp)
-	movl	$14, %edi
-	call	malloc@PLT
-	movq	%rax, -16(%rbp)
-	movq	-16(%rbp), %rax
-	movabsq	$8391086215246539110, %rsi
-	movq	%rsi, (%rax)
-	movl	$1735289202, 8(%rax)
-	movb	$0, 12(%rax)
-	movl	$16, %edi
-	call	malloc@PLT
-	movq	%rax, -8(%rbp)
-	movq	-8(%rbp), %rax
-	movabsq	$7863395374866851187, %rsi
-	movq	%rsi, (%rax)
-	movl	$1634956133, 8(%rax)
-	movw	$25959, 12(%rax)
-	movb	$0, 14(%rax)
-	movq	-8(%rbp), %rax
-	movq	%rax, -16(%rbp)
-	cmpb	$0, -26(%rbp)
-	je	.L2
-	leaq	.LC0(%rip), %rax
-	jmp	.L3
-.L2:
-	leaq	.LC1(%rip), %rax
+	subq	$32, %rsp
+	movl	%edi, -20(%rbp)
+	movq	%rsi, -32(%rbp)
+	movl	$0, -4(%rbp)
+	jmp	.L2
 .L3:
-	movq	-16(%rbp), %rcx
-	movl	-24(%rbp), %edx
-	movq	%rax, %rsi
-	leaq	.LC2(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	cmpb	$0, -25(%rbp)
-	je	.L4
-	leaq	.LC0(%rip), %rax
-	jmp	.L5
-.L4:
-	leaq	.LC1(%rip), %rax
-.L5:
-	movq	-8(%rbp), %rcx
-	movl	-20(%rbp), %edx
-	movq	%rax, %rsi
-	leaq	.LC3(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	movb	$1, -25(%rbp)
-	movl	$50, -20(%rbp)
-	movq	-8(%rbp), %rax
-	movl	$6, %esi
-	movq	%rax, %rdi
-	call	realloc@PLT
-	movq	%rax, -8(%rbp)
-	movq	-8(%rbp), %rax
-	movl	$1835886701, (%rax)
-	movb	$0, 4(%rax)
-	cmpb	$0, -26(%rbp)
-	je	.L6
-	leaq	.LC0(%rip), %rax
-	jmp	.L7
-.L6:
-	leaq	.LC1(%rip), %rax
-.L7:
-	movq	-16(%rbp), %rcx
-	movl	-24(%rbp), %edx
-	movq	%rax, %rsi
-	leaq	.LC2(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	cmpb	$0, -25(%rbp)
-	je	.L8
-	leaq	.LC0(%rip), %rax
-	jmp	.L9
-.L8:
-	leaq	.LC1(%rip), %rax
-.L9:
-	movq	-8(%rbp), %rcx
-	movl	-20(%rbp), %edx
-	movq	%rax, %rsi
-	leaq	.LC2(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
+	leaq	.LC0(%rip), %rdi
+	call	puts@PLT
+	addl	$1, -4(%rbp)
+.L2:
+	cmpl	$9, -4(%rbp)
+	jle	.L3
 	movl	$0, %eax
 	leave
 	.cfi_def_cfa 7, 8
