@@ -28,11 +28,11 @@ public class Tile implements PredefinedDesign {
         return new DesignDefinitionNode(
                 new IdNode("Tile"),
                 new DesignDeclarationNode(
-                        new DesignRef("Tile"),
+                        "Tile",
                         "next"
                 ),
                 new DesignDeclarationNode(
-                        new DesignRef("Tile"),
+                        "Tile",
                         "prev"
                 ),
                 new ListDeclarationNode(

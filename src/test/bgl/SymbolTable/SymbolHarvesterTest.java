@@ -82,7 +82,7 @@ public class SymbolHarvesterTest {
         DesignDefinitionNode Player = new DesignDefinitionNode(
                 new IdNode("Player"),
                 new DesignDeclarationNode(
-                        new DesignRef("Color"),
+                        "Color",
                         "color")
         );
 

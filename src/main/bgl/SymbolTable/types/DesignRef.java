@@ -13,6 +13,6 @@ public class DesignRef implements TypeDenoter, SequentiallyDeclared {
 
     @Override
     public String toString() {
-        return "%s".formatted(name);
+        return name;
     }
 }

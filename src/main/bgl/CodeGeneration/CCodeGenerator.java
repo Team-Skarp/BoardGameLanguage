@@ -307,7 +307,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 %s (*%s)(%s);
                 """
                 ).formatted(
-                toCString(n.returnType),
+                toCType(n.returnType),
                 n.name,
                 formalParams
         );
@@ -321,7 +321,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 struct %s *%s;
                 """
                 .formatted(
-                n.ref.name,
+                n.ref,
                 n.name
         ));
     }
@@ -343,7 +343,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 """
                 %s %s%s;
                 """.formatted(
-                        toCString(finalType),
+                        toCType(finalType),
                         n.name,
                         braces
                 )
@@ -351,29 +351,43 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     /**
-     * Turns a type denoter into usable C string;
+     * Maps a type denoter to a C type;
      * @param type
      * @return C string of the type
      */
-    private String toCString(TypeDenoter type) {
-        String string = "";
+    public static String toCType(TypeDenoter type) {
+        String string;
         if (type instanceof IntType) {
             string = "int";
         }
         else if (type instanceof StringType) {
-            string = "char[]";
+            string = "char*";
         }
         else if (type instanceof BoolType) {
             string = "bool";
         }
-        else if (type instanceof DesignRef temp) {
-            string = "struct %s".formatted(temp.name);
+        else if (type instanceof DesignRef design) {
+            string = "struct %s".formatted(design.name);
         }
         else if (type instanceof VoidType) {
             string = "void";
         }
+
+        else if (type instanceof ListType list) {
+
+            TypeDenoter finalType = list.elementType;
+
+            //Find the final type of the list
+            int numOfPointers = 1;
+            while (finalType instanceof ListType temp) {
+                finalType = temp.elementType;
+                numOfPointers++;
+            }
+
+            string = toCType(finalType) + "*".repeat(numOfPointers);
+        }
         else {
-            throw new RuntimeException("Invalid return type '%s'".formatted(type));
+            throw new RuntimeException("No mapping for type '%s' to a C type was found".formatted(type));
         }
 
         return string;
@@ -394,7 +408,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
             return """
                    %s %s = %s;
                    """.formatted(
-                    toCString(n.type()),
+                    toCType(n.type()),
                     n.name,
                     n.value.accept(this)
             );
@@ -403,7 +417,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
             return """
                    %s %s;
                    """.formatted(
-                    toCString(n.type()),
+                    toCType(n.type()),
                     n.name
                     );
         }
@@ -437,9 +451,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
                    %s %s = %s malloc(%d);
                    strcpy(%s, %s);
                    """.formatted(
-                    toCString(n.type()),
+                    toCType(n.type()),
                     n.name,
-                    toCString(n.type()),
+                    toCType(n.type()),
                     val.length(),
                     n.name,
                     n.value.accept(this)
@@ -449,9 +463,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
             return """
                    %s %s = %s malloc(%d);
                    """.formatted(
-                    toCString(n.type()),
+                    toCType(n.type()),
                     n.name,
-                    toCString(n.type()),
+                    toCType(n.type()),
                     2                       //Allocate 2 bytes by default on string declarations
             );
         }
@@ -532,7 +546,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return """
                foreach (%s *%s, %s) %s
                """.formatted(
-                        iteratorSymbol.type instanceof StringType ? "char" : toCString(iteratorSymbol.type),
+                        iteratorSymbol.type instanceof StringType ? "char" : toCType(iteratorSymbol.type),
                         n.iterator.name,
                         n.iterable.name,
                         n.body.accept(this)

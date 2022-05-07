@@ -20,25 +20,23 @@ class DesignDeclarationNodeTest {
 
     @Test
     void accept() {
-        designRef = new DesignRef("StarTile");
-        designDeclarationNode = new DesignDeclarationNode(designRef, "Tile");
+
+        designDeclarationNode = new DesignDeclarationNode("StarTile", "Tile");
 
         designDeclarationNode.accept(new PrettyPrinter());
     }
 
     @Test
     void varName() {
-        designRef = new DesignRef("StarTile");
-        designDeclarationNode = new DesignDeclarationNode(designRef, "Tile");
+        designDeclarationNode = new DesignDeclarationNode("StarTile", "Tile");
 
         assertEquals("Tile", designDeclarationNode.varName());
     }
 
     @Test
     void type() {
-        designRef = new DesignRef("StarTile");
-        designDeclarationNode = new DesignDeclarationNode(designRef, "Tile");
+        designDeclarationNode = new DesignDeclarationNode("StarTile", "Tile");
 
-        assertEquals(designRef, designDeclarationNode.ref);
+        assertEquals("StarTile", designDeclarationNode.ref);
     }
 }

@@ -27,7 +27,7 @@ public class Piece implements PredefinedDesign {
         return new DesignDefinitionNode(
                 new IdNode("Piece"),
                 new DesignDeclarationNode(
-                        new DesignRef("Piece"),
+                        "Piece",
                         "color"
                 ),
                 new ActionDeclarationNode(

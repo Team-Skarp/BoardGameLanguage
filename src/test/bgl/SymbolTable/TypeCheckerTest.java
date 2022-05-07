@@ -37,7 +37,7 @@ public class TypeCheckerTest {
         ST = new SymbolTable();
 
         DesignDeclarationNode designDcl = new DesignDeclarationNode(
-                new DesignRef("NotDefinedType"),
+                "NotDefinedType",
                 "a"
         );
 

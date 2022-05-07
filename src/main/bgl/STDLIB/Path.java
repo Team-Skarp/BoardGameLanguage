@@ -30,19 +30,19 @@ public class Path implements PredefinedDesign {
         return new DesignDefinitionNode(
                 new IdNode("Path"),
                 new DesignDeclarationNode(
-                        new DesignRef("Tile"),
+                        "Tile",
                         "tile"
                 ),
                 new DesignDeclarationNode(
-                        new DesignRef("str"),
+                        "str",
                         "direction"
                 ),
                 new DesignDeclarationNode(
-                        new DesignRef("Path"),
+                        "Path",
                         "next"
                 ),
                 new DesignDeclarationNode(
-                        new DesignRef("Path"),
+                        "Path",
                         "prev"
                 ),
                 new ActionDeclarationNode(

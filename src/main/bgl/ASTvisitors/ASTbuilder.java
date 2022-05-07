@@ -493,7 +493,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new BooleanDeclarationNode(paramName);
         }
         else if (paramType instanceof DesignRef design) {
-            return new DesignDeclarationNode(design, paramName);
+            return new DesignDeclarationNode(design.name, paramName);
         }
         else if (paramType instanceof ListType list) {
             return new ListDeclarationNode(list.elementType, paramName);
@@ -524,7 +524,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null) {
             return new DesignDeclarationNode(
-                    new DesignRef(ctx.IDENTIFIER(0).getText()),
+                    ctx.IDENTIFIER(0).getText(),
                     ctx.IDENTIFIER(1).getText()
             );
         }
@@ -559,6 +559,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Maps the grammer for a type to a Type Denoter
+     * @param type Type grammer rule
+     * @return TypeDenoter
+     */
     private TypeDenoter getType(BoardParser.TypeContext type) {
 
         if (type.INTDCL() != null) {
@@ -573,7 +578,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (type.IDENTIFIER() != null) {
             return new DesignRef(type.IDENTIFIER().getText());
         }
-
         //If we have nested list types we recursively call getListType on whatever the listtype is
         else if (type.listType() != null) {
             return new ListType(getListType(type.listType()));

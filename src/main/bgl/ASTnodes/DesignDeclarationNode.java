@@ -11,10 +11,10 @@ import SymbolTable.types.TypeDenoter;
  */
 public class DesignDeclarationNode implements ASTNode<Object>, Declaration {
 
-    public final DesignRef ref;         //Reference name to a design type name
+    public final String ref;            //Reference name to a design type name
     public final String name;           //Name of the identifier
 
-    public DesignDeclarationNode(DesignRef ref, String name) {
+    public DesignDeclarationNode(String ref, String name) {
         this.ref = ref;
         this.name = name;
     }
@@ -32,6 +32,6 @@ public class DesignDeclarationNode implements ASTNode<Object>, Declaration {
 
     @Override
     public TypeDenoter type() {
-        return new DesignRef(name);
+        return new DesignRef(ref);
     }
 }

@@ -26,11 +26,11 @@ public class Player implements PredefinedDesign {
         return new DesignDefinitionNode(
                 new IdNode("Player"),
                 new DesignDeclarationNode(
-                        new DesignRef("str"),
+                        "str",
                         "name"
                 ),
                 new DesignDeclarationNode(
-                        new DesignRef("Piece"),
+                        "Piece",
                         "pieces"
                 )
         );
