@@ -30,11 +30,13 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    str greeting = "Hello C!";
+                    int i = 0; 
                     
-                    foreach (a in greeting) {
-                        print(a);
+                    while(i<10){
+                        print("hej");
+                        i = i+1;
                     }
+                    
                 }
                 RULES{}
                 GAMELOOP{}

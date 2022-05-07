@@ -3,6 +3,8 @@ package Demos;
 import ASTnodes.ASTNode;
 import ASTvisitors.ASTbuilder;
 import CodeGeneration.GNUASMCodeGenerator;
+import SymbolTable.SymbolHarvester;
+import SymbolTable.SymbolTable;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
@@ -27,7 +29,10 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    print(5);
+                    bool c = (2>=1 or 2<=1) and !(true and false) and (2==2)and(3>2);
+                    int a = 2*2+5;
+                    bool gha = false;
+                    print(c,a,gha," sooo cool");
                 }
                 
                 RULES{}
@@ -45,12 +50,18 @@ public class GNUASMGenerationDemo {
         BoardParser.GameContext cst = parser.game();
         ASTNode ast = new ASTbuilder().visitGame(cst);
 
-        // Assembly x86 - code generation
-        GNUASMCodeGenerator generator = new GNUASMCodeGenerator();
+
+
+        // Symmbol harvester
+        SymbolHarvester SH = new SymbolHarvester();
+        SymbolTable ST = (SymbolTable) ast.accept(SH);
+
+        // GNU GAS assembly - code generation
+        GNUASMCodeGenerator generator = new GNUASMCodeGenerator(ST);
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);
-
+        System.out.println(code);
         try {
             FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.s", false);
             fw.write(code);

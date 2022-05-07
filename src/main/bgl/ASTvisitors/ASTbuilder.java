@@ -91,7 +91,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
-
+        lo.g(ctx.children);
         List<ASTNode> children = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {
@@ -248,7 +248,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitAssignmentStatement(BoardParser.AssignmentStatementContext ctx) {
-
         if(ctx.children != null){
             return ctx.getChild(0).accept(this);
         }
@@ -284,7 +283,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitStringAssigment(BoardParser.StringAssigmentContext ctx) {
-
         if (ctx.ASSIGN() != null) {
             return new StringAssignmentNode(
               ctx.IDENTIFIER().getText(),

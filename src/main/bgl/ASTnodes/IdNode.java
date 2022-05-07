@@ -1,7 +1,7 @@
 package ASTnodes;
 import ASTvisitors.ASTvisitor;
 
-public class IdNode implements ASTNode {
+public class IdNode implements ASTNode, ArithmeticExpression {
 
     public final String name;       //Name of the variable
 

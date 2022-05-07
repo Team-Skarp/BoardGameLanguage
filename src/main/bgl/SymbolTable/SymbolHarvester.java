@@ -3,6 +3,7 @@ package SymbolTable;
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
+import SymbolTable.SymbolTable;
 
 import java.util.List;
 
@@ -175,22 +176,22 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(Assignment n) {
-        return visit(n);
+        return ST;
     }
 
     @Override
     public SymbolTable visit(StringAssignmentNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(IntegerAssignmentNode n) {
-        return null;
+        return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanAssignmentNode n) {
-        return null;
+        return ST;
     }
 
     @Override
@@ -450,7 +451,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(InputNode n) {
-        return null;
+        return ST;
     }
 
     @Override

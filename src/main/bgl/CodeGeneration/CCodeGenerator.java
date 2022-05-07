@@ -74,6 +74,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(UnaryMinusNode n) {
+        lo.g(n.operand.accept(this).toString()+" unary minus");
         String str = " ( -( "+n.operand.accept(this)+" ) ) ";
         return str;
     }
@@ -236,23 +237,28 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(Assignment n) {
-        System.out.println("SSSSSSSSSSSSSSSSSSs");
         return null;
     }
 
     @Override
     public String visit(StringAssignmentNode n) {
-        return null;
+        String str = "";
+        str += n.varName+" = (char *) realloc("+n.varName+","+n.literal.length()+")"+EOL;
+        str += "strcpy("+n.varName+", "+n.literal+")"+EOL;
+        return str;
     }
 
     @Override
     public String visit(IntegerAssignmentNode n) {
-        return null;
+
+        String str = n.id.name+" = "+n.aexpr.accept(this)+EOL;
+        return str;
     }
 
     @Override
     public String visit(BooleanAssignmentNode n) {
-        return null;
+        String str = n.varName+" = "+n.bexpr.accept(this)+EOL;
+        return str;
     }
 
     @Override
@@ -408,6 +414,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return null;
     }
 
+
     @Override
     public String visit(BooleanDeclarationNode n) {
         String str = "bool "+n.name;
@@ -475,7 +482,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ConditionalNode n) {
         String str = "if("+n.predicate.accept(this)+")"+n.ifBlock.accept(this);
-
+        n.ifBlock.accept(this);
         if(n.elseifBlocks != null){
             for(ASTNode elif : n.elseifBlocks){
                 str += (String) elif.accept(this);
@@ -508,7 +515,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(WhileNode n) {
+        lo.g(n.predicate.accept(this));
         String str = "while("+n.predicate.accept(this)+")"+n.whileBlock.accept(this);
+        lo.g("whlenode");
         return str;
     }
 
@@ -535,11 +544,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String str = "printf(\"";
         String endPart = "";
         for(ASTNode p : n.prints){
-            if(p.getClass() == StringNode.class){
-                //string literals
-                str +="%s";
-                endPart += ", \""+((StringNode) p).value+"\"";
-            }else if(p.getClass() == IdNode.class){
+
+            if(p.getClass() == IdNode.class){
                 Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
                 if(symbol.type instanceof IntType){
                     str +="%d";
@@ -552,14 +558,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 }else if(symbol.type instanceof BoolType){
                     str +="%s";
                     endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
-
                 }
                 else {
                     System.out.println("Incompatible type for print");
                 }
                 //variables
-                //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
-                //endPart += (","+((IdNode) p).name);
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
                 str +="%d";
@@ -568,7 +571,10 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 //boolean
                 str +="%s";
                 endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
-            }
+            }else if(p.getClass() == StringNode.class){
+                //string literals
+                str +="%s";
+                endPart += ", \""+((StringNode) p).value+"\"";}
 
         };
         str += "\\n\""+endPart+")"+EOL;
@@ -580,7 +586,26 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(InputNode n) {
-        return null;
+        String str = "scanf(\"";
+        IdNode variableName = n.inputVariableName;
+        if (variableName.getClass() == IdNode.class) {
+            Symbol symbol = ST.retrieveSymbol(variableName.name);
+            if (symbol.type instanceof IntType) {
+                str += ("%d, &" + variableName.name);
+
+            } else if (symbol.type instanceof StringType) {
+                str += ("%s, &" + variableName.name);
+
+            } else if (symbol.type instanceof BoolType) {
+                str += ("%s, &" + variableName.name);
+
+            } else {
+                System.out.println("Incompatible type for input");
+            }
+
+            str += ")" + EOL;
+        }
+        return str;
     }
 
     @Override
