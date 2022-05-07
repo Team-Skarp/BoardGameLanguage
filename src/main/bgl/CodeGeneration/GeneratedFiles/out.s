@@ -1,34 +1,78 @@
 	.file	"out.c"
-	.text
-	.section	.rodata
-.LC0:
-	.string	"hej"
+	.intel_syntax noprefix
 	.text
 	.globl	main
-	.type	main, @function
+	.section	.rodata
+.LC0:
+    .string	"true"
+.LC1:
+    .string	"false"
+.LC2:
+    .string	"%s"
+.LC3:
+    .string	"%d"
+.LC4:
+    .string	"%s"
+.LC5:
+    .string	" sooo cool\n"
+.text
+.type	main, @function
 main:
 .LFB6:
 	.cfi_startproc
 	endbr64
-	pushq	%rbp
+	push	rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
-	movq	%rsp, %rbp
+	mov	rbp, rsp
 	.cfi_def_cfa_register 6
-	subq	$32, %rsp
-	movl	%edi, -20(%rbp)
-	movq	%rsi, -32(%rbp)
-	movl	$0, -4(%rbp)
-	jmp	.L2
-.L3:
-	leaq	.LC0(%rip), %rdi
-	call	puts@PLT
-	addl	$1, -4(%rbp)
+	sub	rsp, 16
+	mov	DWORD PTR -26[rbp], edi
+ 	mov	QWORD PTR -38[rbp], rsi
+
+    mov	BYTE PTR -5[rbp],  (  (  (  ( ((!(2>1)&&!(2<1))||(2>1)) || ((!(2>1)&&!(2<1))||(2<1)) )  &&  ( !(  ( 1 && 0 )  ) ) )  && (!(2>2)&&!(2<2)) )  &&  ( 3 > 2 )  ) 
+    mov	DWORD PTR -9[rbp],  (  ( 2 * 2 )  + 5 ) 
+    mov	BYTE PTR -10[rbp], 0
+	cmp	BYTE PTR -5[rbp], 0
+	je	.L2
+	lea	rax, .LC0[rip]
+	jmp	.L3
 .L2:
-	cmpl	$9, -4(%rbp)
-	jle	.L3
-	movl	$0, %eax
-	leave
+	lea	rax, .LC1[rip]
+.L3:
+    mov rsi, rax
+    
+
+    lea	rdi, .LC2[rip]
+	mov	eax, 0
+	call	printf@PLT
+    mov eax, DWORD PTR -9[rbp]
+    mov	esi, eax
+    
+
+    lea	rdi, .LC3[rip]
+	mov	eax, 0
+	call	printf@PLT
+	cmp	BYTE PTR -10[rbp], 0
+	je	.L4
+	lea	rax, .LC0[rip]
+	jmp	.L5
+.L4:
+	lea	rax, .LC1[rip]
+.L5:
+    mov rsi, rax
+    
+
+    lea	rdi, .LC4[rip]
+	mov	eax, 0
+	call	printf@PLT
+    mov	esi, eax    
+
+    lea	rdi, .LC5[rip]
+	mov	eax, 0
+	call	printf@PLT
+  	leave
+ 	mov	eax, 0
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc

@@ -405,7 +405,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(WhileNode n) {
-        return ST;
+        return (SymbolTable) n.whileBlock.accept(this);
     }
 
     @Override

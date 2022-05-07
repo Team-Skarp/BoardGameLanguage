@@ -80,9 +80,10 @@ public class SymbolTable {
      * Sets the active block to be the first child in the list of blocks inside currently active block
      */
     public void dive() {
-        if (activeBlock.getChildren().size() > 0)
+        if (activeBlock.getChildren().size() > 0) {
             System.out.printf("Dived into child %s%n", activeBlock.next);
             activeBlock = activeBlock.getChildren().get(activeBlock.next++); //Point to next child next time we dive in current scope
+        }
     }
 
     /**
