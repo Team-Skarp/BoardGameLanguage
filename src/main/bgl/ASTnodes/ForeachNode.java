@@ -5,10 +5,9 @@ import ASTvisitors.ASTvisitor;
 public class ForeachNode implements ASTNode{
     public IdNode iterator;
     public IdNode iterable;
-    public ASTNode body;
+    public ParameterBlock body;
 
-    //if(){}
-    public ForeachNode(IdNode iterator, IdNode iterable, ASTNode body) {
+    public ForeachNode(IdNode iterator, IdNode iterable, ParameterBlock body) {
         this.iterator = iterator;
         this.iterable = iterable;
         this.body = body;

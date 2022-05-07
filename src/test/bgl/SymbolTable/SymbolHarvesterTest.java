@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import SymbolTable.types.*;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SymbolHarvesterTest {
@@ -86,6 +88,31 @@ public class SymbolHarvesterTest {
 
         symbolHarvester.visit(Color);
         symbolHarvester.visit(Player);
+
+    }
+
+    /**
+     * Tests the code:
+     * a -> {                #Variable a have been passed down to this block
+     *     int a;       #should fail to redeclare
+     * }
+     */
+    @Test
+    public void should_throw_error_when_redeclaring_variable_from_parameterized_block() {
+
+        symbolHarvester = new SymbolHarvester();
+
+        ParameterBlock parameterBlock = new ParameterBlock(
+                new IntegerDeclarationNode("a")
+        );
+
+        parameterBlock.variables = List.of(new Symbol(
+                "a",
+                new IntType())
+        );
+
+        assertThrows(DuplicateSymbolException.class, () ->
+                symbolHarvester.visit(parameterBlock));
 
     }
 

@@ -7,13 +7,13 @@ class ForeachNodeTest {
     IdNode idNodeNew;
     IdNode idNodeMain;
     ForeachNode foreachNode;
-    BlockNode blockNodeForeach;
+    ParameterBlock blockNodeForeach;
 
     @Test
     void accept() {
         idNodeNew = new IdNode("piece");
         idNodeMain = new IdNode("redPieces");
-        blockNodeForeach = new BlockNode(new StringNode("\"forEachBlock\""));
+        blockNodeForeach = new ParameterBlock(new StringNode("\"forEachBlock\""));
         foreachNode = new ForeachNode(idNodeNew, idNodeMain, blockNodeForeach);
 
         foreachNode.accept(new PrettyPrinter());

@@ -131,6 +131,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ParameterBlock n) {
+        return null;
+    }
+
+    @Override
     public String visit(ActionBodyNode n) {
         return null;
     }

@@ -159,6 +159,11 @@ public class Evaluator implements ASTvisitor<Object> {
     }
 
     @Override
+    public Object visit(ParameterBlock n) {
+        return null;
+    }
+
+    @Override
     public Object visit(ActionBodyNode n) {
         return null;
     }

@@ -5,11 +5,7 @@ import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 import SymbolTable.SymbolTable;
 import SymbolTable.Symbol;
-import SymbolTable.Block;
 import SymbolTable.types.*;
-
-import java.util.List;
-
 
 /**
  * Class for generating C code.
@@ -29,7 +25,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(GameNode n) {
-        String str = """
+        return (
+                """
                 #include <stdio.h>
                 #include<stdbool.h>
                 #include<math.h>
@@ -44,9 +41,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
                          keep = !keep, count++)                      \\
                         for (item = (array) + count; keep; keep = !keep)
 
-                int main(int argc, char *argv[])""";
-        str += (String) n.setup.accept(this);
-        return str;
+                int main(int argc, char *argv[]) %s
+                """.formatted(
+                        n.setup.accept(this)
+                )
+        );
     }
 
     @Override
@@ -188,30 +187,42 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BlockNode n) {
-        String str = "";
-        List<Block> childBlocks = ST.getActiveBlock().getChildren();
+        String str;
 
-        if (childBlocks.size() > 0) {
-            for (Block block : childBlocks) {
+        //Go down into the scope of this block
+        ST.dive();
 
-                ST.dive();
- 
-                str = "{\n";
-
-                for (ASTNode c: n.children){
-                    str += (String) c.accept(this);
-                }
-
-                str += "}";
-
-            }
-        } else {
-            str = "{\n";
-            for (ASTNode c: n.children){
-                str += (String) c.accept(this);
-            }
-            str += "}";
+        //Generate C code from withing this block
+        str = "{\n";
+        indent++;
+        for (ASTNode c: n.children){
+            str += TAB.repeat(indent) + c.accept(this);
         }
+        indent--;
+        str += "}";
+
+        //When finished, climb back to parrent scope
+        ST.climb();
+
+        return str;
+    }
+
+    @Override
+    /**
+     * Block that can have passed down variables. Behaves like a Block
+     */
+    public String visit(ParameterBlock n) {
+        String str;
+
+        ST.dive();
+
+        str = "{\n";
+        indent++;
+        for (ASTNode c: n.children){
+            str += TAB.repeat(indent) + c.accept(this);
+        }
+        indent--;
+        str += "}";
 
         ST.climb();
 
@@ -248,10 +259,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(DesignDefinitionNode n) {
 
         String designBody = "";
+        indent++;
         for (Declaration field : n.fields) {
-            designBody += TAB + field.accept(this);
+            designBody += TAB.repeat(indent) + field.accept(this);
         }
-
+        indent--;
+        
         return (
                 """
                 struct %s {
@@ -280,7 +293,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         String formalParams = "";
         for (Declaration param : n.formalParameters) {
-            formalParams += param.accept(this);
+            formalParams += TAB.repeat(indent) + param.accept(this);
         }
 
         return (
@@ -371,12 +384,23 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntegerDeclarationNode n) {
-        String str = n.type() +" "+n.name;
-        if(n.value != null){
-            str += " = "+n.value.accept(this);
+        if (n.value != null) {
+            return """
+                   %s %s = %s;
+                   """.formatted(
+                    toCString(n.type()),
+                    n.name,
+                    n.value.accept(this)
+            );
         }
-        str += EOL;
-        return str;
+        else {
+            return """
+                   %s %s;
+                   """.formatted(
+                    toCString(n.type()),
+                    n.name
+                    );
+        }
     }
 
     @Override
@@ -397,20 +421,34 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(StringDeclarationNode n) {
 
-        String str = "char* "+n.name+EOL;
-        if(n.value != null){
-            String end = (String) n.value.accept(this);
-
-            str += n.name+" = (char *) malloc("+end.length()+")"+EOL;
-            str += "strcpy("+n.name+","+end+")"+EOL;
-        }else{
-            str += n.name+" = (char *) malloc(2)"+EOL;
-        }
-        return str;
-
         //TODO: when assignment needs to be done for strings. use this:
         //n.name+" = (char *) realloc("+n.name+","+end.length()+")"+EOL;
         //"strcpy("+n.name+", "+end+")"+EOL;
+        if (n.value != null) {
+            String val = (String) n.value.accept(this);
+            return """
+                   %s %s = %s malloc(%d);
+                   strcpy(%s, %s);
+                   """.formatted(
+                    toCString(n.type()),
+                    n.name,
+                    toCString(n.type()),
+                    val.length(),
+                    n.name,
+                    n.value.accept(this)
+            );
+        }
+        else {
+            return """
+                   %s %s = %s malloc(%d);
+                   """.formatted(
+                    toCString(n.type()),
+                    n.name,
+                    toCString(n.type()),
+                    2                       //Allocate 2 bytes by default on string declarations
+            );
+        }
+
     }
 
 
@@ -476,17 +514,15 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ForeachNode n) {
-        Symbol iterableSymbol = ST.retrieveSymbol(n.iterable.name);
+
         Symbol iteratorSymbol = ST.retrieveSymbol(n.iterator.name);
 
         /*str +="for(int i = 0; i < sizeof("+n.mainId+")/sizeof("+n.mainId+"[0]); i++)";
         str +=n.foreachBlock.accept(this);*/
 
         return """
-                foreach (%s *%s, %s) {
-                    %s
-                }
-                """.formatted(
+               foreach (%s *%s, %s) %s
+               """.formatted(
                         iteratorSymbol.type instanceof StringType ? "char" : toCString(iteratorSymbol.type),
                         n.iterator.name,
                         n.iterable.name,
@@ -523,7 +559,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 }
                 //variables
                 //TODO: implement symbol table, to recognize what type the var is, and change outcome based on that
-                endPart += (","+((IdNode) p).name);
+                //endPart += (","+((IdNode) p).name);
             }else if(p instanceof ArithmeticExpression ){
                 //arithmetic
                 str +="%d";

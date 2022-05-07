@@ -3,6 +3,7 @@ package SymbolTable;
 public class SymbolTable {
 
     //Global block
+
     private Block activeBlock;
 
     public SymbolTable() {
@@ -69,7 +70,7 @@ public class SymbolTable {
         }
         activeBlock.addSymbol(sym);
 
-        System.out.println(String.format("Symbol entered: '%s' of type '%s'", sym.name, sym.type));
+        System.out.printf("Symbol entered: '%s' of type '%s'%n", sym.name, sym.type);
 
         return this;
 
@@ -79,20 +80,20 @@ public class SymbolTable {
      * Sets the active block to be the first child in the list of blocks inside currently active block
      */
     public void dive() {
-        if (activeBlock.getChildren().size() != 0)
-            this.activeBlock = this.activeBlock.getChildren().get(0);
+        if (activeBlock.getChildren().size() > 0)
+            System.out.printf("Dived into child %s%n", activeBlock.next);
+            activeBlock = activeBlock.getChildren().get(activeBlock.next++); //Point to next child next time we dive in current scope
     }
 
     /**
      * Sets the active block to be that of the parrent block and pops itself
      *
-     * Cannot climb if there is not parrent scope to climb into
+     * Cannot climb if there is not parrent scope to climb upto
      */
     public void climb() {
         if (activeBlock.getParent() != null) {
-            Block oldBlock = activeBlock;
             activeBlock = activeBlock.getParent();
-            activeBlock.getChildren().remove(oldBlock);
+            System.out.println("Climbed to parrent block");
         }
     }
 

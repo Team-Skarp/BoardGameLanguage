@@ -151,6 +151,24 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(ParameterBlock n) {
+        ST.openScope();
+
+        //Enter all variables that was passed down into the block
+        for (Symbol var : n.variables) {
+            ST.enterSymbol(var);
+        }
+
+        for (ASTNode node : n.children) {
+            node.accept(this);
+        }
+
+        ST.closeScope();
+
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(ActionBodyNode n) {
         return ST;
     }
@@ -402,21 +420,27 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
             ));
         }
 
+        //Assign type to the iterator to be of the element type of iterable
         TypeDenoter iteratorElementType;
-
         if (iterableSymbol.type instanceof ListType list) {
             iteratorElementType = list.elementType;
         } else {
-            iteratorElementType = (StringType) iterableSymbol.type;
+            iteratorElementType = iterableSymbol.type;
         }
-
-        // Create new symbol for iterator
-        ST.enterSymbol(new Symbol(
+        Symbol iteratorSym = new Symbol(
                 n.iterator.name,
                 iteratorElementType
-        ));
+        );
 
-        return ST;
+        //Declare iterator in current scope and pass down to the foreach body
+        ST.enterSymbol(iteratorSym);
+
+        n.body.variables = List.of(
+                iteratorSym
+        );
+
+        return (SymbolTable) n.body.accept(this);
+
     }
 
     @Override

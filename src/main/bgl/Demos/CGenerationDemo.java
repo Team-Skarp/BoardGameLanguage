@@ -27,7 +27,8 @@ public class CGenerationDemo {
         * use this string starting from gamestart, before pushing any changes.
         * no errors must occur when parsing this string.
         */
-        String bglCodeExample = """
+        String bglCodeExample =
+                """
                 SETUP {
                     str greeting = "Hello C!";
                     

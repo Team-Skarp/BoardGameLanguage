@@ -17,6 +17,7 @@ public class Block {
     private Block                parent;
     private Map<String, Symbol>  symbols = new HashMap<String, Symbol>();
     private List<Block>          children = new ArrayList<>();
+    int next = 0;           //Keeps track of which block should be diven into next
 
     public Block(){};
 

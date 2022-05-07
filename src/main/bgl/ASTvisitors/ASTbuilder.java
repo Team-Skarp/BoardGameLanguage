@@ -942,15 +942,15 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitForeach(BoardParser.ForeachContext ctx) {
 
-        if(ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null && ctx.normalBlock() != null){
-            return new ForeachNode(
-                    new IdNode(ctx.IDENTIFIER(0).getText()),
-                    new IdNode(ctx.IDENTIFIER(1).getText()),
-                    ctx.getChild(6).accept(this)
-            );
-        }
-
-        return null;
+        return new ForeachNode(
+                new IdNode(ctx.IDENTIFIER(0).getText()),
+                new IdNode(ctx.IDENTIFIER(1).getText()),
+                new ParameterBlock(
+                        ((BlockNode) ctx.normalBlock().accept(this))
+                                .children
+                                .toArray(new ASTNode[0])
+                )
+        );
     }
 
     @Override

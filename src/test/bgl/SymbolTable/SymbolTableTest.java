@@ -94,4 +94,41 @@ public class SymbolTableTest {
 
     }
 
+    /**
+     * Tests the code:
+     * {int a; {}{can get from here!}}
+     */
+    @Test
+    public void canFindVariableFromSymbolTableTreeAfterCreation() {
+
+        ST = new SymbolTable();
+        ST.openScope();
+        ST.enterSymbol(
+                new Symbol(
+                        "a",
+                        new IntType()
+                )
+        );
+        ST.openScope();
+        ST.closeScope();
+        ST.openScope();
+        ST.closeScope();
+        ST.closeScope();
+
+        assertThrows(ReferenceErrorException.class, () ->
+                ST.retrieveSymbol("a"));
+
+        ST.dive();
+        ST.dive();
+        ST.climb();
+        ST.dive();
+
+        Symbol sym = ST.retrieveSymbol("a");
+
+        assertNotNull(sym);
+        assertEquals("a", sym.name);
+
+    }
+
+
 }
