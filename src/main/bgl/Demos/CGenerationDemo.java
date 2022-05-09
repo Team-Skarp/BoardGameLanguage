@@ -35,6 +35,7 @@ public class CGenerationDemo {
                     str msg = "hej med dig!";
                     print(msg);
                     print(msg);
+                    msg = "am i a good bou? yess";
                     foreach(letter in msg){
                         print(letter);
                     }
