@@ -2,9 +2,9 @@
 /src/main/bgl/antlr
 
 **/.DS_Store
-out.asm
-out.c
-out.s
+*.asm
+*.c
+*.s
 .idea
 
 .classpath
