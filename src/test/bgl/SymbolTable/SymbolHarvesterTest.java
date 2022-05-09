@@ -7,6 +7,7 @@ import SymbolTable.types.*;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SymbolHarvesterTest {
@@ -113,6 +114,43 @@ public class SymbolHarvesterTest {
 
         assertThrows(DuplicateSymbolException.class, () ->
                 symbolHarvester.visit(parameterBlock));
+
+    }
+
+    @Test
+    /**
+     *
+     * action foo(int a, int b) {
+     *     #here we should be able to reference a and b
+     * }
+     *
+     * a and b, should be written to symbol table
+     */
+    public void should_write_formal_params_into_symbol_table() {
+
+        symbolHarvester = new SymbolHarvester();
+
+        ActionDefinitionNode foo = new ActionDefinitionNode(
+                "foo",
+                new VoidType(),
+                new ParameterBlock(),
+                new IntegerDeclarationNode(
+                        "a"
+                ),
+                new IntegerDeclarationNode(
+                        "b"
+                )
+        );
+
+        SymbolTable ST = symbolHarvester.visit(foo);
+
+        //Expect that a new scope for the action body have been created
+        assertEquals(1, ST.getActiveBlock().getChildren().size());
+
+        //Expect that within the action body scope we can retrieve the two declarations
+        ST.dive();
+        ST.retrieveSymbol("a");
+        ST.retrieveSymbol("b");
 
     }
 

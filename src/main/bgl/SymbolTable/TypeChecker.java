@@ -383,11 +383,6 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
-    public TypeDenoter visit(ActionBodyNode n) {
-        return null;
-    }
-
-    @Override
     public TypeDenoter visit(StringNode n) {
         return new StringType();
     }

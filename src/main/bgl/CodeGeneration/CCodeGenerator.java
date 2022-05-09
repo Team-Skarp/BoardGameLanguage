@@ -230,10 +230,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
-    @Override
-    public String visit(ActionBodyNode n) {
-        return null;
-    }
 
     @Override
     public String visit(Assignment n) {

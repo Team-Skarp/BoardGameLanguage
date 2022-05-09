@@ -163,10 +163,6 @@ public class Evaluator implements ASTvisitor<Object> {
         return null;
     }
 
-    @Override
-    public Object visit(ActionBodyNode n) {
-        return null;
-    }
 
     @Override
     public Object visit(Assignment n) {

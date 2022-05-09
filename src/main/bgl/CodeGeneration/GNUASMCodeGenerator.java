@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GNUASMCodeGenerator implements ASTvisitor<String> {
+
     private SymbolTable ST;
     private int             indent = 0;
     private final String    TAB = "\t";
@@ -34,7 +35,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     public GNUASMCodeGenerator(SymbolTable ST) {
         this.ST = ST;
     }
-
 
     @Override
     public String visit(GameNode n) {
@@ -284,11 +284,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ParameterBlock n) {
-        return null;
-    }
-
-    @Override
-    public String visit(ActionBodyNode n) {
         return null;
     }
 

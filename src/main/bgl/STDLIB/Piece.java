@@ -52,7 +52,7 @@ public class Piece implements PredefinedDesign {
         ActionDefinitionNode move = new ActionDefinitionNode(
                 "move",
                 new VoidType(),
-                new ActionBodyNode()
+                new ParameterBlock()
         );
 
         /*
@@ -63,7 +63,7 @@ public class Piece implements PredefinedDesign {
         ActionDefinitionNode jump = new ActionDefinitionNode(
                 "jump",
                 new VoidType(),
-                new ActionBodyNode()
+                new ParameterBlock()
         );
 
         return List.of(move, jump);

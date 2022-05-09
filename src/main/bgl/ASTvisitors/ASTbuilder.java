@@ -211,7 +211,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new ActionDefinitionNode(
                     ctx.IDENTIFIER().getText(),
                     getType(ctx.type()),
-                    new ActionBodyNode(
+                    new ParameterBlock(
                             (BlockNode) ctx.rulesBlock().accept(this)
                     ),
                     formalParameters.toArray(new Declaration[0])
@@ -222,7 +222,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new ActionDefinitionNode(
                     ctx.IDENTIFIER().getText(),
                     new VoidType(),
-                    new ActionBodyNode(
+                    new ParameterBlock(
                             (BlockNode) ctx.rulesBlock().accept(this)
                     ),
                     formalParameters.toArray(new Declaration[0])

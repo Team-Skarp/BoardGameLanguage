@@ -60,12 +60,14 @@ public class TypeCheckerTest {
         ActionDefinitionNode foo = new ActionDefinitionNode(
                 "foo",
                 new BoolType(),
-                new ActionBodyNode(
+                new ParameterBlock(
                         new ReturnNode(
                                 new IntNode(5)
                         )
                 )
         );
+
+        //TODO: Write the actual test
     }
 
     @Test
@@ -76,7 +78,7 @@ public class TypeCheckerTest {
         ActionDefinitionNode foo = new ActionDefinitionNode(
                 "foo",
                 new VoidType(),
-                new ActionBodyNode(),
+                new ParameterBlock(),
                 new IntegerDeclarationNode("a"),
                 new IntegerDeclarationNode("b")
         );

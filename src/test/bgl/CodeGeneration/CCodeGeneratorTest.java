@@ -10,6 +10,7 @@ import static CodeGeneration.CCodeGenerator.toCType;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CCodeGeneratorTest {
+
     CCodeGenerator generator;
     SymbolHarvester SH = new SymbolHarvester();
 

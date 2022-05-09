@@ -40,8 +40,6 @@ public interface ASTvisitor<T> {
     //Blocks
     T visit(BlockNode n);
     T visit(ParameterBlock n);
-    T visit(ActionBodyNode n);
-
     T visit(Assignment n);
     T visit(StringAssignmentNode n);
     T visit(IntegerAssignmentNode n);

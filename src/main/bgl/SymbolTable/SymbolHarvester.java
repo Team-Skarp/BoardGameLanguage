@@ -5,6 +5,7 @@ import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
 import SymbolTable.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -170,11 +171,6 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
-    public SymbolTable visit(ActionBodyNode n) {
-        return ST;
-    }
-
-    @Override
     public SymbolTable visit(Assignment n) {
         return ST;
     }
@@ -233,7 +229,23 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ActionDefinitionNode n) {
-        return ST;
+        List<Symbol> formalParams = new ArrayList<>();
+
+        //Convert declarations to symbols
+        for (Declaration param : n.formalParameters) {
+            formalParams.add(
+                    new Symbol(
+                            param.varName(),
+                            param.type()
+                    )
+            );
+        }
+
+        //Pass down the formal parameters to the action body
+        n.body.variables = formalParams;
+
+        //Visit action body
+        return (SymbolTable) n.body.accept(this);
     }
 
     @Override
