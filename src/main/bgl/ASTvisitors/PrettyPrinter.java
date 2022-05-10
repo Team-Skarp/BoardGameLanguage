@@ -311,11 +311,6 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
-    public Void visit(ActionBodyNode n) {
-        return null;
-    }
-
-    @Override
     public Void visit(Assignment n) {
         return null;
     }

@@ -128,6 +128,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSetupDeclaration(BoardParser.SetupDeclarationContext ctx) {
+        if (ctx.getChild(0) != null) {
+            return ctx.getChild(0).accept(this);
+        }
         return null;
     }
 
@@ -153,6 +156,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDesignDeclaration(BoardParser.DesignDeclarationContext ctx) {
+        System.out.println("hello from builder");
         return null;
     }
 
@@ -169,13 +173,13 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         if (ctx.FROM() != null) {
             return new DesignDefinitionNode(
                     new IdNode(ctx.IDENTIFIER(0).getText()),
+                    new IdNode(ctx.IDENTIFIER(1).getText()),
                     fields.toArray(new Declaration[0])
             );
         }
         else {
             return new DesignDefinitionNode(
                     new IdNode(ctx.IDENTIFIER(0).getText()),
-                    new IdNode(ctx.IDENTIFIER(1).getText()),
                     fields.toArray(new Declaration[0])
             );
         }
@@ -212,7 +216,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new ActionDefinitionNode(
                     ctx.IDENTIFIER().getText(),
                     getType(ctx.type()),
-                    new ActionBodyNode(
+                    new ParameterBlock(
                             (BlockNode) ctx.rulesBlock().accept(this)
                     ),
                     formalParameters.toArray(new Declaration[0])
@@ -223,7 +227,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new ActionDefinitionNode(
                     ctx.IDENTIFIER().getText(),
                     new VoidType(),
-                    new ActionBodyNode(
+                    new ParameterBlock(
                             (BlockNode) ctx.rulesBlock().accept(this)
                     ),
                     formalParameters.toArray(new Declaration[0])

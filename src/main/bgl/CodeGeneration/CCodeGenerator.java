@@ -9,6 +9,7 @@ import SymbolTable.types.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Class for generating C code.
@@ -213,10 +214,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
-    @Override
-    public String visit(ActionBodyNode n) {
-        return null;
-    }
 
     @Override
     public String visit(Assignment n) {
@@ -243,23 +240,35 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDefinitionNode n) {
-
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
             designBody += TAB.repeat(indent) + field.accept(this);
         }
         indent--;
-        
-        return (
-                """
-                struct %s {
-                %s};
-                """.formatted(
-                        n.typeDefinition.name,
-                        designBody,
-                        n.typeDefinition
-        ));
+
+        if (n.parentType != null) {
+            return (
+                    """
+                    struct %s {
+                    struct %s parent;
+                    %s};
+                    """.formatted(
+                            n.typeDefinition.name,
+                            n.parentType.name,
+                            designBody,
+                            n.typeDefinition));
+        } else {
+            return (
+                    """
+                    struct %s {
+                    %s};
+                    """.formatted(
+                            n.typeDefinition.name,
+                            designBody,
+                            n.typeDefinition
+                    ));
+        }
     }
 
     @Override
@@ -294,7 +303,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDeclarationNode n) {
-
         return (
                 """
                 struct %s *%s;

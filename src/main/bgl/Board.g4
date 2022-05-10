@@ -251,6 +251,7 @@ assignmentStatement
     | dotAssignment EOL
     | actionAssignment EOL
     | choiceAssignment
+    | designAssignment EOL
     ;
 
 intAssigment
@@ -281,7 +282,15 @@ actionAssignment
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     ;
 
-// Special bodies
+// Design assignment,
+designAssignment
+    : IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) (COMMA ( INT | STR | BOOL | IDENTIFIER ))* RBRACE
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE LBRACE ( INT | STR | BOOL | IDENTIFIER )* RBRACE (COMMA ( INT | STR | BOOL ))* RBRACE
+    ;
+
+
+// Special body's
 designBody
     : LBRACE (fieldRow)+ RBRACE
     ;

@@ -57,7 +57,7 @@ public class Tile implements PredefinedDesign {
         ActionDefinitionNode isEmpty = new ActionDefinitionNode(
                 "isEmpty",
                 new BoolType(),
-                new ActionBodyNode()
+                new ParameterBlock()
                 //TODO: Implemented rest of the action
 
         );
