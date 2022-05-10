@@ -43,17 +43,33 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(StringAssignmentNode n) {
-        return null;
+        return (TypeDenoter) n.accept(this);
     }
 
     @Override
     public TypeDenoter visit(IntegerAssignmentNode n) {
-        return null;
+        TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+        }
     }
 
     @Override
     public TypeDenoter visit(BooleanAssignmentNode n) {
-        return null;
+        TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+        }
     }
 
     @Override
@@ -119,7 +135,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ArithmeticExpression n) {
-        return null;
+        return (TypeDenoter) n.accept(this);
 
     }
 
@@ -394,16 +410,19 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(BooleanExpression n) {
-        return null;
+        TypeDenoter idType = (TypeDenoter) n.accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+        }
     }
 
     @Override
-    public TypeDenoter visit(IntegerDeclarationNode n) {
-        return null;
-    }
-
-    @Override
-    public TypeDenoter visit(IntegerAssignDeclarationNode n) {
+    public TypeDenoter visit(IntegerAssignDeclarationNode n) { //Todo: marked for termination, we should only have assigns and decls, not a node for the combined type
         TypeDenoter exprType = (TypeDenoter) n.expr.accept(this);
 
         if (exprType instanceof IntType) {
@@ -438,7 +457,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     @Override
     public TypeDenoter visit(ConditionalNode n) {
         return null;
-    }
+    } //Todo: implement?
 
     @Override
     public TypeDenoter visit(ElifConditionalNode n) {
@@ -511,13 +530,18 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(IntegerDeclarationNode n) {
+        return new IntType();
+    }
+
+    @Override
     public TypeDenoter visit(BooleanDeclarationNode n) {
-        return null;
+        return new BoolType();
     }
 
     @Override
     public TypeDenoter visit(StringDeclarationNode n) {
-        return null;
+        return new StringType();
 
     }
 }

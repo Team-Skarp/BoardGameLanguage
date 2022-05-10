@@ -2,6 +2,7 @@ package SymbolTable;
 
 import ASTnodes.*;
 
+import ASTvisitors.ASTvisitor;
 import org.junit.Test;
 import SymbolTable.types.*;
 
@@ -29,6 +30,29 @@ public class TypeCheckerTest {
         TC = new TypeChecker(ST, TENV);
 
         assertThrows(TypeErrorException.class, () -> TC.visit(plus));
+    }
+
+    @Test
+    public void should_throw_typeerror_when_adding_three_ids_with_different_types() {
+
+        ST = new SymbolTable();
+
+        Expression extPlus = new PlusNode(
+          new IdNode("a"),
+          new PlusNode(
+            new IdNode("b"),
+            new IdNode("c")
+          )
+        );
+
+
+        ST.enterSymbol(new Symbol("a", new IntType()));
+        ST.enterSymbol(new Symbol("b", new BoolType()));
+        ST.enterSymbol(new Symbol("c", new StringType()));
+
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(extPlus));
     }
 
     @Test
@@ -100,5 +124,23 @@ public class TypeCheckerTest {
         assertThrows(TypeErrorException.class,
                 () ->  TC.visit(callFoo)
         );
+    }
+
+    @Test
+    public void should_throw_typeerror_when_assigning_wrong_value_type() {
+
+        ST = new SymbolTable();
+
+        BooleanAssignmentNode assignmentNode = new BooleanAssignmentNode(new IdNode("i").name,
+          new BooleanNode(true));
+
+        // ST.openScope();
+        ST.enterSymbol(new Symbol("i", new IntType()));
+        // ST.climb();
+        // ST.closeScope();
+        // ST.dive();
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
     }
 }
