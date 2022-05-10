@@ -3,7 +3,6 @@ package SymbolTable;
 public class SymbolTable {
 
     //Global block
-
     private Block activeBlock;
 
     public SymbolTable() {
@@ -82,7 +81,7 @@ public class SymbolTable {
     public void dive() {
         if (activeBlock.getChildren().size() > 0) {
             System.out.printf("Dived into child %s%n", activeBlock.next);
-            activeBlock = activeBlock.getChildren().get(activeBlock.next++); //Point to next child next time we dive in current scope
+            activeBlock = activeBlock.getChildren().get(activeBlock.next); //Point to next child next time we dive in current scope
         }
     }
 
@@ -94,6 +93,7 @@ public class SymbolTable {
     public void climb() {
         if (activeBlock.getParent() != null) {
             activeBlock = activeBlock.getParent();
+            activeBlock.next++;
             System.out.println("Climbed to parrent block");
         }
     }

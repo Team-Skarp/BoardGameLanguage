@@ -30,26 +30,13 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    int i = 1;
-                    int j = 0;
-                    str msg = "hej med dig!";
-                    print(msg);
-                    print(msg);
-                    msg = "am i a good bou? yess";
-                    foreach(letter in msg){
-                        print(letter);
+                    int a = 6 ^ 5;
+                    if (true) {
+                        if (true) {
+                            
+                        }
+                        print(a);
                     }
-                    
-                    design Potion {
-                        int doses;
-                    }
-                    
-                    design SpeedPotion from Potion {
-                        int refill_rate;
-                    }
-                    
-                    Potion test;
-                    SpeedPotion test2;
                 }
                 RULES{}
                 GAMELOOP{}

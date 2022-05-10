@@ -399,12 +399,17 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ConditionalNode n) {
+        n.ifBlock.accept(this);
+        n.elseifBlocks.forEach(elif->elif.accept(this));
+        if (n.elseBlock != null) {
+            n.elseBlock.accept(this);
+        }
         return ST;
     }
 
     @Override
     public SymbolTable visit(ElifConditionalNode n) {
-        return ST;
+        return (SymbolTable) n.ifBlock.accept(this);
     }
 
     @Override

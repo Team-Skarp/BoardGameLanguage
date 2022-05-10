@@ -127,7 +127,7 @@ normalDeclaration
     | BOOLDCL booleanDeclaration EOL
     | STRDCL stringDeclaration EOL
     | LISTDCL listDeclaration EOL
-    | IDENTIFIER designDeclaration EOL
+    | designDeclaration EOL
     | sequentialDeclaration EOL
     ;
 
@@ -145,7 +145,7 @@ uniqueDeclaration
     ;
 
 designDeclaration
-    : IDENTIFIER (COMMA IDENTIFIER)*
+    : IDENTIFIER IDENTIFIER
     ;
 
 //Design declerations should only appear in SETUP block
@@ -162,7 +162,7 @@ sequentialDeclaration
     : INTDCL integerDeclaration (COMMA integerDeclaration)+
     | BOOLDCL booleanDeclaration (COMMA booleanDeclaration)+
     | STRDCL stringDeclaration (COMMA stringDeclaration)+
-    | IDENTIFIER designDeclaration (COMMA designDeclaration)+
+    | designDeclaration (COMMA IDENTIFIER)+
     ;
 
 booleanDeclaration

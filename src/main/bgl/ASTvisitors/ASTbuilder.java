@@ -118,6 +118,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.listDeclaration() != null) {
             return ctx.listDeclaration().accept(this);
         }
+        else if (ctx.designDeclaration() != null) {
+            return ctx.designDeclaration().accept(this);
+        }
         else if (ctx.sequentialDeclaration() != null) {
             return ctx.sequentialDeclaration().accept(this);
         }
@@ -155,8 +158,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDesignDeclaration(BoardParser.DesignDeclarationContext ctx) {
-        System.out.println("hello from builder");
-        return null;
+        return new DesignDeclarationNode(
+                ctx.IDENTIFIER(0).getText(),
+                ctx.IDENTIFIER(1).getText()
+        );
+
     }
 
     @Override
@@ -313,6 +319,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
+        return null;
+    }
+
+    @Override
     public ASTNode visitListDeclaration(BoardParser.ListDeclarationContext ctx) {
         return null;
     }
@@ -422,8 +433,8 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                 declarations.add( (Declaration) node.accept(this) );
             }
         }
-        else if (ctx.IDENTIFIER() != null) {
-            type = new DesignRef(ctx.IDENTIFIER().getText());
+        else if (ctx.designDeclaration() != null) {
+            type = new DesignRef(ctx.designDeclaration().IDENTIFIER(0).getText());
 
             for (BoardParser.StringDeclarationContext node : ctx.stringDeclaration()) {
                 declarations.add( (Declaration) node.accept(this) );

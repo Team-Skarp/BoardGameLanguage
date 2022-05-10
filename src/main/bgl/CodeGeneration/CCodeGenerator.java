@@ -484,12 +484,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ConditionalNode n) {
         String str = "if("+n.predicate.accept(this)+")"+n.ifBlock.accept(this);
-        n.ifBlock.accept(this);
-        if(n.elseifBlocks != null){
+
+        if(n.elseifBlocks.size() > 0 ){
             for(ASTNode elif : n.elseifBlocks){
                 str += (String) elif.accept(this);
             }
         }
+
         if(n.elseBlock != null){
             str+="else"+n.elseBlock.accept(this);
         }
@@ -503,8 +504,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ElseNode n) {
-        lo.g("why are you in this node?");
-        return null;
+        n.elseBlock.accept(this);
+        return "";
     }
 
     @Override
