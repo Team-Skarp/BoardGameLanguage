@@ -15,7 +15,7 @@ public class TypeCheckerTest {
     TypeChecker TC;
 
     @Test
-    public void should_throw_typeerror_when_adding_two_ids_with_different_types() {
+    public void shouldThrowTypeerrorWhenAddingTwoIdsWithDifferentTypes() {
 
         ST = new SymbolTable();
 
@@ -33,7 +33,7 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void should_throw_typeerror_when_adding_three_ids_with_different_types() {
+    public void shouldThrowTypeErrorWhenAddingThreeIdsWithDifferentTypes() {
 
         ST = new SymbolTable();
 
@@ -56,7 +56,7 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void should_throw_typeDefError_when_declaring_non_defined_type() {
+    public void shouldThrowTypeDefErrorWhenDeclaringNonDefinedType() {
 
         ST = new SymbolTable();
 
@@ -79,7 +79,7 @@ public class TypeCheckerTest {
      *
      */
     @Test
-    public void should_throw_type_error_when_return_type_does_not_match_returned_type_of_action() {
+    public void shouldThrowTypeErrorWhenReturnTypeDoesNotMatchReturnedTypeOfAction() {
 
         ActionDefinitionNode foo = new ActionDefinitionNode(
                 "foo",
@@ -93,7 +93,7 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void should_throw_type_error_when_calling_action_with_too_many_arguments() {
+    public void shouldThrowTypeErrorWhenCallingActionWithTooManyArguments() {
 
         ST = new SymbolTable();
 
@@ -127,7 +127,7 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void should_throw_typeerror_when_assigning_wrong_value_type() {
+    public void shouldThrowTypeErrorWhenAssigningValueTypeIsNotABoolean() {
 
         ST = new SymbolTable();
 
@@ -136,6 +136,41 @@ public class TypeCheckerTest {
 
         // ST.openScope();
         ST.enterSymbol(new Symbol("i", new IntType()));
+        // ST.climb();
+        // ST.closeScope();
+        // ST.dive();
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
+    }
+
+    @Test
+    public void shouldThrowTypeErrorWhenAssigningValueTypeIsNotAInt() {
+        ST = new SymbolTable();
+
+        IntegerAssignmentNode assignmentNode = new IntegerAssignmentNode(new IdNode("i"),
+                new IntNode(8));
+
+        // ST.openScope();
+        ST.enterSymbol(new Symbol("i", new StringType()));
+        // ST.climb();
+        // ST.closeScope();
+        // ST.dive();
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
+    }
+
+    @Test
+    public void shouldThrowTypeErrorWhenAssigningValueTypeIsNotAString() {
+        ST = new SymbolTable();
+
+        StringAssignmentNode assignmentNode = new StringAssignmentNode(new IdNode("piece").name,
+                new IdNode("red").name);
+
+        // ST.openScope();
+        ST.enterSymbol(new Symbol("piece", new BoolType()));
+        ST.enterSymbol(new Symbol("red", new IntType()));
         // ST.climb();
         // ST.closeScope();
         // ST.dive();

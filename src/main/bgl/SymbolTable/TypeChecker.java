@@ -43,7 +43,15 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(StringAssignmentNode n) {
-        return (TypeDenoter) n.accept(this);
+        TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+        }
     }
 
     @Override

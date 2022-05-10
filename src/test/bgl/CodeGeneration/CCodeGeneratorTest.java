@@ -39,7 +39,7 @@ class CCodeGeneratorTest {
     }
 
     @Test
-    public void converts_basic_TypeDenoters_to_actual_c_types() {
+    public void convertBasicTypeDenotersToActualCTypes() {
 
         IntType     intType     = new IntType();
         StringType  stringType  = new StringType();
@@ -55,7 +55,7 @@ class CCodeGeneratorTest {
     }
 
     @Test
-    public void converts_list_types_to_actual_c_types() {
+    public void convertsListTypesToActualCTypes() {
 
         //Given
         ListType intList    = new ListType(new IntType());

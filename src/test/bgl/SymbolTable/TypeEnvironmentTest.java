@@ -42,7 +42,7 @@ class TypeEnvironmentTest {
     }
 
     @Test
-    void cannotCreateTypeWithParrentTypeThatDoesNotExist() {
+    void cannotCreateTypeWithParentTypeThatDoesNotExist() {
 
         typeEnvironment = new TypeEnvironment();
 
