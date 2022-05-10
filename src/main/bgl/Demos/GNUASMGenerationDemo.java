@@ -29,10 +29,10 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    bool c = (2>=1 or 2<=1) and !(true and false) and (2==2)and(3>2);
-                    int a = 2*2+5;
-                    bool gha = false;
-                    print(c,a,gha," sooo cool");
+                    int a = 6^5;
+                    print(a);
+                    print(a);
+
                 }
                 
                 RULES{}
@@ -61,7 +61,6 @@ public class GNUASMGenerationDemo {
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);
-        System.out.println(code);
         try {
             FileWriter fw = new FileWriter("./src/main/bgl/CodeGeneration/GeneratedFiles/out.s", false);
             fw.write(code);

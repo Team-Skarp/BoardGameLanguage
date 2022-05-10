@@ -67,6 +67,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
 
         if (idType.getClass() == exprType.getClass()) {
+            System.out.println(idType.getClass() + " " + exprType.getClass()); //todo remove
             return idType;          //Could be the expression type or the id type
         }
         else {
@@ -443,19 +444,6 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
-    public TypeDenoter visit(IntegerAssignDeclarationNode n) { //Todo: marked for termination, we should only have assigns and decls, not a node for the combined type
-        TypeDenoter exprType = (TypeDenoter) n.expr.accept(this);
-
-        if (exprType instanceof IntType) {
-            return new IntType();
-        }
-        else {
-            throw new TypeErrorException(String.format("type of expression should be of type 'int', got type '%s'", exprType));
-        }
-
-    }
-
-    @Override
     public TypeDenoter visit(PathDeclarationNode n) {
         return null;
     }
@@ -610,19 +598,35 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(FieldAccessNode n) {
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(IntegerDeclarationNode n) {
-        return new IntType();
+        if ((n.value != null) && (n.value.accept(this).getClass() != IntType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        } else {
+            return new IntType();
+        }
     }
 
     @Override
     public TypeDenoter visit(BooleanDeclarationNode n) {
-        return new BoolType();
+        if ((n.value != null) && (n.value.accept(this).getClass() != BoolType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        } else {
+            return new BoolType();
+        }
     }
 
     @Override
     public TypeDenoter visit(StringDeclarationNode n) {
-        return new StringType();
-
+        if ((n.value != null) && (n.value.accept(this).getClass() != StringType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        } else {
+            return new StringType();
+        }
     }
 
 }

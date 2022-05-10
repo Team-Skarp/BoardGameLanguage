@@ -8,7 +8,7 @@ Logger file to log information of file location and date
 */
 public class Logger {
     //these 4 variables are the only that should be changed
-    Boolean logAll = true;
+    Boolean logAll = false;
     Boolean logNothing = false;
     Boolean includeTimeStamp = false;
     int stampLength = 50;

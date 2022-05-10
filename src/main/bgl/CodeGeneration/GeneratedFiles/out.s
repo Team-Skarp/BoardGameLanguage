@@ -1,80 +1,47 @@
 	.file	"out.c"
-	.text
-	.section	.rodata
-.LC0:
-	.string	"%c\n"
+	.intel_syntax noprefix
 	.text
 	.globl	main
-	.type	main, @function
+	.section	.rodata
+.LC0:
+    .string	"true"
+.LC1:
+    .string	"false"
+.LC2:
+    .string	"%d\n"
+.LC3:
+    .string	"%d\n"
+.text
+.type	main, @function
 main:
 .LFB6:
 	.cfi_startproc
 	endbr64
-	pushq	%rbp
+	push	rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
-	movq	%rsp, %rbp
+	mov	rbp, rsp
 	.cfi_def_cfa_register 6
-	subq	$64, %rsp
-	movl	%edi, -52(%rbp)
-	movq	%rsi, -64(%rbp)
-	movl	$1, -28(%rbp)
-	movl	$0, -24(%rbp)
-	movq	$0, -16(%rbp)
-	movl	$3, %edi
-	call	malloc@PLT
-	movq	%rax, -16(%rbp)
-	movq	-16(%rbp), %rax
-	movabsq	$2334102026254443880, %rcx
-	movq	%rcx, (%rax)
-	movl	$560425316, 8(%rax)
-	movb	$0, 12(%rax)
-	movq	-16(%rbp), %rax
-	movq	%rax, %rdi
-	call	puts@PLT
-	movq	-16(%rbp), %rax
-	movq	%rax, %rdi
-	call	puts@PLT
-	movl	$1, -36(%rbp)
-	movl	$0, -32(%rbp)
-	movl	$8, -20(%rbp)
-	jmp	.L2
-.L6:
-	movl	-32(%rbp), %eax
-	movslq	%eax, %rdx
-	movq	-16(%rbp), %rax
-	addq	%rdx, %rax
-	movq	%rax, -8(%rbp)
-	jmp	.L3
-.L4:
-	movq	-8(%rbp), %rax
-	movzbl	(%rax), %eax
-	movsbl	%al, %eax
-	movl	%eax, %esi
-	leaq	.LC0(%rip), %rdi
-	movl	$0, %eax
+	sub	rsp, 16
+	mov	DWORD PTR -24[rbp], edi
+ 	mov	QWORD PTR -36[rbp], rsi
+    mov	DWORD PTR -8[rbp], 7776
+    mov eax, DWORD PTR -8[rbp]
+    mov	esi, eax
+    
+
+    lea	rdi, .LC2[rip]
+	mov	eax, 0
 	call	printf@PLT
-	cmpl	$0, -36(%rbp)
-	sete	%al
-	movzbl	%al, %eax
-	movl	%eax, -36(%rbp)
-.L3:
-	cmpl	$0, -36(%rbp)
-	jne	.L4
-	cmpl	$0, -36(%rbp)
-	sete	%al
-	movzbl	%al, %eax
-	movl	%eax, -36(%rbp)
-	addl	$1, -32(%rbp)
-.L2:
-	cmpl	$0, -36(%rbp)
-	je	.L5
-	movl	-32(%rbp), %eax
-	cmpl	-20(%rbp), %eax
-	jne	.L6
-.L5:
-	movl	$0, %eax
-	leave
+    mov eax, DWORD PTR -8[rbp]
+    mov	esi, eax
+    
+
+    lea	rdi, .LC3[rip]
+	mov	eax, 0
+	call	printf@PLT
+  	leave
+ 	mov	eax, 0
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc

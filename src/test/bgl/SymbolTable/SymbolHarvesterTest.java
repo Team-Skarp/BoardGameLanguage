@@ -45,7 +45,7 @@ public class SymbolHarvesterTest {
         SequentialDeclaration sequence = new SequentialDeclaration(
                 new IntType(),
                 new IntegerDeclarationNode("a"),
-                new IntegerAssignDeclarationNode(
+                new IntegerDeclarationNode(
                         "b",
                         new BooleanNode(false)
                 )

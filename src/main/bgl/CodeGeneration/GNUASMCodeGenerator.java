@@ -10,6 +10,8 @@ import SymbolTable.types.BoolType;
 import SymbolTable.types.IntType;
 import SymbolTable.types.StringType;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,7 +33,12 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     int LAmount = 2;
     //creates a hashmap between a symbol from the symbol table and its pointer for assembly
     HashMap<Integer,Integer> ptrTable = new HashMap<Integer, Integer>();
-
+    //hashtable for conditional statements, such that no dangling else problems arise
+    HashMap<Integer,Integer> condTable = new HashMap<Integer, Integer>();
+    //this is the last ptr used
+    int ptr = 0;
+    //this is the pointer currently used to declare a variable
+    int ptrVarDecl = 0;
     public GNUASMCodeGenerator(SymbolTable ST) {
         this.ST = ST;
     }
@@ -96,7 +103,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                         .text
                         .type	main, @function
                         """;
-        lo.g(data);
         return data+initialize+str+footer;
     }
 
@@ -112,48 +118,177 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PlusNode n) {
-        String str = " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
-        return str;
+        //String str = " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
+        /*pointerOffset += 4;
+        ptr = pointerOffset-16;
+        String str = (n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this);
+        str += (n.right.getClass() == IntNode.class || n.right.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.right.accept(this)) : (String) n.right.accept(this);
+        */
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            int result = a+b;
+            return result+"";
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(MinusNode n) {
-        String str = " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
-        return str;
+        //String str = " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
+        /*String str = (n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this);
+        str += (n.right.getClass() == IntNode.class || n.right.getClass() == UnaryMinusNode.class) ? "\n\tsub DWORD PTR -%d[rbp], %s".formatted(ptr,n.right.accept(this)) : (String) n.right.accept(this);
+        */
+        //return str;
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            int result = a-b;
+            return result+"";
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(UnaryMinusNode n) {
-        String str = " ( -( "+n.operand.accept(this)+" ) ) ";
-        return str;
+        //String str = " ( -( "+n.operand.accept(this)+" ) ) ";
+        return "-"+n.operand.accept(this);
     }
 
     @Override
     public String visit(MultNode n) {
-        String str = " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
-        return str;
+        //String str = " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
+        //(n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tsub DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this);
+        /*ptr = pointerOffset-16;
+        String str2 = """
+                    %s
+                	mov	eax, DWORD PTR -%d[rbp]
+                	sub eax, 2
+                	mov	DWORD PTR -%d[rbp], 0	
+                	jmp	.L%d
+                .L%d:
+                	add	DWORD PTR -%d[rbp], ebx
+                	add	DWORD PTR -%d[rbp], 1	
+                .L%d:
+                	cmp	DWORD PTR -%d[rbp], eax
+                	jle	.L%d
+                """.formatted((n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this)
+                        ,ptr,ptr+4,LAmount,LAmount+1,ptr+8,ptr+4,LAmount,ptr+4,LAmount+1);
+        LAmount+=2;
+        pointerOffset += 8;
+        ptr = pointerOffset-16;
+        String str1 = """
+                mov DWORD PTR -%d[rbp], 0
+                %s
+                mov ebx, DWORD PTR -%d[rbp]     
+                """.formatted(ptr,
+                (n.right.getClass() == IntNode.class || n.right.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.right.accept(this)) : (String) n.right.accept(this)
+                ,ptr);
+
+        return str1+str2;*/
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            int result = a*b;
+            return result+"";
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(DivNode n) {
-        String str = " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
-        return str;
+        //String str = " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            int result = (int) Math.floor(a/b);
+            return result+"";
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(ModNode n) {
-        String str = " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
-        return str;
+        //String str = " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            int result = a%b;
+            return result+"";
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(PowNode n) {
-        String str = ""; //TODO: figure out how to integrate a power function. use loop to increment?
-        return str;
+       /* String str = """
+                	mov	DWORD PTR -%d[rbp], %s
+                	mov	DWORD PTR -%d[rbp], %s
+                	mov	eax, DWORD PTR -%d[rbp]	
+                	mov	DWORD PTR -%d[rbp], eax	
+                	mov	DWORD PTR -%d[rbp], 1	
+                	jmp	.L%d	
+                .L%d:
+                	mov	eax, DWORD PTR -%d[rbp]	
+                	mov	DWORD PTR -%d[rbp], eax	
+                	mov	DWORD PTR -%d[rbp], 1	
+                	jmp	.L%d	
+                .L%d:
+                	mov	eax, DWORD PTR -%d[rbp]	
+                	add	DWORD PTR -%d[rbp], eax	
+                	add	DWORD PTR -%d[rbp], 1	
+                .L%d:
+                	mov	eax, DWORD PTR -%d[rbp]	
+                	cmp	eax, DWORD PTR -%d[rbp]	
+                	jl	.L%d	
+                	add	DWORD PTR -%d[rbp], 1
+                .L%d:
+                	mov	eax, DWORD PTR -%d[rbp]	
+                	cmp	eax, DWORD PTR -%d[rbp]	
+                	jl	.L%d
+                """.formatted(ptrVarDecl,n.left.accept(this),ptr+12,n.right.accept(this),ptrVarDecl,ptr+8,ptr+20,LAmount,LAmount+3,
+                    ptrVarDecl, ptr+4, ptr+16,LAmount+1,LAmount+2,ptr+4,ptrVarDecl,ptr+16,LAmount+1,ptr+16,ptr+8,LAmount+2,ptr+20
+                    ,LAmount,ptr+20,ptr+12,LAmount+3
+                    );
+        pointerOffset += 24;
+        ptr = pointerOffset-16;
+        LAmount+=4;*/
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            int result = 1;
+            for (int i = 0; i < b; i++){
+                result *=a;
+            }
+            return result+"";
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
+        //String str = ""+n.right.accept(this);
+        //return str;
     }
     @Override
     public String visit(IdNode n) {
-        return null;
+        Symbol symbol = ST.retrieveSymbol(n.name);
+        String str = "DWORD PTR -%d[rbp]".formatted(ptrTable.get(symbol.hashCode()));
+        return str;
     }
 
     @Override
@@ -183,101 +318,176 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(EqualNode n) {
-        String a = n.left.accept(this)+"";
+        /*String a = n.left.accept(this)+"";
         String b = n.right.accept(this)+"";
         String str = "(!("+a+">"+b+")&&!("+a+"<"+b+"))";
-        return str;
+        return str;*/
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            if(a == b){
+                return "1";
+            }else{
+                return "0";
+            }
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(NotEqualNode n) {
-        String a = n.left.accept(this)+"";
+        /*String a = n.left.accept(this)+"";
         String b = n.right.accept(this)+"";
         String str = "(("+a+">"+b+")||("+a+"<"+b+"))";
-        return str;
+        return str;*/
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            if(a != b){
+                return "1";
+            }else{
+                return "0";
+            }
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(LessThanNode n) {
-        String str = " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
-        return str;
+        /*String str = " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
+        return str;*/
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            if(a < b){
+                return "1";
+            }else{
+                return "0";
+            }
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(GreaterThanNode n) {
-        String str = " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
-        return str;
+        /*String str = " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
+        return str;*/
+
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            if(a > b){
+                return "1";
+            }else{
+                return "0";
+            }
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(GreaterThanEqualsNode n) {
-        String a = n.left.accept(this)+"";
+        /*String a = n.left.accept(this)+"";
         String b = n.right.accept(this)+"";
         String str = "((!("+a+">"+b+")&&!("+a+"<"+b+"))||("+a+">"+b+"))";
-        return str;
+        return str;*/
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            if(a >= b){
+                return "1";
+            }else{
+                return "0";
+            }
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables
+            return null;
+        }
     }
 
     @Override
     public String visit(LessThanEqualsNode n) {
-        String a = n.left.accept(this)+"";
+        /*String a = n.left.accept(this)+"";
         String b = n.right.accept(this)+"";
         String str = "((!("+a+">"+b+")&&!("+a+"<"+b+"))||("+a+"<"+b+"))";
-        return str;
+        return str;*/
+        /*if(n.left.accept(this) <= n.right.accept(this)){
+            return "1";
+        }else{
+            return "0";
+        }*/
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            if(a <= b){
+                return "1";
+            }else{
+                return "0";
+            }
+        }
+        catch (NumberFormatException ex){
+            //TODO: do i for variables and numbers
+            return null;
+        }
     }
 
     @Override
     public String visit(NegationNode n) {
-        String str = " ( !( "+n.child.accept(this)+" ) )";
-        return str;
+        /*String str = " ( !( "+n.child.accept(this)+" ) )";
+        return str;*/
+        if(n.child.accept(this) == "1"){
+            return "0";
+        }else{
+            return "1";
+        }
     }
 
     @Override
     public String visit(OrNode n) {
-        String str = " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
-        return str;
+        /*String str = " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
+        return str;*/
+        if(n.left.accept(this) == "1" || n.right.accept(this) == "1"){
+            return "1";
+        }else{
+            return "0";
+        }
     }
 
     @Override
     public String visit(AndNode n) {
-        String str = " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
-        return str;
+        //String str = " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
+        if(n.left.accept(this) == "1" && n.right.accept(this) == "1"){
+            return "1";
+        }else{
+            return "0";
+        }
     }
 
     @Override
     public String visit(BlockNode n) {
-        String str = "\n";
-        List<Block> childBlocks = ST.getActiveBlock().getChildren();
-
-        if (childBlocks.size() > 0) {
-            int cnt = 0;
-            for (Block block : childBlocks) {
-                ST.dive();
-                String dataCpy = data;
-                String strCpy = str;
-                int dataAmountCpy = dataAmount;
-                int pointerOffsetCpy = pointerOffset;
-                int LAmountCpy = LAmount;
-                HashMap<Integer,Integer> ptrTableCpy = ptrTable;
-
-                cnt++;
-                for (ASTNode c: n.children){
-
-                    str += (String) c.accept(this);
-                }
-                if(cnt != 2){
-                    data = dataCpy;
-                    str = strCpy;
-                    pointerOffset = pointerOffsetCpy;
-                    dataAmount = dataAmountCpy;
-                    ptrTable = ptrTableCpy;
-                    LAmount = LAmountCpy;
-                }
-            }
-        } else {
-            for (ASTNode c: n.children){
-                str += (String) c.accept(this);
-            }
+        String str = "";
+        //Go down into the scope of this block
+        lo.g("blocknode entering");
+        ST.dive();
+        lo.g("blocknode dived");
+        lo.g("blocknode childs:"+n.children.size());
+        for (ASTNode c: n.children){
+            str += TAB.repeat(indent) + c.accept(this);
         }
+        //When finished, climb back to parrent scope
         ST.climb();
         return str;
     }
@@ -299,12 +509,22 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntegerAssignmentNode n) {
-        return null;
+        Symbol symbol = ST.retrieveSymbol(n.id.name);
+        String str = """
+                	mov eax, %s
+                	mov	DWORD PTR -%d[rbp],eax
+                """.formatted(n.aexpr.accept(this),ptrTable.get(symbol.hashCode()));
+        return str;
     }
 
     @Override
     public String visit(BooleanAssignmentNode n) {
-        return null;
+        Symbol symbol = ST.retrieveSymbol(n.varName);
+        String str = """
+                	mov eax, %s
+                	mov	DWORD PTR -%d[rbp],eax
+                """.formatted(n.bexpr.accept(this),ptrTable.get(symbol.hashCode()));
+        return str;
     }
 
     @Override
@@ -349,30 +569,40 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(IntegerDeclarationNode n) {
         pointerOffset += 4;
-        int ptr = pointerOffset-16;
+        ptr = pointerOffset-16;
         String str = """
                     mov	DWORD PTR -%d[rbp], %s
                 """.formatted(ptr,n.value.accept(this));
+
+        //String str = "    mov DWORD PTR -%d[rbp], 0\n".formatted(ptr)+n.value.accept(this)+"\n";
+
         Symbol symbol = ST.retrieveSymbol(n.name);
-        lo.g(symbol.hashCode());
         ptrTable.put(symbol.hashCode(),ptr);
         return str;
-    }
-
-    @Override
-    public String visit(IntegerAssignDeclarationNode n) {
-        return null;
     }
 
     @Override
     public String visit(BooleanDeclarationNode n) {
         pointerOffset += 1;
         int ptr = pointerOffset-16;
-        String str = """
+        String str = "";
+        if(n.value == null){
+            str+= """
+                    mov	BYTE PTR -%d[rbp], 0
+                    """.formatted(ptr);
+        }
+        else if(((String)n.value.accept(this)).contains("DWORD")){
+            str+= """
+                        mov	BYTE PTR -%d[rbp], 0
+                        mov	eax, DWORD PTR -%d[rbp]
+                        mov	%s,eax
+                    """.formatted(ptr,ptr,n.value.accept(this));
+        }else{
+            str+= """
                     mov	BYTE PTR -%d[rbp], %s
-                """.formatted(ptr,n.value.accept(this));
+                    """.formatted(ptr,n.value.accept(this));
+        }
         Symbol symbol = ST.retrieveSymbol(n.name);
-        lo.g(symbol.hashCode());
         ptrTable.put(symbol.hashCode(),ptr);
         return str;
     }
@@ -404,12 +634,63 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ConditionalNode n) {
-        return null;
+        LAmount++;
+        condTable.put(n.ifBlock.hashCode(),LAmount);
+        lo.g("end cond"+condTable.get(n.ifBlock.hashCode()));
+        LAmount++;
+        int ifstmntLoc = LAmount;
+        String str = """
+                    \n
+                    # Ifstatement start
+                	mov eax, %s
+                	cmp	eax, 1
+                	jne	.L%d
+                	# inner if s
+                	%s
+                	# inner if e
+                	jmp	.L%d
+                 .L%d:
+                  # Ifstatement end
+                """.formatted(n.predicate.accept(this),ifstmntLoc,n.ifBlock.accept(this),condTable.get(n.ifBlock.hashCode()),ifstmntLoc);
+        lo.g("ifstmnt"+ifstmntLoc);
+        LAmount++;
+        lo.g("size"+n.elseifBlocks.size());
+        for (ASTNode elseif : n.elseifBlocks){
+            lo.g(elseif);
+            LAmount++;
+            lo.g("elseif"+LAmount);
+            str += """
+                 #elasasd
+                	%s
+                	jmp	.L%d
+                 .L%d:
+                """.formatted(elseif.accept(this),condTable.get(n.ifBlock.hashCode()),LAmount);
+            LAmount++;
+        }
+        lo.g("elseblock");
+
+        if(n.elseBlock != null){
+            lo.g(n.elseBlock.accept(this));
+            str+= """
+                    %s
+                    """.formatted(n.elseBlock.accept(this));
+        }
+
+        return str+ """
+                 .L%d:
+                """.formatted(condTable.get(n.ifBlock.hashCode()));
     }
 
     @Override
     public String visit(ElifConditionalNode n) {
-        return null;
+        String str = """
+                 # elseif statement
+                	mov eax, %s
+                	cmp	eax, 1
+                	jne	.L%d
+                	%s
+                """.formatted(n.predicate.accept(this),LAmount,n.ifBlock.accept(this));
+        return str;
     }
 
     @Override
@@ -435,7 +716,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(PrintNode n) {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        lo.g(stackTraceElements);
         //TODO: implement symbol table, implement all idnodes, implement the rest of the nodes. retrieve pointer loc.
         printNode = n;
         String str = "";
@@ -510,6 +790,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ReturnNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(FieldAccessNode n) {
         return null;
     }
 }

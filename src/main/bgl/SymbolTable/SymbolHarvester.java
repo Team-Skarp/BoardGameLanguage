@@ -312,16 +312,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(IntegerDeclarationNode n) {
 
-        ST.enterSymbol(new Symbol(
-                n.name,
-                n.type()
-        ));
+        TC = new TypeChecker(ST, TENV);
 
-        return ST;
-    }
-
-    @Override
-    public SymbolTable visit(IntegerAssignDeclarationNode n) {
+        if ((n.value != null) && (n.value.accept(TC).getClass() != IntType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        }
 
         ST.enterSymbol(new Symbol(
                 n.name,
@@ -334,6 +329,12 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(BooleanDeclarationNode n) {
 
+        TC = new TypeChecker(ST, TENV);
+
+        if ((n.value != null) && (n.value.accept(TC).getClass() != BoolType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        }
+
         ST.enterSymbol(new Symbol(
                 n.name,
                 n.type()
@@ -344,6 +345,12 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(StringDeclarationNode n) {
+
+        TC = new TypeChecker(ST, TENV);
+
+        if ((n.value != null) && (n.value.accept(TC).getClass() != StringType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        }
 
         ST.enterSymbol(new Symbol(
                 n.name,
@@ -480,6 +487,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ReturnNode n) {
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(FieldAccessNode n) {
         return ST;
     }
 }
