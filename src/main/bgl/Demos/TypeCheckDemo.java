@@ -20,7 +20,7 @@ public class TypeCheckDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("int a, b = 3, c;");
+        input = CharStreams.fromString("int a, b = 4;");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);

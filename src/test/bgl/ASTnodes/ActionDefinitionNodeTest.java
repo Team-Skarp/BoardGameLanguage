@@ -11,11 +11,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class ActionDefinitionNodeTest {
     ActionDefinitionNode fooDef;
     ActionDeclarationNode fooDcl;
-    ActionBodyNode fooBody;
+    ParameterBlock fooBody;
 
     @BeforeEach
     void setup() {
-        fooBody = new ActionBodyNode(
+        fooBody = new ParameterBlock(
                 new IntegerDeclarationNode("a"),
                 new BooleanDeclarationNode("b"));
 

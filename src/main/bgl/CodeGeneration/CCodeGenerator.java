@@ -9,6 +9,7 @@ import SymbolTable.types.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Class for generating C code.
@@ -31,8 +32,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return (
                 """
                         #include <stdio.h>
-                        #include<stdbool.h>
-                        #include<math.h>
+                        #include <stdbool.h>
+                        #include <math.h>
                         #include <string.h>
                         #include <stdlib.h>
                                         
@@ -65,69 +66,58 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PlusNode n) {
-        String str = " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(MinusNode n) {
-        String str = " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(UnaryMinusNode n) {
         lo.g(n.operand.accept(this).toString()+" unary minus");
-        String str = " ( -( "+n.operand.accept(this)+" ) ) ";
-        return str;
+        return " ( -( "+n.operand.accept(this)+" ) ) ";
     }
 
     @Override
     public String visit(MultNode n) {
-        String str = " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(DivNode n) {
-        String str = " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(ModNode n) {
-        String str = " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(PowNode n) {
-        String str = " ( (int)pow("+n.left.accept(this)+", "+n.right.accept(this)+") ) ";
-        return str;
+        return " ( (int)pow("+n.left.accept(this)+", "+n.right.accept(this)+") ) ";
     }
 
     @Override
     public String visit(IdNode n) {
-        String str = ""+n.name;
-        return str;
+        return "" + n.name;
     }
 
     @Override
     public String visit(IntNode n) {
-        String str = n.value+"";
-        return str;
+        return n.value + "";
     }
 
     @Override
     public String visit(BooleanNode n) {
-        String str = ""+n.value;
-        return str;
+        return "" + n.value;
     }
 
     @Override
     public String visit(StringNode n) {
-        String str = "\""+n.value+"\"";
-        return str;
+        return "\"" + n.value + "\"";
     }
 
     @Override
@@ -137,56 +127,47 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(EqualNode n) {
-        String str = " ( "+n.left.accept(this)+"=="+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+"=="+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(NotEqualNode n) {
-        String str = " ( "+n.left.accept(this)+" != "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" != "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(LessThanNode n) {
-        String str = " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(GreaterThanNode n) {
-        String str = " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(GreaterThanEqualsNode n) {
-        String str = " ( "+n.left.accept(this)+" >= "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" >= "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(LessThanEqualsNode n) {
-        String str = " ( "+n.left.accept(this)+" <= "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" <= "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(NegationNode n) {
-        String str = " ( !( "+n.child.accept(this)+" ) )";
-        return str;
+        return " ( !( "+n.child.accept(this)+" ) )";
     }
 
     @Override
     public String visit(OrNode n) {
-        String str = " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
     }
 
     @Override
     public String visit(AndNode n) {
-        String str = " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
-        return str;
+        return " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
     }
 
     @Override
@@ -233,10 +214,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
-    @Override
-    public String visit(ActionBodyNode n) {
-        return null;
-    }
 
     @Override
     public String visit(Assignment n) {
@@ -253,37 +230,45 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntegerAssignmentNode n) {
-
-        String str = n.id.name+" = "+n.aexpr.accept(this)+EOL;
-        return str;
+        return n.id.name+" = "+n.aexpr.accept(this)+EOL;
     }
 
     @Override
     public String visit(BooleanAssignmentNode n) {
-        String str = n.varName+" = "+n.bexpr.accept(this)+EOL;
-        return str;
+        return n.varName+" = "+n.bexpr.accept(this)+EOL;
     }
 
     @Override
     public String visit(DesignDefinitionNode n) {
-
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
             designBody += TAB.repeat(indent) + field.accept(this);
         }
         indent--;
-        
-        return (
-                """
-                struct %s {
-                %s};
-                """.formatted(
-                        n.typeDefinition.name,
-                        designBody,
-                        n.typeDefinition
-        ));
 
+        if (n.parentType != null) {
+            return (
+                    """
+                    struct %s {
+                    struct %s parent;
+                    %s};
+                    """.formatted(
+                            n.typeDefinition.name,
+                            n.parentType.name,
+                            designBody,
+                            n.typeDefinition));
+        } else {
+            return (
+                    """
+                    struct %s {
+                    %s};
+                    """.formatted(
+                            n.typeDefinition.name,
+                            designBody,
+                            n.typeDefinition
+                    ));
+        }
     }
 
     @Override
@@ -318,7 +303,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDeclarationNode n) {
-
         return (
                 """
                 struct %s *%s;
@@ -400,13 +384,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(SequentialDeclaration n) {
         String str = "";
         for(ASTNode decl: n.declarations){
-            str+=decl.accept(this);
+            str+= decl.accept(this);
         }
         return str;
     }
 
     @Override
     public String visit(IntegerDeclarationNode n) {
+        //TODO Fix indent somewhere between this and sequential decl. Also fix sequential decl.
         if (n.value != null) {
             return """
                    %s %s = %s;
@@ -415,8 +400,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.name,
                     n.value.accept(this)
             );
-        }
-        else {
+        } else {
             return """
                    %s %s;
                    """.formatted(
@@ -425,12 +409,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     );
         }
     }
-
-    @Override
-    public String visit(IntegerAssignDeclarationNode n) {
-        return null;
-    }
-
 
     @Override
     public String visit(BooleanDeclarationNode n) {
@@ -513,9 +491,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ElifConditionalNode n) {
-        String str = "else if("+n.predicate.accept(this)+")"+n.ifBlock.accept(this);
-
-        return str;
+        return "else if("+n.predicate.accept(this)+")"+n.ifBlock.accept(this);
     }
 
     @Override
@@ -636,5 +612,17 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ReturnNode n) {
         return null;
+    }
+
+    @Override
+    public String visit(FieldAccessNode n) {
+        System.out.println("We have reached FieldAccessNode");
+        StringBuilder str = new StringBuilder();
+        str.append(n.origin.name);
+        for (String field : n.originFields) {
+            str.append(field);
+        }
+        str.append(EOL);
+        return str.toString();
     }
 }

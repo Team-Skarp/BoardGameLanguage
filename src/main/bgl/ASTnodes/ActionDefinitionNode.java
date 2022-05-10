@@ -11,9 +11,9 @@ public class ActionDefinitionNode implements ASTNode<Object>, Declaration {
     public final String name;
     public final List<Declaration> formalParameters;
     public final TypeDenoter returnType;
-    public final ActionBodyNode body;
+    public final ParameterBlock body;
 
-    public ActionDefinitionNode(String name, TypeDenoter returnType, ActionBodyNode body, Declaration... formalParameters) {
+    public ActionDefinitionNode(String name, TypeDenoter returnType, ParameterBlock body, Declaration... formalParameters) {
         this.name = name;
         this.formalParameters = List.of(formalParameters);
         this.returnType = returnType;

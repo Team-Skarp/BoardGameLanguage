@@ -230,6 +230,11 @@ returnStatement
 actionCall
     : IDENTIFIER LPAREN (expression | expression (COMMA expression )+)? RPAREN
     ;
+
+fieldAccess
+    : IDENTIFIER (.IDENTIFIER)+
+    ;
+
 //INTDCL | BOOLDCL | STRDCL
 type
     : INTDCL
@@ -246,10 +251,9 @@ assignmentStatement
     | dotAssignment EOL
     | actionAssignment EOL
     | choiceAssignment
+    | designAssignment EOL
     ;
 
-//Todo: find out why a = 2 + 2 2 + 2; is a legal input;
-// removing * does not seem to help, neither does removing + from additive rule
 intAssigment
     : IDENTIFIER ASSIGN arithmeticExpression
     ;
@@ -276,6 +280,13 @@ choiceAssignment
 actionAssignment
     : IDENTIFIER DOT IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
+    ;
+
+// Design assignment,
+designAssignment
+    : IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) (COMMA ( INT | STR | BOOL | IDENTIFIER ))* RBRACE
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE LBRACE ( INT | STR | BOOL | IDENTIFIER )* RBRACE (COMMA ( INT | STR | BOOL ))* RBRACE
     ;
 
 
@@ -317,7 +328,6 @@ statement
     | returnStatement EOL
     ;
 
-
 expression
     : booleanExpression
     ;
@@ -325,6 +335,7 @@ expression
 arithmeticExpression
     : additive
     ;
+
 booleanExpression
     : logor
     ;
@@ -356,6 +367,8 @@ arithmeticAtom
     : INT
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
+    | fieldAccess
+    | actionCall
     ;
 
 logor
@@ -392,7 +405,6 @@ booleanAtom
     : BOOL
     | IDENTIFIER
     | LPAREN booleanExpression RPAREN
-    | actionCall
     ;
 
 ifStatement
@@ -402,6 +414,7 @@ ifStatement
 elseStatement
     : ELSE normalBlock
     ;
+
 elseifStatement
     : ELSEIF LPAREN booleanExpression RPAREN normalBlock
     ;

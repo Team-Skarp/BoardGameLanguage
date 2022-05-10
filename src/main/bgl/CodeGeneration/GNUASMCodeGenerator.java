@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GNUASMCodeGenerator implements ASTvisitor<String> {
+
     private SymbolTable ST;
     private int             indent = 0;
     private final String    TAB = "\t";
@@ -41,7 +42,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     public GNUASMCodeGenerator(SymbolTable ST) {
         this.ST = ST;
     }
-
 
     @Override
     public String visit(GameNode n) {
@@ -498,11 +498,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
-    public String visit(ActionBodyNode n) {
-        return null;
-    }
-
-    @Override
     public String visit(Assignment n) {
         return null;
     }
@@ -584,11 +579,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
         Symbol symbol = ST.retrieveSymbol(n.name);
         ptrTable.put(symbol.hashCode(),ptr);
         return str;
-    }
-
-    @Override
-    public String visit(IntegerAssignDeclarationNode n) {
-        return null;
     }
 
     @Override
@@ -800,6 +790,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ReturnNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(FieldAccessNode n) {
         return null;
     }
 }

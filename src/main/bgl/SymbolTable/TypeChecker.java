@@ -17,6 +17,13 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     private final SymbolTable ST;
     private final TypeEnvironment TENV;
 
+
+    /**
+     * The action node that we are currently in else
+     * returns null if we are not in an action
+     */
+    private ActionDefinitionNode currentAction;
+
     public TypeChecker(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
         this.TENV = TENV;
@@ -43,17 +50,42 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(StringAssignmentNode n) {
-        return null;
+        TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+        }
     }
 
     @Override
     public TypeDenoter visit(IntegerAssignmentNode n) {
-        return null;
+        TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            System.out.println(idType.getClass() + " " + exprType.getClass()); //todo remove
+            return idType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+        }
     }
 
     @Override
     public TypeDenoter visit(BooleanAssignmentNode n) {
-        return null;
+        TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+        }
     }
 
     @Override
@@ -63,6 +95,14 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ActionDefinitionNode n) {
+
+        currentAction = n;
+
+        //Typecheck body. All return statements found within are typechecked against the return type of the action
+        n.body.accept(this);
+
+        //When we leave the action there should not be a current action
+        currentAction = null;
         return null;
     }
 
@@ -119,7 +159,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ArithmeticExpression n) {
-        return null;
+        return (TypeDenoter) n.accept(this);
 
     }
 
@@ -379,11 +419,9 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ParameterBlock n) {
-        return null;
-    }
-
-    @Override
-    public TypeDenoter visit(ActionBodyNode n) {
+        for (ASTNode child : n.children) {
+            child.accept(this);
+        }
         return null;
     }
 
@@ -394,25 +432,15 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(BooleanExpression n) {
-        return null;
-    }
+        TypeDenoter idType = (TypeDenoter) n.accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.accept(this);
 
-    @Override
-    public TypeDenoter visit(IntegerDeclarationNode n) {
-        return null;
-    }
-
-    @Override
-    public TypeDenoter visit(IntegerAssignDeclarationNode n) {
-        TypeDenoter exprType = (TypeDenoter) n.expr.accept(this);
-
-        if (exprType instanceof IntType) {
-            return new IntType();
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type of expression should be of type 'int', got type '%s'", exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
         }
-
     }
 
     @Override
@@ -438,7 +466,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     @Override
     public TypeDenoter visit(ConditionalNode n) {
         return null;
-    }
+    } //Todo: implement?
 
     @Override
     public TypeDenoter visit(ElifConditionalNode n) {
@@ -507,17 +535,98 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ReturnNode n) {
+
+        if (isNotInAction()) {
+            throw new SyntaxError("return statement must be inside an action");
+        }
+        else if (isReturningFromVoid(n)) {
+            throw new TypeErrorException(
+                    "action '%s' does not expect a value to be returned".formatted(
+                            currentAction.name
+                    )
+            );
+        }
+        else if (haveEmptyReturnWhenOneExpected(n)) {
+            throw new TypeErrorException(
+                    "action '%s' expects a return type of '%s' but nothing was given".formatted(
+                        currentAction.name,
+                        currentAction.returnType
+                    )
+            );
+        }
+        else if (nonMatchingReturnType(n)) {
+            throw new TypeErrorException(
+                    "return value of type '%s' does not match return type of '%s', expected type '%s'".formatted(
+                            n.returnVal.accept(this),
+                            currentAction.name,
+                            currentAction.returnType
+                    )
+            );
+        }
+
         return null;
+    }
+
+    /**
+     * Checks that type of return value matches current action definition
+     * @param n
+     */
+    private boolean nonMatchingReturnType(ReturnNode n) {
+        TypeDenoter exprType = (TypeDenoter) n.returnVal.accept(this);
+
+        return exprType.getClass() != currentAction.returnType.getClass();
+    }
+
+    /**
+     * Check that if there is no return value, then the action return type should be Void
+     * @param n
+     */
+    private boolean haveEmptyReturnWhenOneExpected(ReturnNode n) {
+        return n.returnVal == null && !(currentAction.returnType instanceof VoidType);
+    }
+
+    /**
+     * Check that nothing is returned from a void action
+     * @param n
+     */
+    private boolean isReturningFromVoid(ReturnNode n) {
+        return n.returnVal != null && currentAction.returnType instanceof VoidType;
+    }
+
+    private boolean isNotInAction() {
+        return currentAction == null;
+    }
+
+    @Override
+    public TypeDenoter visit(FieldAccessNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(IntegerDeclarationNode n) {
+        if ((n.value != null) && (n.value.accept(this).getClass() != IntType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        } else {
+            return new IntType();
+        }
     }
 
     @Override
     public TypeDenoter visit(BooleanDeclarationNode n) {
-        return null;
+        if ((n.value != null) && (n.value.accept(this).getClass() != BoolType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        } else {
+            return new BoolType();
+        }
     }
 
     @Override
     public TypeDenoter visit(StringDeclarationNode n) {
-        return null;
-
+        if ((n.value != null) && (n.value.accept(this).getClass() != StringType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        } else {
+            return new StringType();
+        }
     }
+
 }

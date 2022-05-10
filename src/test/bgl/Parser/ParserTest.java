@@ -37,7 +37,6 @@ public class ParserTest {
 
 
             try {
-
                 ParseTree walker = parser.arithmeticExpression(); // parse the input stream!
 
                 System.out.println("🟢 Successful parse of testfile: " + testfile.getName());
@@ -47,6 +46,6 @@ public class ParserTest {
                 System.out.println("\u001B[31m" + error.getMessage() + "\u001B[0m");
             }
         }
-    };
+    }
 
 }

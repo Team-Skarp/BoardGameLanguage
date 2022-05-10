@@ -7,6 +7,7 @@ import SymbolTable.types.*;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SymbolHarvesterTest {
@@ -37,14 +38,14 @@ public class SymbolHarvesterTest {
      * int a, b = false
      */
     @Test
-    public void should_throw_typeerror_when_expression_type_does_not_match_in_sequence_declaration() {
+    public void shouldThrowTypeErrorWhenExpressionTypeDoesNotMatchInSequenceDeclaration() {
 
         symbolHarvester = new SymbolHarvester();
 
         SequentialDeclaration sequence = new SequentialDeclaration(
                 new IntType(),
                 new IntegerDeclarationNode("a"),
-                new IntegerAssignDeclarationNode(
+                new IntegerDeclarationNode(
                         "b",
                         new BooleanNode(false)
                 )
@@ -56,7 +57,7 @@ public class SymbolHarvesterTest {
     }
 
     @Test
-    public void can_enter_design_definition_into_symbol_table() {       //design Player {str name;}
+    public void canEnterDesignDefinitionIntoSymbolTable() {       //design Player {str name;}
 
         symbolHarvester = new SymbolHarvester();
 
@@ -70,7 +71,7 @@ public class SymbolHarvesterTest {
     }
 
     @Test
-    public void can_define_design_with_design_field() {       //design Player {Color color;}
+    public void canDefineDesignWithDesignField() {       //design Player {Color color;}
 
         symbolHarvester = new SymbolHarvester();
 
@@ -98,7 +99,7 @@ public class SymbolHarvesterTest {
      * }
      */
     @Test
-    public void should_throw_error_when_redeclaring_variable_from_parameterized_block() {
+    public void shouldThrowErrorWhenRedeclaringVariableFromParameterizedBlock() {
 
         symbolHarvester = new SymbolHarvester();
 
@@ -113,6 +114,43 @@ public class SymbolHarvesterTest {
 
         assertThrows(DuplicateSymbolException.class, () ->
                 symbolHarvester.visit(parameterBlock));
+
+    }
+
+    @Test
+    /**
+     *
+     * action foo(int a, int b) {
+     *     #here we should be able to reference a and b
+     * }
+     *
+     * a and b, should be written to symbol table
+     */
+    public void should_write_formal_params_into_symbol_table() {
+
+        symbolHarvester = new SymbolHarvester();
+
+        ActionDefinitionNode foo = new ActionDefinitionNode(
+                "foo",
+                new VoidType(),
+                new ParameterBlock(),
+                new IntegerDeclarationNode(
+                        "a"
+                ),
+                new IntegerDeclarationNode(
+                        "b"
+                )
+        );
+
+        SymbolTable ST = symbolHarvester.visit(foo);
+
+        //Expect that a new scope for the action body have been created
+        assertEquals(1, ST.getActiveBlock().getChildren().size());
+
+        //Expect that within the action body scope we can retrieve the two declarations
+        ST.dive();
+        ST.retrieveSymbol("a");
+        ST.retrieveSymbol("b");
 
     }
 

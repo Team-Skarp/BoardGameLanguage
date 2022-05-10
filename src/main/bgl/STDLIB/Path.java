@@ -73,7 +73,7 @@ public class Path implements PredefinedDesign {
         ActionDefinitionNode getNext = new ActionDefinitionNode(
                 "getNext",
                 new PathType(""), // TODO: ask jakob about string param
-                new ActionBodyNode() // TODO: Implement rest of action
+                new ParameterBlock() // TODO: Implement rest of action
         );
 
 
@@ -89,7 +89,7 @@ public class Path implements PredefinedDesign {
         ActionDefinitionNode getPrev = new ActionDefinitionNode(
                 "getPrev",
                 new PathType(""), // TODO: ask jakob about string param
-                new ActionBodyNode(
+                new ParameterBlock(
 
                 ) // TODO: ask jakob about string param
         );
