@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import SymbolTable.types.*;
 import Logging.Logger;
 
+import java.net.IDN;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -239,6 +240,22 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
         return null;
+    }
+
+    @Override
+    public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
+
+        if (ctx.IDENTIFIER() != null) {
+            IdNode origin = new IdNode(ctx.IDENTIFIER(0).toString());
+            List<String> fieldIds = new ArrayList<>();
+
+            for (int i = 1; i < ctx.children.size(); i++) {
+                fieldIds.add(ctx.getChild(i).getText());
+            }
+            return new FieldAccessNode(origin, fieldIds);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -737,6 +754,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if(ctx.arithmeticExpression() != null){
             return ctx.arithmeticExpression().accept(this);
+        }
+        else if(ctx.fieldAccess() != null){
+            return ctx.fieldAccess().accept(this);
         }
         //Todo: missing impl for action call
         return null;

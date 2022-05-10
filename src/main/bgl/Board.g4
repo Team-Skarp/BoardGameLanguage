@@ -230,6 +230,11 @@ returnStatement
 actionCall
     : IDENTIFIER LPAREN (expression | expression (COMMA expression )+)? RPAREN
     ;
+
+fieldAccess
+    : IDENTIFIER (.IDENTIFIER)+
+    ;
+
 //INTDCL | BOOLDCL | STRDCL
 type
     : INTDCL
@@ -248,8 +253,6 @@ assignmentStatement
     | choiceAssignment
     ;
 
-//Todo: find out why a = 2 + 2 2 + 2; is a legal input;
-// removing * does not seem to help, neither does removing + from additive rule
 intAssigment
     : IDENTIFIER ASSIGN arithmeticExpression
     ;
@@ -278,8 +281,7 @@ actionAssignment
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     ;
 
-
-// Special body's
+// Special bodies
 designBody
     : LBRACE (fieldRow)+ RBRACE
     ;
@@ -317,7 +319,6 @@ statement
     | returnStatement EOL
     ;
 
-
 expression
     : booleanExpression
     ;
@@ -325,6 +326,7 @@ expression
 arithmeticExpression
     : additive
     ;
+
 booleanExpression
     : logor
     ;
@@ -356,6 +358,8 @@ arithmeticAtom
     : INT
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
+    | fieldAccess
+    | actionCall
     ;
 
 logor
@@ -392,7 +396,6 @@ booleanAtom
     : BOOL
     | IDENTIFIER
     | LPAREN booleanExpression RPAREN
-    | actionCall
     ;
 
 ifStatement
@@ -402,6 +405,7 @@ ifStatement
 elseStatement
     : ELSE normalBlock
     ;
+
 elseifStatement
     : ELSEIF LPAREN booleanExpression RPAREN normalBlock
     ;

@@ -237,11 +237,6 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
-    public String visit(IntegerAssignDeclarationNode n) {
-        return null;
-    }
-
-    @Override
     public String visit(BooleanDeclarationNode n) {
         return null;
     }
@@ -342,6 +337,11 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ReturnNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(FieldAccessNode n) {
         return null;
     }
 }

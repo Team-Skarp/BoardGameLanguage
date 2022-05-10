@@ -31,8 +31,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return (
                 """
                         #include <stdio.h>
-                        #include<stdbool.h>
-                        #include<math.h>
+                        #include <stdbool.h>
+                        #include <math.h>
                         #include <string.h>
                         #include <stdlib.h>
                                         
@@ -376,13 +376,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(SequentialDeclaration n) {
         String str = "";
         for(ASTNode decl: n.declarations){
-            str+=decl.accept(this);
+            str+= decl.accept(this);
         }
         return str;
     }
 
     @Override
     public String visit(IntegerDeclarationNode n) {
+        //TODO Fix indent somewhere between this and sequential decl. Also fix sequential decl.
         if (n.value != null) {
             return """
                    %s %s = %s;
@@ -391,8 +392,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.name,
                     n.value.accept(this)
             );
-        }
-        else {
+        } else {
             return """
                    %s %s;
                    """.formatted(
@@ -401,12 +401,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     );
         }
     }
-
-    @Override
-    public String visit(IntegerAssignDeclarationNode n) {
-        return null;
-    }
-
 
     @Override
     public String visit(BooleanDeclarationNode n) {
@@ -610,5 +604,17 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ReturnNode n) {
         return null;
+    }
+
+    @Override
+    public String visit(FieldAccessNode n) {
+        System.out.println("We have reached FieldAccessNode");
+        StringBuilder str = new StringBuilder();
+        str.append(n.origin.name);
+        for (String field : n.originFields) {
+            str.append(field);
+        }
+        str.append(EOL);
+        return str.toString();
     }
 }

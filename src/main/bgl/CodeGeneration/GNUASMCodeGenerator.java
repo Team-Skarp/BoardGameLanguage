@@ -365,11 +365,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
-    public String visit(IntegerAssignDeclarationNode n) {
-        return null;
-    }
-
-    @Override
     public String visit(BooleanDeclarationNode n) {
         pointerOffset += 1;
         int ptr = pointerOffset-16;
@@ -515,6 +510,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ReturnNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(FieldAccessNode n) {
         return null;
     }
 }
