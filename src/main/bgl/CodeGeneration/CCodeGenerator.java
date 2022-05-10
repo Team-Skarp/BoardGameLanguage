@@ -7,6 +7,9 @@ import SymbolTable.SymbolTable;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Class for generating C code.
  * "gcc out.c -o out && ./out"
@@ -18,7 +21,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     private final String    TAB = "\t";
     Logger lo =             new Logger();
     private final String EOL = ";\n";
-
+    HashMap<String,String> foreachDict = new HashMap<>();
     public CCodeGenerator(SymbolTable ST) {
         this.ST = ST;
     }
@@ -27,22 +30,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(GameNode n) {
         return (
                 """
-                #include <stdio.h>
-                #include<stdbool.h>
-                #include<math.h>
-                #include <string.h>
-                #include <stdlib.h>
-                
-                #define foreach(item, array)                         \\
-                    for (int keep = 1,                               \\
-                             count = 0,                              \\
-                             size = sizeof(array) / sizeof *(array); \\
-                         keep && count != size;                      \\
-                         keep = !keep, count++)                      \\
-                        for (item = (array) + count; keep; keep = !keep)
+                        #include <stdio.h>
+                        #include<stdbool.h>
+                        #include<math.h>
+                        #include <string.h>
+                        #include <stdlib.h>
+                                        
+                        #define foreach(item, array)                         \\
+                            for (int keep = 1,                               \\
+                                     count = 0,                              \\
+                                     size = __builtin_types_compatible_p(typeof(array), char*) ? (strlen(array)): (sizeof(array) / sizeof *(array));\\
+                                 keep && count != size;                      \\
+                                 keep = !keep, count++)                      \\
+                                for (item = (array) + count; keep; keep = !keep)
 
-                int main(int argc, char *argv[]) %s
-                """.formatted(
+                        int main(int argc, char *argv[]) %s
+                        """.formatted(
                         n.setup.accept(this)
                 )
         );
@@ -448,7 +451,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         if (n.value != null) {
             String val = (String) n.value.accept(this);
             return """
-                   %s %s = %s malloc(%d);
+                   %s %s = (%s) malloc(%d * sizeof(char));
                    strcpy(%s, %s);
                    """.formatted(
                     toCType(n.type()),
@@ -461,7 +464,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         }
         else {
             return """
-                   %s %s = %s malloc(%d);
+                   %s %s = %s malloc(%d * sizeof(char*));
                    """.formatted(
                     toCType(n.type()),
                     n.name,
@@ -539,10 +542,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(ForeachNode n) {
 
         Symbol iteratorSymbol = ST.retrieveSymbol(n.iterator.name);
-
-        /*str +="for(int i = 0; i < sizeof("+n.mainId+")/sizeof("+n.mainId+"[0]); i++)";
-        str +=n.foreachBlock.accept(this);*/
-
+        foreachDict.put(n.iterator.name,"c");
         return """
                foreach (%s *%s, %s) %s
                """.formatted(
@@ -551,6 +551,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                         n.iterable.name,
                         n.body.accept(this)
                     );
+
+
     }
 
     @Override
@@ -566,9 +568,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     endPart += (","+((IdNode) p).name);
 
                 }else if(symbol.type instanceof StringType){
-                    str +="%s";
-                    endPart += (","+((IdNode) p).name);
-
+                    if(foreachDict.get(symbol.name) == "c"){
+                        str +="%c";
+                        endPart += (",*"+((IdNode) p).name);
+                    }else{
+                        str +="%s";
+                        endPart += (","+((IdNode) p).name);
+                    }
                 }else if(symbol.type instanceof BoolType){
                     str +="%s";
                     endPart += ","+p.accept(this)+" ? \"true\" : \"false\"";
