@@ -47,12 +47,12 @@ public class TypeEnvironment {
     /**
      * Enters a new custom type into the type environment
      * @param type to enter
-     * @throws TypeDefinitionException if parrent type already exist or is already defined
+     * @throws TypeDefinitionException if parent type already exist or is already defined
      */
     public TypeEnvironment enterType(DesignType type) {
 
-        if ( !parrentTypeDefined(type.parrent)) {
-            throw new TypeDefinitionException("parrent type '%s' is not defined".formatted(type.parrent));
+        if ( !parentTypeDefined(type.parent)) {
+            throw new TypeDefinitionException("parent type '%s' is not defined".formatted(type.parent));
         }
 
         DesignType prevType = env.put(type.name, type);
@@ -65,13 +65,13 @@ public class TypeEnvironment {
     }
 
     /**
-     * Checks that the parrent type exist
-     * @param parrent type name of parrent
+     * Checks that the parent type exist
+     * @param parent type name of parent
      */
-    private boolean parrentTypeDefined(String parrent) {
-        if (parrent != null) {
+    private boolean parentTypeDefined(String parent) {
+        if (parent != null) {
             try {
-                recieveType(parrent);
+                receiveType(parent);
                 return true;
             } catch (TypeDefinitionException err) {
                 return false;
@@ -81,11 +81,11 @@ public class TypeEnvironment {
     }
 
     /**
-     * Recieves a single type entry from the type environment
-     * @param name of the type to recieve
+     * Receives a single type entry from the type environment
+     * @param name of the type to receive
      * @throws TypeDefinitionException if type is not found
      */
-    public DesignType recieveType(String name) {
+    public DesignType receiveType(String name) {
 
         DesignType type = env.get(name);
 
@@ -93,7 +93,7 @@ public class TypeEnvironment {
             throw new TypeDefinitionException("type '%s' is not defined".formatted(name));
         }
 
-        System.out.printf("type 's' recieved%n", type.name);
+        System.out.printf("type '%s' received\n", type.name);
         return type;
     }
 }
