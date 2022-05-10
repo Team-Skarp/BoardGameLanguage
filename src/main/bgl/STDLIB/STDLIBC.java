@@ -13,12 +13,12 @@ public class STDLIBC {
 
     public static String defines =
             """
-            #define foreach(item, array)                         
-                for (int keep = 1,                               
-                         count = 0,                              
+            #define foreach(item, array)                         \\
+                for (int keep = 1,                               \\
+                         count = 0,                              \\
                          size = __builtin_types_compatible_p(typeof(array), char*) ? (strlen(array)): (sizeof(array) / sizeof *(array));\\
-                     keep && count != size;                      
-                     keep = !keep, count++)                      
-                    for (item = (array) + count; keep; keep = !keep)
+                     keep && count != size;                      \\
+                     keep = !keep, count++)                      \\
+                    for (item = (array) + count; keep; keep = !keep)\\
             """;
 }

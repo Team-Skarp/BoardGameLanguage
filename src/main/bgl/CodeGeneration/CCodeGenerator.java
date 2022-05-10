@@ -21,7 +21,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     Logger                      lo = new Logger();
     HashMap<String,String>      foreachDict = new HashMap<>();
 
-    private String              top;
+    public String               top = "";
 
     private int                 indent = 0;
     private final String        TAB = "\t";
@@ -34,7 +34,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(GameNode n) {
         String userCode;
-        top = """
+        top += """
                %s
                %s
                """.formatted(imports, defines);
@@ -46,7 +46,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.setup.accept(this)
                 );
 
-        return top + userCode;
+        return (top + userCode);
     }
 
     @Override
