@@ -2,6 +2,7 @@ package SymbolTable;
 
 import ASTnodes.*;
 
+import ASTvisitors.ASTvisitor;
 import org.junit.Test;
 import SymbolTable.types.*;
 
@@ -14,7 +15,7 @@ public class TypeCheckerTest {
     TypeChecker TC;
 
     @Test
-    public void should_throw_typeerror_when_adding_two_ids_with_different_types() {
+    public void shouldThrowTypeerrorWhenAddingTwoIdsWithDifferentTypes() {
 
         ST = new SymbolTable();
 
@@ -32,7 +33,30 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void should_throw_typeDefError_when_declaring_non_defined_type() {
+    public void shouldThrowTypeErrorWhenAddingThreeIdsWithDifferentTypes() {
+
+        ST = new SymbolTable();
+
+        Expression extPlus = new PlusNode(
+          new IdNode("a"),
+          new PlusNode(
+            new IdNode("b"),
+            new IdNode("c")
+          )
+        );
+
+
+        ST.enterSymbol(new Symbol("a", new IntType()));
+        ST.enterSymbol(new Symbol("b", new BoolType()));
+        ST.enterSymbol(new Symbol("c", new StringType()));
+
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(extPlus));
+    }
+
+    @Test
+    public void shouldThrowTypeDefErrorWhenDeclaringNonDefinedType() {
 
         ST = new SymbolTable();
 
@@ -55,7 +79,7 @@ public class TypeCheckerTest {
      *
      */
     @Test
-    public void should_throw_type_error_when_return_type_does_not_match_returned_type_of_action() {
+    public void shouldThrowTypeErrorWhenReturnTypeDoesNotMatchReturnedTypeOfAction() {
 
         SymbolHarvester SH = new SymbolHarvester();
 
@@ -75,7 +99,7 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void should_throw_type_error_when_calling_action_with_too_many_arguments() {
+    public void shouldThrowTypeErrorWhenCallingActionWithTooManyArguments() {
 
         ST = new SymbolTable();
 
@@ -106,5 +130,58 @@ public class TypeCheckerTest {
         assertThrows(TypeErrorException.class,
                 () ->  TC.visit(callFoo)
         );
+    }
+
+    @Test
+    public void shouldThrowTypeErrorWhenAssigningValueTypeIsNotABoolean() {
+
+        ST = new SymbolTable();
+
+        BooleanAssignmentNode assignmentNode = new BooleanAssignmentNode(new IdNode("i").name,
+          new BooleanNode(true));
+
+        // ST.openScope();
+        ST.enterSymbol(new Symbol("i", new IntType()));
+        // ST.climb();
+        // ST.closeScope();
+        // ST.dive();
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
+    }
+
+    @Test
+    public void shouldThrowTypeErrorWhenAssigningValueTypeIsNotAInt() {
+        ST = new SymbolTable();
+
+        IntegerAssignmentNode assignmentNode = new IntegerAssignmentNode(new IdNode("i"),
+                new IntNode(8));
+
+        // ST.openScope();
+        ST.enterSymbol(new Symbol("i", new StringType()));
+        // ST.climb();
+        // ST.closeScope();
+        // ST.dive();
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
+    }
+
+    @Test
+    public void shouldThrowTypeErrorWhenAssigningValueTypeIsNotAString() {
+        ST = new SymbolTable();
+
+        StringAssignmentNode assignmentNode = new StringAssignmentNode(new IdNode("piece").name,
+                new IdNode("red").name);
+
+        // ST.openScope();
+        ST.enterSymbol(new Symbol("piece", new BoolType()));
+        ST.enterSymbol(new Symbol("red", new IntType()));
+        // ST.climb();
+        // ST.closeScope();
+        // ST.dive();
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
     }
 }

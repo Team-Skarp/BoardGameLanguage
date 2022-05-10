@@ -20,14 +20,14 @@ public class TypeCheckDemo {
         CommonTokenStream tokens;
         BoardParser parser;
 
-        input = CharStreams.fromString("int a, b = 3, c;");
+        input = CharStreams.fromString("int a;");
 
         lexer = new BoardLexer(input);
         tokens = new CommonTokenStream(lexer);
         parser = new BoardParser(tokens);
 
-        BoardParser.SequentialDeclarationContext cst = parser.sequentialDeclaration();
-        ASTNode ast = new ASTbuilder().visitSequentialDeclaration(cst);
+        BoardParser.NormalDeclarationContext cst = parser.normalDeclaration();
+        ASTNode ast = new ASTbuilder().visitNormalDeclaration(cst);
 
         //Give it an empty symbol table and type env
         SymbolTable ST = new SymbolTable();

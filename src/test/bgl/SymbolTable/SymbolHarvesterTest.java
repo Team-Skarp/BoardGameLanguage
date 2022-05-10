@@ -38,7 +38,7 @@ public class SymbolHarvesterTest {
      * int a, b = false
      */
     @Test
-    public void should_throw_typeError_when_expression_type_does_not_match_in_sequence_declaration() {
+    public void shouldThrowTypeErrorWhenExpressionTypeDoesNotMatchInSequenceDeclaration() {
 
         symbolHarvester = new SymbolHarvester();
 
@@ -57,7 +57,7 @@ public class SymbolHarvesterTest {
     }
 
     @Test
-    public void can_enter_design_definition_into_symbol_table() {       //design Player {str name;}
+    public void canEnterDesignDefinitionIntoSymbolTable() {       //design Player {str name;}
 
         symbolHarvester = new SymbolHarvester();
 
@@ -71,7 +71,7 @@ public class SymbolHarvesterTest {
     }
 
     @Test
-    public void can_define_design_with_design_field() {       //design Player {Color color;}
+    public void canDefineDesignWithDesignField() {       //design Player {Color color;}
 
         symbolHarvester = new SymbolHarvester();
 
@@ -99,7 +99,7 @@ public class SymbolHarvesterTest {
      * }
      */
     @Test
-    public void should_throw_error_when_redeclaring_variable_from_parameterized_block() {
+    public void shouldThrowErrorWhenRedeclaringVariableFromParameterizedBlock() {
 
         symbolHarvester = new SymbolHarvester();
 
