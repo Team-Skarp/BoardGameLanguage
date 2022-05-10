@@ -49,7 +49,7 @@ public class CGenerationDemo {
                     }
                     
                     Potion test;
-                    SpeedPotion test2; 
+                    SpeedPotion test2;
                 }
                 RULES{}
                 GAMELOOP{}

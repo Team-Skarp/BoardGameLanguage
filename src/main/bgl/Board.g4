@@ -246,6 +246,7 @@ assignmentStatement
     | dotAssignment EOL
     | actionAssignment EOL
     | choiceAssignment
+    | designAssignment EOL
     ;
 
 //Todo: find out why a = 2 + 2 2 + 2; is a legal input;
@@ -276,6 +277,13 @@ choiceAssignment
 actionAssignment
     : IDENTIFIER DOT IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
+    ;
+
+// Design assignment,
+designAssignment
+    : IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) (COMMA ( INT | STR | BOOL | IDENTIFIER ))* RBRACE
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE LBRACE ( INT | STR | BOOL | IDENTIFIER )* RBRACE (COMMA ( INT | STR | BOOL ))* RBRACE
     ;
 
 
