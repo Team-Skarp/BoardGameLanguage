@@ -6,6 +6,6 @@ public class GridType implements TypeDenoter {
 
     public GridType(String type) {
         this.type = new DesignRef(type);
-    }
+    } //Todo: Path and Grid types don't overwrite toString(), should they?
 
 }
