@@ -7,9 +7,9 @@ import SymbolTable.SymbolTable;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
-import java.util.ArrayList;
+import static STDLIB.STDLIBC.*;         //C imports and defines
+
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * Class for generating C code.
@@ -17,39 +17,36 @@ import java.util.Objects;
  */
 public class CCodeGenerator implements ASTvisitor<String> {
 
-    private SymbolTable     ST;
-    private int             indent = 0;
-    private final String    TAB = "\t";
-    Logger lo =             new Logger();
-    private final String EOL = ";\n";
-    HashMap<String,String> foreachDict = new HashMap<>();
+    private final SymbolTable   ST;
+    Logger                      lo = new Logger();
+    HashMap<String,String>      foreachDict = new HashMap<>();
+
+    private String              top;
+
+    private int                 indent = 0;
+    private final String        TAB = "\t";
+    private final String        EOL = ";\n";
+
     public CCodeGenerator(SymbolTable ST) {
         this.ST = ST;
     }
 
     @Override
     public String visit(GameNode n) {
-        return (
-                """
-                        #include <stdio.h>
-                        #include<stdbool.h>
-                        #include<math.h>
-                        #include <string.h>
-                        #include <stdlib.h>
-                                        
-                        #define foreach(item, array)                         \\
-                            for (int keep = 1,                               \\
-                                     count = 0,                              \\
-                                     size = __builtin_types_compatible_p(typeof(array), char*) ? (strlen(array)): (sizeof(array) / sizeof *(array));\\
-                                 keep && count != size;                      \\
-                                 keep = !keep, count++)                      \\
-                                for (item = (array) + count; keep; keep = !keep)
+        String userCode;
+        top = """
+               %s
+               %s
+               """.formatted(imports, defines);
 
-                        int main(int argc, char *argv[]) %s
-                        """.formatted(
-                        n.setup.accept(this)
-                )
-        );
+        userCode =
+                """
+                int main(int argc, char *argv[]) %s
+                """.formatted(
+                    n.setup.accept(this)
+                );
+
+        return top + userCode;
     }
 
     @Override
@@ -239,6 +236,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    /**
+     * Should only append to top level code
+     */
     public String visit(DesignDefinitionNode n) {
         String designBody = "";
         indent++;
@@ -248,27 +248,28 @@ public class CCodeGenerator implements ASTvisitor<String> {
         indent--;
 
         if (n.parentType != null) {
-            return (
-                    """
+            top +=  """
                     struct %s {
                     struct %s parent;
                     %s};
                     """.formatted(
-                            n.typeDefinition.name,
-                            n.parentType.name,
-                            designBody,
-                            n.typeDefinition));
+                    n.typeDefinition.name,
+                    n.parentType.name,
+                    designBody,
+                    n.typeDefinition
+            );
         } else {
-            return (
-                    """
+            top +=  """
                     struct %s {
                     %s};
                     """.formatted(
-                            n.typeDefinition.name,
-                            designBody,
-                            n.typeDefinition
-                    ));
+                    n.typeDefinition.name,
+                    designBody,
+                    n.typeDefinition
+                    );
         }
+
+        return "";
     }
 
     @Override
