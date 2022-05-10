@@ -57,6 +57,8 @@ public class TypeCheckerTest {
     @Test
     public void should_throw_type_error_when_return_type_does_not_match_returned_type_of_action() {
 
+        SymbolHarvester SH = new SymbolHarvester();
+
         ActionDefinitionNode foo = new ActionDefinitionNode(
                 "foo",
                 new BoolType(),
@@ -67,7 +69,9 @@ public class TypeCheckerTest {
                 )
         );
 
-        //TODO: Write the actual test
+        assertThrows(TypeErrorException.class, () ->
+                SH.visit(foo));
+
     }
 
     @Test

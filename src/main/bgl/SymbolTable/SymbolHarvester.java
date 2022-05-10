@@ -3,7 +3,6 @@ package SymbolTable;
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
-import SymbolTable.SymbolTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -229,9 +228,12 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ActionDefinitionNode n) {
-        List<Symbol> formalParams = new ArrayList<>();
+        //Type check that return expression matches return type
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
 
         //Convert declarations to symbols
+        List<Symbol> formalParams = new ArrayList<>();
         for (Declaration param : n.formalParameters) {
             formalParams.add(
                     new Symbol(

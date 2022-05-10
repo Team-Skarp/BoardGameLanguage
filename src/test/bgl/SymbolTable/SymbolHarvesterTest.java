@@ -38,7 +38,7 @@ public class SymbolHarvesterTest {
      * int a, b = false
      */
     @Test
-    public void should_throw_typeerror_when_expression_type_does_not_match_in_sequence_declaration() {
+    public void should_throw_typeError_when_expression_type_does_not_match_in_sequence_declaration() {
 
         symbolHarvester = new SymbolHarvester();
 
