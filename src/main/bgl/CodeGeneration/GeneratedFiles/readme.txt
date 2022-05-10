@@ -10,4 +10,4 @@ gcc out.s -o out && ./out
 
 
 
-//Notes: gcc -S out.c -masm=intel && gcc out.s -o out && ./out
+//Notes: gcc -S out.c -masm=intel -fverbose-asm && gcc out.s -o out && ./out

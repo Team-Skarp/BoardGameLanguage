@@ -82,7 +82,11 @@ public class SymbolTable {
     public void dive() {
         if (activeBlock.getChildren().size() > 0) {
             System.out.printf("Dived into child %s%n", activeBlock.next);
+        try{
             activeBlock = activeBlock.getChildren().get(activeBlock.next++); //Point to next child next time we dive in current scope
+        }catch(Exception e){
+            System.out.println(e);
+        }
         }
     }
 
