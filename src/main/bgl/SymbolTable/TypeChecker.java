@@ -98,7 +98,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         currentAction = n;
 
-        //Typecheck body. All return statements found within are typechecked against the return type of the action
+        //Type check body. All return statements found within are type checked against the return type of the action
         n.body.accept(this);
 
         //When we leave the action there should not be a current action
@@ -120,7 +120,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     public TypeDenoter visit(DesignDeclarationNode n) {
 
         //Check that the type is actually in the type environment
-        return TENV.recieveType(n.ref);
+        return TENV.receiveType(n.ref);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
                 TypeDenoter typeOfExpr = (TypeDenoter) expr.accept(this);
 
                 if (sequenceType.getClass() != typeOfExpr.getClass()) {
-                    throw new TypeErrorException(String.format("value of expression yielded type '%s' and cannot be assigned to '%s' declaration",typeOfExpr, sequenceType));
+                    throw new TypeErrorException(String.format("value of expression yielded type '%s' and cannot be assigned to '%s' declaration", typeOfExpr, sequenceType));
                 }
             }
         }

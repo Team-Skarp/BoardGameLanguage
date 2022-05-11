@@ -11,7 +11,6 @@ public class ConditionalNode implements ASTNode {
     public List<ASTNode> elseifBlocks;
     public ASTNode elseBlock;
 
-
     //if(){}
     public ConditionalNode(ASTNode boolExpr, ASTNode ifBlock) {
         this.predicate = boolExpr;

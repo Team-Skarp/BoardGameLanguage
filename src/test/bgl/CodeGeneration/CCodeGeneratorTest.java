@@ -23,7 +23,9 @@ class CCodeGeneratorTest {
 
         //When code generator visits tile node
         generator = new CCodeGenerator(symbolTable);
-        String code = generator.visit(tile.getDesign());
+        generator.visit(tile.getDesign());
+
+        String actual = generator.top;
 
         //Expect C struct that works
         String expected =
@@ -36,7 +38,7 @@ class CCodeGeneratorTest {
                 };
                 """;
 
-        assertEquals(expected, code);
+        assertEquals(expected, actual);
     }
 
     @Test

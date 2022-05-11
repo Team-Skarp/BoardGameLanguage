@@ -8,18 +8,18 @@ public class DesignType implements TypeDenoter {
 
     public final String name;
     public SymbolTable fields;
-    public final String parrent;
+    public final String parent;
 
     public DesignType(String name, SymbolTable fields) {
         this.name = name;
         this.fields = fields;
-        this.parrent = null;
+        this.parent = null;
     }
 
-    public DesignType(String name, String parrent, SymbolTable fields) {
+    public DesignType(String name, String parent, SymbolTable fields) {
         this.name = name;
         this.fields = fields;
-        this.parrent = parrent;
+        this.parent = parent;
     }
 
     @Override

@@ -87,6 +87,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(StringNode n) {
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(BooleanNode n) {
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(EqualNode n) {
         return ST;
     }
@@ -113,11 +123,6 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(LessThanEqualsNode n) {
-        return ST;
-    }
-
-    @Override
-    public SymbolTable visit(BooleanNode n) {
         return ST;
     }
 
@@ -192,10 +197,10 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(DesignDefinitionNode n) {
 
-        //Create a seperate symbol table that resides in the design type
+        //Create a separate symbol table that resides in the design type
         SymbolTable fields = new SymbolTable();
 
-        //Write in all the declarations into that symboltable
+        //Write in all the declarations into that symbol table
         Symbol sym;
 
         for (Declaration field : n.fields) {
@@ -252,14 +257,14 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(Declaration n) {
-        n.accept(this);//Todo: why is this required for an interface?
+        n.accept(this); //Todo: why is this required for an interface?
         return ST;
     }
 
     @Override
     public SymbolTable visit(ActionDeclarationNode n) {
         return ST;
-    }
+    } //Todo: implement?
 
     @Override
     public SymbolTable visit(DesignDeclarationNode n) {
@@ -279,7 +284,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(ListDeclarationNode n) {
         return null;
-    }
+    } //Todo: implement?
 
     @Override
     public SymbolTable visit(SequentialDeclaration n) {
@@ -296,11 +301,6 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
                     n.type));
         }
 
-        return ST;
-    }
-
-    @Override
-    public SymbolTable visit(StringNode n) {
         return ST;
     }
 
@@ -406,12 +406,17 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ConditionalNode n) {
+        n.ifBlock.accept(this);
+        n.elseifBlocks.forEach(elif->elif.accept(this));
+        if (n.elseBlock != null) {
+            n.elseBlock.accept(this);
+        }
         return ST;
     }
 
     @Override
     public SymbolTable visit(ElifConditionalNode n) {
-        return ST;
+        return (SymbolTable) n.ifBlock.accept(this);
     }
 
     @Override

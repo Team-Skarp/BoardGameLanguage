@@ -30,8 +30,12 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    int a = 6^5;
-                    if(2<a){
+                    int a = 6 ^ 5;
+                    if (true) {
+                        if (true) {
+                            
+                        }
+                        print(a);
                     }
                 }
                 RULES{}

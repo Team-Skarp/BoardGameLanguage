@@ -3,7 +3,6 @@ package SymbolTable;
 public class SymbolTable {
 
     //Global block
-
     private Block activeBlock;
 
     public SymbolTable() {
@@ -31,7 +30,7 @@ public class SymbolTable {
     }
 
     /**
-     * Retrieves a symbol from either the current scope or any of the parrent scopes.
+     * Retrieves a symbol from either the current scope or any of the parent scopes.
      * @param name of the symbol
      * @return Symbol that is found
      */
@@ -48,14 +47,14 @@ public class SymbolTable {
 
             activeBlock = activeBlock.getParent();
 
-            Symbol found_sym = retrieveSymbol(name); //Call recursively to find the symbol in the parrent block
+            Symbol found_sym = retrieveSymbol(name); //Call recursively to find the symbol in the parent block
 
             activeBlock = temp_block;   //Set the active block back to be the temporary block
 
             return found_sym;
         }
 
-        System.out.println(String.format("Symbol retrieved: '%s' of type '%s' ", name, sym.type));
+        System.out.printf("Symbol retrieved: '%s' of type '%s' %n", name, sym.type);
         return sym;
     }
 
@@ -82,23 +81,20 @@ public class SymbolTable {
     public void dive() {
         if (activeBlock.getChildren().size() > 0) {
             System.out.printf("Dived into child %s%n", activeBlock.next);
-        try{
-            activeBlock = activeBlock.getChildren().get(activeBlock.next++); //Point to next child next time we dive in current scope
-        }catch(Exception e){
-            System.out.println(e);
-        }
+            activeBlock = activeBlock.getChildren().get(activeBlock.next); //Point to next child next time we dive in current scope
         }
     }
 
     /**
-     * Sets the active block to be that of the parrent block and pops itself
+     * Sets the active block to be that of the parent block and pops itself
      *
-     * Cannot climb if there is not parrent scope to climb upto
+     * Cannot climb if there is not parent scope to climb upto
      */
     public void climb() {
         if (activeBlock.getParent() != null) {
             activeBlock = activeBlock.getParent();
-            System.out.println("Climbed to parrent block");
+            activeBlock.next++;
+            System.out.println("Climbed to parent block");
         }
     }
 
