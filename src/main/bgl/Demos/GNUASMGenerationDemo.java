@@ -29,10 +29,14 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    int a = 6^5;
-                    print(a);
-                    print(a);
-
+                    int a = 0;                    
+                    while(a < 100){
+                        if(a % 2 == 0){
+                        print("hej");
+                        }
+                        a = a+1;
+                    }
+                    
                 }
                 
                 RULES{}

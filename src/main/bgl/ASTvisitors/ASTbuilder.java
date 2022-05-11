@@ -330,6 +330,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
+        return null;
+    }
+
+    @Override
     public ASTNode visitListDeclaration(BoardParser.ListDeclarationContext ctx) {
         return null;
     }
