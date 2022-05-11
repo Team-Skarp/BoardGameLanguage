@@ -643,14 +643,22 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(StringAssignmentNode n) {
-        return null;
+        dataAmount++;
+        int temp = dataAmount;
+        dataAmount++;
+        Symbol symbol = ST.retrieveSymbol(n.varName);
+        ptrTable.put(symbol.hashCode(),temp);
+            data+= """
+                    .LC%d:
+                        .string %s
+                    """.formatted(temp,n.literal);
+            strTable.put(temp,n.literal);
+        return "";
     }
 
     @Override
     public String visit(IntegerAssignmentNode n) {
         Symbol symbol = ST.retrieveSymbol(n.id.name);
-        System.out.println("assigning");
-        assignPtr = ptrTable.get(symbol.hashCode());
         String str = """
                     # assignemnt
                 	mov eax, %s

@@ -10,7 +10,9 @@
 .LC3:
     .string	"hej"
 .LC5:
-    .string	"car"
+    .string	"asd"
+.LC7:
+    .string "carlsjunio!"
 .text
 .type	main, @function
 main:
@@ -25,6 +27,9 @@ main:
 	sub	rsp, 16
 	mov	DWORD PTR -20[rbp], edi
  	mov	QWORD PTR -32[rbp], rsi
+    # assignemnt
+	mov eax, DWORD PTR -5[rbp]
+	mov	DWORD PTR -3[rbp],eax
     
 
     lea	rdi, .LC3[rip]
@@ -32,7 +37,7 @@ main:
 	call printf@PLT
     
 
-    lea	rdi, .LC5[rip]
+    lea	rdi, .LC7[rip]
 	mov	eax, 0
 	call printf@PLT
   	leave

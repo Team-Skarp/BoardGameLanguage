@@ -30,8 +30,10 @@ public class GNUASMGenerationDemo {
         String bglCodeExample = """
                 SETUP {
                     str a = "hej";
-                    str b = "car";
-                    print(a,b);
+                    str b = "asd";
+                     a = b;
+                     b = "carlsjunio!";
+                     print(a,b);
                     
                 }
                 
