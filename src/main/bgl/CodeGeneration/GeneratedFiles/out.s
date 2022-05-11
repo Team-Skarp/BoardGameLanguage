@@ -7,8 +7,10 @@
     .string	"true"
 .LC1:
     .string	"false"
-.LC2:
-    .string	"%d\n"
+.LC3:
+    .string	"hej"
+.LC5:
+    .string	"car"
 .text
 .type	main, @function
 main:
@@ -21,38 +23,18 @@ main:
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
 	sub	rsp, 16
-	mov	DWORD PTR -24[rbp], edi
- 	mov	QWORD PTR -36[rbp], rsi
-    mov	DWORD PTR -8[rbp], 0
-    # assignemnt
-	mov eax, DWORD PTR -8[rbp]
-add eax, 1
-
-	mov	DWORD PTR -8[rbp],eax
- # while loop start
-	jmp	.L4
-.L3:
-    # while loop block start
-	    mov eax, DWORD PTR -8[rbp]
-    mov	esi, eax
+	mov	DWORD PTR -20[rbp], edi
+ 	mov	QWORD PTR -32[rbp], rsi
     
 
-    lea	rdi, .LC2[rip]
+    lea	rdi, .LC3[rip]
 	mov	eax, 0
-	call	printf@PLT
-    # assignemnt
-	mov eax, DWORD PTR -8[rbp]
-add eax, 1
+	call printf@PLT
+    
 
-	mov	DWORD PTR -8[rbp],eax
-
-	# while loop block end
-.L4:
-# predicate
-    mov eax, 0
-	cmp	eax, 0
-	je	.L3
+    lea	rdi, .LC5[rip]
 	mov	eax, 0
+	call printf@PLT
   	leave
  	mov	eax, 0
 	.cfi_def_cfa 7, 8
