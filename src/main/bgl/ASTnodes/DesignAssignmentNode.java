@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DesignAssignmentNode implements ASTNode<Object>, Assignment {
 
-    public final IdNode parentType;              //*Optional parrent type when extending from another type
+    public final IdNode parentType;              //*Optional parent type when extending from another type
     public List<Declaration> fields;             //Fields of the design definition
 
     public DesignAssignmentNode(IdNode parentType, Declaration... fields) {

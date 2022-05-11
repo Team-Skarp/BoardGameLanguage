@@ -5,12 +5,11 @@ import java.util.List;
 
 public class FieldAccessNode implements ASTNode, Expression {
 
-    public IdNode origin;
-    public List<String> originFields;
+    public List<String> fields;
 
-    public FieldAccessNode(IdNode origin, List<String> originFields) {
-        this.origin = origin;
-        this.originFields = originFields;
+    public FieldAccessNode(List<String> fields) {
+
+        this.fields = fields;
     }
 
     @Override
