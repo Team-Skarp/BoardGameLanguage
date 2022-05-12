@@ -1,15 +1,16 @@
 package Demos;
 
 import ASTnodes.ASTNode;
-import ASTvisitors.ASTbuilder;
 import CodeGeneration.CCodeGenerator;
-import SymbolTable.SymbolTable;
 import SymbolTable.SymbolHarvester;
+import SymbolTable.SymbolTable;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+
+import ASTvisitors.ASTbuilder;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,9 +31,11 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    design Piece {
-                        int move_speed;
-                        str owner;
+                    jump();
+                }
+                RULES{
+                    action jump () {
+                        print("Jump");
                     }
                     
                     design GhostPiece from Piece {
@@ -44,8 +47,9 @@ public class CGenerationDemo {
                     GhostPiece wee = {pot, true};
                     GhostPiece boo = {{10, "skarp"}, true};
                 }
-                RULES{}
-                GAMELOOP{}
+                GAMELOOP{
+                    jump();
+                }
                 """;
 
         // Parse Input

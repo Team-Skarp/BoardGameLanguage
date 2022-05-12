@@ -8,7 +8,7 @@ Logger file to log information of file location and date
 */
 public class Logger {
     //these 4 variables are the only that should be changed
-    Boolean logAll = false;
+    Boolean logAll = true;
     Boolean logNothing = false;
     Boolean includeTimeStamp = false;
     int stampLength = 50;
@@ -128,7 +128,7 @@ public class Logger {
             while(stamp.length() <= this.stampLength){
                 stamp = stamp+" ";
             }
-            System.out.println(CYAN_BOLD_BRIGHT +stamp+CYAN_BRIGHT+str+ RESET);
+            System.out.println(BLUE_BRIGHT +stamp+CYAN_BRIGHT+str+ RESET);
         }
 
     }

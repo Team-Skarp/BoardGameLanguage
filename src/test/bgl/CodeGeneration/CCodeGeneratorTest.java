@@ -1,5 +1,6 @@
 package CodeGeneration;
 
+import ASTnodes.*;
 import STDLIB.Tile;
 import SymbolTable.SymbolHarvester;
 import SymbolTable.SymbolTable;
@@ -30,6 +31,7 @@ class CCodeGeneratorTest {
         //Expect C struct that works
         String expected =
                 """
+                bool isEmpty();
                 struct Tile {
                 \tstruct Tile *next;
                 \tstruct Tile *prev;
@@ -72,5 +74,65 @@ class CCodeGeneratorTest {
         assertEquals("bool*", toCType(boolList));
         assertEquals("struct TestType*", toCType(designList));
         assertEquals("int***", toCType(intArray3D));
+    }
+
+    @Test
+    /**
+     * Tests the code:
+     * action biggest(int a, int b) : int {
+     *     if (a < b) {
+     *         return b;
+     *     }
+     *     return a;
+     * }
+     */
+    public void generatesCorrectCCodeForActions() {
+
+        ActionDefinitionNode biggest = new ActionDefinitionNode(
+                "biggest",
+                new IntType(),
+                new ParameterBlock(
+                        new ConditionalNode(
+                                new LessThanNode(
+                                        new IdNode("a"),
+                                        new IdNode("b")
+                                ),
+                                new BlockNode(
+                                        new ReturnNode(
+                                                new IdNode("b")
+                                        )
+                                )
+                        ),
+                        new ReturnNode(
+                                new IdNode("b")
+                        )
+
+                ),
+                new IntegerDeclarationNode(
+                        "a"
+                ),
+                new IntegerDeclarationNode(
+                        "b"
+                )
+        );
+
+        String expected = """
+                          int biggest(int a, int b) {
+                            if (a < b) {
+                                return b;
+                            }
+                            return a;
+                          }
+                          """;
+
+        SH = new SymbolHarvester();
+        SymbolTable symbolTable = SH.visit(biggest);
+
+        generator = new CCodeGenerator(symbolTable);
+        generator.visit(biggest);
+
+        //String actual = generator.top;
+
+        //assertEquals(expected, actual);
     }
 }

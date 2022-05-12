@@ -44,7 +44,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
 
@@ -57,7 +57,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
 
@@ -71,7 +71,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
 
@@ -84,7 +84,20 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
+        }
+    }
+
+    @Override
+    public TypeDenoter visit(DotAssignmentNode n) {
+        TypeDenoter fieldType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (fieldType.getClass() == exprType.getClass()) {
+            return fieldType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, fieldType));
         }
     }
 
@@ -182,7 +195,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         }
         else {
             throw new TypeErrorException(
-                    String.format("type '%s' cannot be added to type '%s'", leftType, rightType)
+                    String.format("type '%s' cannot be added to type '%s'", rightType, leftType)
             );
         }
     }
@@ -197,7 +210,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return new IntType();
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be negated to type '%s'", leftType, rightType));
+            throw new TypeErrorException(String.format("type '%s' cannot be negated to type '%s'", rightType, leftType));
         }
     }
 
@@ -416,14 +429,26 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(BlockNode n) {
+        ST.dive();
         for (ASTNode child : n.children) {
             child.accept(this);
         }
+        ST.climb();
         return null;
     }
 
     @Override
     public TypeDenoter visit(ParameterBlock n) {
+        ST.dive();
+        for (ASTNode child : n.children) {
+            child.accept(this);
+        }
+        ST.climb();
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(NonScopeBlockNode n) {
         for (ASTNode child : n.children) {
             child.accept(this);
         }
@@ -470,11 +495,22 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ConditionalNode n) {
+        n.ifBlock.accept(this);
+
+        if (n.elseifBlocks != null) {
+            n.elseifBlocks.forEach(elif->elif.accept(this));
+        }
+        if (n.elseBlock != null) {
+            n.elseBlock.accept(this);
+        }
+
         return null;
-    } //Todo: implement?
+
+    }
 
     @Override
     public TypeDenoter visit(ElifConditionalNode n) {
+        n.ifBlock.accept(this);
         return null;
     }
 
@@ -505,6 +541,17 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(InputNode n) {
+
+        //Check that identifier has type of string
+        TypeDenoter inputType = (TypeDenoter) n.inputVariableName.accept(this);
+        if ( !(inputType instanceof StringType) ) {
+            throw new TypeErrorException(
+                    "input only accepts a variable of type string, but '%s' have type '%s'".formatted(
+                            n.inputVariableName.name,
+                            inputType
+                    ));
+        }
+
         return null;
     }
 
@@ -604,7 +651,24 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(FieldAccessNode n) {
-        return null;
+        String ref = "";
+        Symbol currentSymbol = new Symbol("tempSymbol",new IntType());
+        SymbolTable temp = ST;
+        for (String field: n.fields) {
+            currentSymbol = temp.retrieveSymbol(field);
+            if (currentSymbol.type instanceof DesignRef) {
+                ref = String.valueOf(currentSymbol.type);
+                temp = TENV.receiveType(ref).fields;
+            } else {
+                if (n.fields.indexOf(field) != n.fields.size()-1) {
+                    throw new IllegalFieldAccessException(
+                            "cannot access field %s in %s of type %s"
+                                    .formatted(n.fields.get(n.fields.indexOf(field)+1), field, ref));
+                }
+            }
+
+        }
+        return currentSymbol.type;
     }
 
     @Override
