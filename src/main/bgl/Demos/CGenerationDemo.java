@@ -30,13 +30,19 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    int a = 6 ^ 5;
-                    if (true) {
-                        if (true) {
-                            
-                        }
-                        print(a);
+                    design Piece {
+                        int move_speed;
+                        str owner;
                     }
+                    
+                    design GhostPiece from Piece {
+                        bool floating;
+                    }
+                    
+                    Piece test;
+                    Piece pot = {10, "skarp"};
+                    GhostPiece wee = {pot, true};
+                    GhostPiece boo = {{10, "skarp"}, true};
                 }
                 RULES{}
                 GAMELOOP{}
@@ -57,7 +63,7 @@ public class CGenerationDemo {
         SymbolTable ST = (SymbolTable) ast.accept(SH);
 
         // C - code generation
-        CCodeGenerator generator = new CCodeGenerator(ST);
+        CCodeGenerator generator = new CCodeGenerator(ST, SH.TENV);
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);

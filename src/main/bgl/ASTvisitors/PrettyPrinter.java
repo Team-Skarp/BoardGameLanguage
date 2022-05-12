@@ -358,6 +358,20 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(DesignAssignmentNode n) {
+        System.out.println(TAB.repeat(indent) + "Design assign: ");
+
+        indent++;
+
+        n.getLeft().accept(this);
+        n.getRight().accept(this);
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
     public Void visit(DesignDefinitionNode n) {
         return null;
     }

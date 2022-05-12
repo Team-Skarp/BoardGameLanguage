@@ -4,6 +4,7 @@ import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 import SymbolTable.SymbolTable;
+import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
@@ -18,6 +19,8 @@ import java.util.HashMap;
 public class CCodeGenerator implements ASTvisitor<String> {
 
     private final SymbolTable   ST;
+    private final TypeEnvironment TENV;
+
     Logger                      lo = new Logger();
     HashMap<String,String>      foreachDict = new HashMap<>();
 
@@ -29,6 +32,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     public CCodeGenerator(SymbolTable ST) {
         this.ST = ST;
+        this.TENV = null;
+    }
+
+    public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
+        this.ST = ST;
+        this.TENV = TENV;
     }
 
     @Override
@@ -236,6 +245,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(DesignAssignmentNode n) {
+        return n.parentType + " ";
+    }
+
+    @Override
     /**
      * Should only append to top level code
      */
@@ -243,6 +257,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
+
             designBody += TAB.repeat(indent) + field.accept(this);
         }
         indent--;
@@ -304,14 +319,31 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDeclarationNode n) {
-        return (
-                """
-                struct %s *%s;
-                """
-                .formatted(
-                n.ref,
-                n.name
-        ));
+
+        DesignType thisType = TENV.receiveType(n.dName);
+
+        if (n.value != null) {
+
+            // Cast parent param to struct of parent type
+            if (n.value.get(0).contains("{") && n.value.get(0).contains("}")) {
+                n.value.set(0,"(struct %s)%s".formatted(thisType.parent, n.value.get(0)));
+            }
+
+            // Joined string for init
+            String collectedString = String.join(", ", n.value);
+
+            return (
+                    """
+                    struct %s %s = {%s};
+                    """.formatted(n.dName, n.name, collectedString)
+            );
+        } else {
+            return (
+                    """
+                    struct %s %s;
+                    """.formatted(n.dName, n.name)
+            );
+        }
     }
 
     @Override

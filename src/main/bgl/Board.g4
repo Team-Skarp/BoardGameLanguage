@@ -144,8 +144,14 @@ uniqueDeclaration
     | choiceDeclaration
     ;
 
+designBlock
+    : LBRACE ((INT | BOOL | STR) | ((INT | BOOL | STR) COMMA))* RBRACE // Nested Desgin Decl
+    | (INT | BOOL | STR | IDENTIFIER)                                               // Normal Prim in Decl
+    ;
+
 designDeclaration
     : IDENTIFIER IDENTIFIER
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE designBlock (COMMA designBlock)* RBRACE
     ;
 
 //Design declerations should only appear in SETUP block
@@ -267,7 +273,7 @@ stringAssigment
     ;
 
 dotAssignment
-    : IDENTIFIER DOT IDENTIFIER ASSIGN (STR|INT|BOOL|IDENTIFIER)*
+    : fieldAccess ASSIGN (STR|INT|BOOL|IDENTIFIER)
     ;
 
 choiceAssignment
