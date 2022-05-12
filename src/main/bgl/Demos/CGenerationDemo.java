@@ -31,11 +31,19 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    jump();
+                    int a;
                 }
-                RULES{
-                    action jump () {
-                        print("Jump");
+                RULES {
+                    action factorial(int n) : int {
+                        if (n == 0) {
+                            return 1;
+                        }
+                        elseif (n == 1) {
+                            return 1;
+                        }
+                        else {
+                            return n * factorial(n - 1);
+                        }
                     }
                     
                     design GhostPiece from Piece {
@@ -47,8 +55,9 @@ public class CGenerationDemo {
                     GhostPiece wee = {pot, true};
                     GhostPiece boo = {{10, "skarp"}, true};
                 }
-                GAMELOOP{
-                    jump();
+                GAMELOOP {
+                    a = factorial(5);
+                    print(a);
                 }
                 """;
 

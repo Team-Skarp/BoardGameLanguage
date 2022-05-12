@@ -320,7 +320,6 @@ statement
     | whileStatement
     | foreach
     | assignmentStatement
-    | actionCall EOL
     | print
     | input
     | expression EOL
@@ -364,10 +363,10 @@ unaryMinus
 
 arithmeticAtom
     : INT
+    | actionCall
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
     | fieldAccess
-    | actionCall
     ;
 
 logor
