@@ -29,16 +29,15 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    bool b = false;
-                    input(b);
-                    print(b);
+                   
                 }
-                RULES{
-                    action fizz(int a){
-                        print("hej");
+                RULES {
+                    action fizz(int a) {
+                        print("Hej");
                     }
                 }
-                GAMELOOP{
+                GAMELOOP {
+                    fizz(5);
                 }
                 """;
 

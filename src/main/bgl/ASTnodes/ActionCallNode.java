@@ -4,7 +4,7 @@ import ASTvisitors.ASTvisitor;
 
 import java.util.List;
 
-public class ActionCallNode implements ASTNode<Object> {
+public class ActionCallNode implements ASTNode, ArithmeticExpression {
 
     public final String             actionName;
     public final List<Expression>   actualParameters;

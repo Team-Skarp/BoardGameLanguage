@@ -814,7 +814,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitArithmeticAtom(BoardParser.ArithmeticAtomContext ctx) {
-
+        lo.g(":D");
         if (ctx.INT() != null) {
             return new IntNode(Integer.parseInt(ctx.INT().getText()));
         }

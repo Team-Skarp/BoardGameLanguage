@@ -48,10 +48,15 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         userCode =
                 """
-                int main(int argc, char *argv[]) 
-                %s
+                int main(int argc, char *argv[]) {
+                    %s
+                    while(true) {
+                       %s
+                    }
+                }
                 """.formatted(
-                    n.setup.accept(this)
+                    n.setup.accept(this),
+                    n.gameloop.accept(this)
                 );
 
         return (header + prototypes + definitions + userCode);
@@ -221,15 +226,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(NonScopeBlockNode n) {
-        String str;
+        String str = "";
 
-        str = "{\n";
-        indent++;
         for (ASTNode c: n.children){
             str += TAB.repeat(indent) + c.accept(this);
         }
-        indent--;
-        str += "}";
 
         return str;
     }
@@ -709,7 +710,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String formattedParams = String.join(",", actualParams);
 
         return """
-               %s(%s);
+               %s(%s)
                """.formatted(
                n.actionName, formattedParams
         );
