@@ -14,7 +14,7 @@ import java.util.List;
 public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     SymbolTable ST;
-    TypeEnvironment TENV;
+    public TypeEnvironment TENV;
     TypeChecker TC;
 
     public SymbolHarvester() {
@@ -24,8 +24,8 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(GameNode n) {
-        n.rules.accept(this);
         n.setup.accept(this);
+        n.rules.accept(this);
         n.gameloop.accept(this);
 
         return ST;

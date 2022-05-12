@@ -4,6 +4,7 @@ import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 import SymbolTable.SymbolTable;
+import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
@@ -20,6 +21,8 @@ import java.util.List;
 public class CCodeGenerator implements ASTvisitor<String> {
 
     private final SymbolTable   ST;
+    private final TypeEnvironment TENV;
+
     Logger                      lo = new Logger();
     HashMap<String,String>      foreachDict = new HashMap<>();
 
@@ -33,6 +36,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     public CCodeGenerator(SymbolTable ST) {
         this.ST = ST;
+        this.TENV = null;
+    }
+
+    public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
+        this.ST = ST;
+        this.TENV = TENV;
     }
 
     @Override
@@ -48,10 +57,15 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         userCode =
                 """
-                int main(int argc, char *argv[]) 
-                %s
+                int main(int argc, char *argv[]) {
+                    %s
+                    while(true) {
+                       %s
+                    }
+                }
                 """.formatted(
-                    n.setup.accept(this)
+                    n.setup.accept(this),
+                    n.gameloop.accept(this)
                 );
 
         return (header + prototypes + definitions + userCode);
@@ -221,15 +235,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(NonScopeBlockNode n) {
-        String str;
+        String str = "";
 
-        str = "{\n";
-        indent++;
         for (ASTNode c: n.children){
             str += TAB.repeat(indent) + c.accept(this);
         }
-        indent--;
-        str += "}";
 
         return str;
     }
@@ -281,6 +291,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
+
             designBody += TAB.repeat(indent) + field.accept(this);
         }
         indent--;
@@ -398,14 +409,31 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDeclarationNode n) {
-        return (
-                """
-                struct %s *%s;
-                """
-                .formatted(
-                n.ref,
-                n.name
-        ));
+
+        DesignType thisType = TENV.receiveType(n.dName);
+
+        if (n.value != null) {
+
+            // Cast parent param to struct of parent type
+            if (n.value.get(0).contains("{") && n.value.get(0).contains("}")) {
+                n.value.set(0,"(struct %s)%s".formatted(thisType.parent, n.value.get(0)));
+            }
+
+            // Joined string for init
+            String collectedString = String.join(", ", n.value);
+
+            return (
+                    """
+                    struct %s %s = {%s};
+                    """.formatted(n.dName, n.name, collectedString)
+            );
+        } else {
+            return (
+                    """
+                    struct %s %s;
+                    """.formatted(n.dName, n.name)
+            );
+        }
     }
 
     @Override
@@ -709,7 +737,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String formattedParams = String.join(",", actualParams);
 
         return """
-               %s(%s);
+               %s(%s)
                """.formatted(
                n.actionName, formattedParams
         );

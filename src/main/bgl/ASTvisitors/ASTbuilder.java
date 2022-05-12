@@ -160,13 +160,39 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
+    /**
+     * Visit a parse tree produced by {@link BoardParser#designBlock}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    @Override
+    public ASTNode visitDesignBlock(BoardParser.DesignBlockContext ctx) {
+        return null;
+    }
+
     @Override
     public ASTNode visitDesignDeclaration(BoardParser.DesignDeclarationContext ctx) {
+
+        if (ctx.ASSIGN() != null) {
+            List<String> childNodes = new ArrayList<>();
+            for (ParseTree child : ctx.designBlock()) {
+                //System.out.println("DesignBlock ->" + child.getText());
+                childNodes.add(child.getText());
+            }
+
+            System.out.println("DesignBlocks " + childNodes);
+
+            return new DesignDeclarationNode(
+                    ctx.IDENTIFIER(0).getText(),
+                    ctx.IDENTIFIER(1).getText(),
+                    childNodes
+            );
+        }
         return new DesignDeclarationNode(
                 ctx.IDENTIFIER(0).getText(),
                 ctx.IDENTIFIER(1).getText()
         );
-
     }
 
     @Override
@@ -377,11 +403,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                         new IntNode(Integer.parseInt(ctx.INT().getText())));
             }
         }
-        return null;
-    }
-
-    @Override
-    public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
         return null;
     }
 
