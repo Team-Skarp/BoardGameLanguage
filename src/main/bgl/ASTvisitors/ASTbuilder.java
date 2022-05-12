@@ -11,7 +11,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import SymbolTable.types.*;
 import Logging.Logger;
 
-import java.net.IDN;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override
@@ -86,7 +85,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
 
     }
 
@@ -138,6 +137,20 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitRulesDeclaration(BoardParser.RulesDeclarationContext ctx) {
+        if (ctx.actionDefinition() != null) {
+            return ctx.actionDefinition().accept(this);
+        }
+        else if (ctx.specialDeclaration() != null) {
+            throw new RuntimeException("Specials is not implemented in the current version");
+        }
+        else if (ctx.choiceDeclaration() != null) {
+            throw new RuntimeException("Choice is not implemented in the current version");
+        }
+        return null;
+    }
+
+    @Override
     public ASTNode visitRulesBlock(BoardParser.RulesBlockContext ctx) {
 
         List<ASTNode> children = new ArrayList<>();
@@ -149,12 +162,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
-    }
-
-    @Override
-    public ASTNode visitUniqueDeclaration(BoardParser.UniqueDeclarationContext ctx) {
-        return null;
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override
@@ -169,7 +177,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitDesignDefinition(BoardParser.DesignDefinitionContext ctx) {
 
-        DesignDefinitionNode dd; // Todo: never used?
         List<Declaration> fields = new ArrayList<>();
 
         for (ParseTree field : ctx.designBody().fieldRow()) {
@@ -204,8 +211,29 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionDeclaration(BoardParser.ActionDeclarationContext ctx) {
-        //Spawn new ActionDeclartionNode()
-        return null;
+
+        //For each formal parameter create declaration
+        List<Declaration> formalParameters = new ArrayList<>();
+        for (BoardParser.FormalParameterContext fp : ctx.formalParameter()) {
+            formalParameters.add((Declaration) fp.accept(this));
+        }
+
+        if (ctx.type() != null) {
+            //Typed action
+            return new ActionDeclarationNode(
+                    ctx.IDENTIFIER().getText(),
+                    getType(ctx.type()),
+                    formalParameters.toArray(new Declaration[0])
+            );
+        }
+        else {
+            //Void action
+            return new ActionDeclarationNode(
+                    ctx.IDENTIFIER().getText(),
+                    new VoidType(),
+                    formalParameters.toArray(new Declaration[0])
+            );
+        }
     }
 
     @Override
@@ -223,7 +251,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                     ctx.IDENTIFIER().getText(),
                     getType(ctx.type()),
                     new ParameterBlock(
-                            (BlockNode) ctx.rulesBlock().accept(this)
+                            ((BlockNode) ctx.normalBlock().accept(this)).children.toArray(new ASTNode[0])
                     ),
                     formalParameters.toArray(new Declaration[0])
             );
@@ -234,7 +262,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                     ctx.IDENTIFIER().getText(),
                     new VoidType(),
                     new ParameterBlock(
-                            (BlockNode) ctx.rulesBlock().accept(this)
+                            ((BlockNode) ctx.normalBlock().accept(this)).children.toArray(new ASTNode[0])
                     ),
                     formalParameters.toArray(new Declaration[0])
             );
@@ -244,12 +272,27 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitReturnStatement(BoardParser.ReturnStatementContext ctx) {
-        return null;
+
+        return new ReturnNode(
+                (Expression) ctx.expression().accept(this)
+        );
+
     }
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
-        return null;
+
+        List<Expression> actualParams = new ArrayList<>();
+
+        ctx.expression().forEach(expressionContext ->
+                actualParams.add((Expression) expressionContext.accept(this))
+        );
+
+        return new ActionCallNode(
+                ctx.IDENTIFIER().getText(),
+                actualParams.toArray(new Expression[0])
+        );
+
     }
 
     @Override
@@ -350,11 +393,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitChoiceAssignment(BoardParser.ChoiceAssignmentContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ASTNode visitActionAssignment(BoardParser.ActionAssignmentContext ctx) {
         return null;
     }
 
@@ -519,6 +557,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDesignBody(BoardParser.DesignBodyContext ctx) {
+
         return null;
     }
 
@@ -576,6 +615,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new ListDeclarationNode(
                     getListType(ctx.listType()),
                     ctx.IDENTIFIER(0).getText());
+        }
+        else if (ctx.actionDeclaration() != null) {
+            return ctx.actionDeclaration().accept(this);
         }
         else if (ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null) {
             return new DesignDeclarationNode(
@@ -662,8 +704,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.expression() != null) {
             return ctx.expression().accept(this);
-        }else if(ctx.input() != null){
+        }
+        else if(ctx.input() != null) {
             return ctx.input().accept(this);
+        }
+        else if (ctx.returnStatement() != null) {
+            return ctx.returnStatement().accept(this);
         }
 
         return null;
@@ -796,7 +842,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.fieldAccess() != null){
             return ctx.fieldAccess().accept(this);
         }
-        //Todo: missing impl for action call
+        else if(ctx.actionCall() != null) {
+            return ctx.actionCall().accept(this);
+        }
+
         return null;
     }
 

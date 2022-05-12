@@ -424,14 +424,26 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(BlockNode n) {
+        ST.dive();
         for (ASTNode child : n.children) {
             child.accept(this);
         }
+        ST.climb();
         return null;
     }
 
     @Override
     public TypeDenoter visit(ParameterBlock n) {
+        ST.dive();
+        for (ASTNode child : n.children) {
+            child.accept(this);
+        }
+        ST.climb();
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(NonScopeBlockNode n) {
         for (ASTNode child : n.children) {
             child.accept(this);
         }
@@ -478,11 +490,22 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ConditionalNode n) {
+        n.ifBlock.accept(this);
+
+        if (n.elseifBlocks != null) {
+            n.elseifBlocks.forEach(elif->elif.accept(this));
+        }
+        if (n.elseBlock != null) {
+            n.elseBlock.accept(this);
+        }
+
         return null;
-    } //Todo: implement?
+
+    }
 
     @Override
     public TypeDenoter visit(ElifConditionalNode n) {
+        n.ifBlock.accept(this);
         return null;
     }
 
@@ -513,6 +536,17 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(InputNode n) {
+
+        //Check that identifier has type of string
+        TypeDenoter inputType = (TypeDenoter) n.inputVariableName.accept(this);
+        if ( !(inputType instanceof StringType) ) {
+            throw new TypeErrorException(
+                    "input only accepts a variable of type string, but '%s' have type '%s'".formatted(
+                            n.inputVariableName.name,
+                            inputType
+                    ));
+        }
+
         return null;
     }
 

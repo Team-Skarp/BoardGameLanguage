@@ -308,6 +308,33 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(ParameterBlock n) {
+        System.out.println(TAB.repeat(indent) + "{");
+
+        indent++;
+
+        for(ASTNode child: n.children){
+            child.accept(this);
+        }
+
+        indent--;
+
+        System.out.println(TAB.repeat(indent) + "}");
+        return null;
+    }
+
+    @Override
+    public Void visit(NonScopeBlockNode n) {
+        System.out.println(TAB.repeat(indent) + "{");
+
+        indent++;
+
+        for(ASTNode child: n.children){
+            child.accept(this);
+        }
+
+        indent--;
+
+        System.out.println(TAB.repeat(indent) + "}");
         return null;
     }
 
