@@ -21,11 +21,11 @@ public class DesignAssignmentNode implements ASTNode<Object>, Assignment {
 
     @Override
     public IdNode getLeft() {
-        return null;
+        return parentType;
     }
 
     @Override
     public ASTNode getRight() {
-        return null;
+        return (ASTNode) fields;
     }
 }

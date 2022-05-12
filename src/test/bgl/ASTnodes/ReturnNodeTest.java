@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class ReturnNodeTest {
     ReturnNode returnNode;
+    ReturnNode returnNodeEmpty;
     IntNode intNode;
     BooleanNode booleanNode;
     StringNode stringNode;
@@ -18,10 +19,12 @@ class ReturnNodeTest {
     }
 
     @Test
-    void accept() {
+    void shouldAcceptAnyExpression() {
         // returnNode can return any of the three initialised nodes at the setup
         returnNode = new ReturnNode(intNode);
+        returnNodeEmpty = new ReturnNode();
 
+        returnNodeEmpty.accept(new PrettyPrinter());
         returnNode.accept(new PrettyPrinter());
     }
 }

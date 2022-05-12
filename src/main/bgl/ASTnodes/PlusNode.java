@@ -18,11 +18,6 @@ public class PlusNode implements ASTNode, ArithmeticExpression, BinaryOperator {
     }
 
     @Override
-    public String toString() {
-        return "PlusNode";
-    }
-
-    @Override
     public Expression getLeft() {
         return (Expression) left;
     }
@@ -31,4 +26,10 @@ public class PlusNode implements ASTNode, ArithmeticExpression, BinaryOperator {
     public Expression getRight() {
         return (Expression) right;
     }
+
+    @Override
+    public String toString() {
+        return "PlusNode";
+    }
+
 }
