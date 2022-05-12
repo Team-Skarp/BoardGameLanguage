@@ -25,7 +25,7 @@ class NotEqualNodeTest {
     }
 
     @Test
-    void accept() {
+    void shouldAcceptAnyPrimitiveNodesForComparing() {
         notEqualNode = new NotEqualNode(intNodeLeft, intNodeRight);
 
         notEqualNode.accept(new PrettyPrinter());

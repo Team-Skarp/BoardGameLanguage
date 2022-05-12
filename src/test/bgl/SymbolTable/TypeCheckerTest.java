@@ -6,6 +6,8 @@ import ASTvisitors.ASTvisitor;
 import org.junit.Test;
 import SymbolTable.types.*;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TypeCheckerTest {
@@ -174,14 +176,57 @@ public class TypeCheckerTest {
         StringAssignmentNode assignmentNode = new StringAssignmentNode(new IdNode("piece").name,
                 new IdNode("red").name);
 
-        // ST.openScope();
         ST.enterSymbol(new Symbol("piece", new BoolType()));
         ST.enterSymbol(new Symbol("red", new IntType()));
-        // ST.climb();
-        // ST.closeScope();
-        // ST.dive();
         TC = new TypeChecker(ST, TENV);
 
         assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
+    }
+
+    @Test
+    /**
+     * design A {
+     *     B b;
+     * }
+     * design B {
+     *     int c;
+     * }
+     *
+     * A a;
+     * int i = a.b.c;
+     */
+    public void IntDeclarationAssignOfFieldAccessNodeValue() {
+        ST = new SymbolTable();
+        TENV = new TypeEnvironment();
+
+        TENV.enterType(
+                new DesignType(
+                        "A",
+                        new SymbolTable().enterSymbol(
+                                new Symbol("b", new DesignRef("B"))
+                        )
+                )
+        ).enterType(
+                new DesignType(
+                        "B",
+                        new SymbolTable().enterSymbol(
+                                new Symbol("c", new IntType())
+                        )
+                )
+        );
+
+
+        ST.enterSymbol(new Symbol("a", new DesignRef("A")));
+
+        IntegerDeclarationNode i = new IntegerDeclarationNode(
+                "i",
+                new FieldAccessNode(
+                        List.of("a", "b", "c")
+                )
+        );
+
+        TC = new TypeChecker(ST, TENV);
+
+        assertEquals(IntType.class, TC.visit(i).getClass());
     }
 }

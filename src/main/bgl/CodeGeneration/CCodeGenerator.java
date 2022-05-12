@@ -647,8 +647,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(FieldAccessNode n) {
         System.out.println("We have reached FieldAccessNode");
         StringBuilder str = new StringBuilder();
-        str.append(n.origin.name);
-        for (String field : n.originFields) {
+        for (String field : n.fields) {
             str.append(field);
         }
         str.append(EOL);

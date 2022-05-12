@@ -270,13 +270,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
         if (ctx.IDENTIFIER() != null) {
-            IdNode origin = new IdNode(ctx.IDENTIFIER(0).toString());
             List<String> fieldIds = new ArrayList<>();
 
-            for (int i = 1; i < ctx.children.size(); i++) {
+            for (int i = 0; i < ctx.children.size(); i++) {
                 fieldIds.add(ctx.getChild(i).getText());
             }
-            return new FieldAccessNode(origin, fieldIds);
+            return new FieldAccessNode(fieldIds);
         } else {
             return null;
         }

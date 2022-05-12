@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DesignAssignmentNode implements ASTNode<Object>, Assignment {
 
-    public final IdNode parentType;              //*Optional parrent type when extending from another type
+    public final IdNode parentType;              //*Optional parent type when extending from another type
     public List<Declaration> fields;             //Fields of the design definition
 
     public DesignAssignmentNode(IdNode parentType, Declaration... fields) {
@@ -21,11 +21,11 @@ public class DesignAssignmentNode implements ASTNode<Object>, Assignment {
 
     @Override
     public IdNode getLeft() {
-        return null;
+        return parentType;
     }
 
     @Override
     public ASTNode getRight() {
-        return null;
+        return (ASTNode) fields;
     }
 }

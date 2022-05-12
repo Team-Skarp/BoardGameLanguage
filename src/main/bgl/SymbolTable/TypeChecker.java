@@ -614,7 +614,27 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(FieldAccessNode n) {
-        return null;
+        //Todo: should check that each "letter" exists in the previous design so that a<-b<-c<-d, and
+        // that the type of d matches the IdNode.type on the left of the "=" sign
+        // maybe change the FieldAccessNode to just contain a list of all the "letters"
+        String ref = "";
+        Symbol currentSymbol = new Symbol("tempSymbol",new IntType());
+        SymbolTable temp = ST;
+        for (String field: n.fields) {
+            currentSymbol = temp.retrieveSymbol(field);
+            if (currentSymbol.type instanceof DesignRef) {
+                ref = String.valueOf(currentSymbol.type);
+                temp = TENV.receiveType(ref).fields;
+            } else {
+                if (n.fields.indexOf(field) != n.fields.size()-1) {
+                    throw new IllegalFieldAccessException(
+                            "cannot access field %s in %s of type %s"
+                                    .formatted(n.fields.get(n.fields.indexOf(field)+1), field, ref));
+                }
+            }
+
+        }
+        return currentSymbol.type;
     }
 
     @Override

@@ -26,7 +26,7 @@ class PrintNodeTest {
 
 
     @Test
-    void accept() {
+    void shouldAcceptAnyTypeOfPrimitiveNodesAnd() {
         prints.add(intNode);
         prints.add(stringNode);
         prints.add(booleanNode);

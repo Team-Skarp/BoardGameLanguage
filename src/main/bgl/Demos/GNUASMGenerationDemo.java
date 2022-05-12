@@ -29,10 +29,12 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    int a = 6^5;
-                    print(a);
-                    print(a);
-
+                    str a = "hej";
+                    str b = "asd";
+                     a = b;
+                     b = "carlsjunio!";
+                     print(a,b);
+                    
                 }
                 
                 RULES{}

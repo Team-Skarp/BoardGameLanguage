@@ -7,10 +7,12 @@
     .string	"true"
 .LC1:
     .string	"false"
-.LC2:
-    .string	"%d\n"
 .LC3:
-    .string	"%d\n"
+    .string	"hej"
+.LC5:
+    .string	"asd"
+.LC7:
+    .string "carlsjunio!"
 .text
 .type	main, @function
 main:
@@ -23,23 +25,21 @@ main:
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
 	sub	rsp, 16
-	mov	DWORD PTR -24[rbp], edi
- 	mov	QWORD PTR -36[rbp], rsi
-    mov	DWORD PTR -8[rbp], 7776
-    mov eax, DWORD PTR -8[rbp]
-    mov	esi, eax
-    
-
-    lea	rdi, .LC2[rip]
-	mov	eax, 0
-	call	printf@PLT
-    mov eax, DWORD PTR -8[rbp]
-    mov	esi, eax
+	mov	DWORD PTR -20[rbp], edi
+ 	mov	QWORD PTR -32[rbp], rsi
+    # assignemnt
+	mov eax, DWORD PTR -5[rbp]
+	mov	DWORD PTR -3[rbp],eax
     
 
     lea	rdi, .LC3[rip]
 	mov	eax, 0
-	call	printf@PLT
+	call printf@PLT
+    
+
+    lea	rdi, .LC7[rip]
+	mov	eax, 0
+	call printf@PLT
   	leave
  	mov	eax, 0
 	.cfi_def_cfa 7, 8
