@@ -314,6 +314,7 @@ statement
     | whileStatement
     | foreach
     | assignmentStatement
+    | actionCall EOL
     | print
     | input
     | expression EOL

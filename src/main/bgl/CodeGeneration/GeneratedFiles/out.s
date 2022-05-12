@@ -8,11 +8,9 @@
 .LC1:
     .string	"false"
 .LC3:
-    .string	"hej"
-.LC5:
-    .string	"asd"
-.LC7:
-    .string "carlsjunio!"
+	.string	"%d"
+.LC4:
+    .string	"%s\n"
 .text
 .type	main, @function
 main:
@@ -25,19 +23,31 @@ main:
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
 	sub	rsp, 16
-	mov	DWORD PTR -20[rbp], edi
- 	mov	QWORD PTR -32[rbp], rsi
-    # assignemnt
-	mov eax, DWORD PTR -5[rbp]
-	mov	DWORD PTR -3[rbp],eax
-    
-
+	mov	DWORD PTR -28[rbp], edi
+ 	mov	QWORD PTR -40[rbp], rsi
+mov	BYTE PTR -8[rbp], -1
+    mov	DWORD PTR -12[rbp], 1
+    lea rax, -12[rbp]
+    mov	rsi, rax
     lea	rdi, .LC3[rip]
-	mov	eax, 0
-	call printf@PLT
+    mov	eax, 0
+    call	__isoc99_scanf@PLT
+    mov	BYTE PTR -8[rbp], -1
+    cmp DWORD PTR -12[rbp], 0
+    jle .L3
+    mov	BYTE PTR -8[rbp], 0
+.L3:
+	cmp	BYTE PTR -8[rbp], -1
+	je	.L5
+	lea	rax, .LC0[rip]
+	jmp	.L6
+.L5:
+	lea	rax, .LC1[rip]
+.L6:
+    mov rsi, rax
     
 
-    lea	rdi, .LC7[rip]
+    lea	rdi, .LC4[rip]
 	mov	eax, 0
 	call printf@PLT
   	leave
