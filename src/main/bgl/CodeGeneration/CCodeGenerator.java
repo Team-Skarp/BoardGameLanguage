@@ -43,9 +43,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(GameNode n) {
         String userCode;
         header += """
-               %s
-               %s
-               """.formatted(imports, defines);
+               #include "%s"
+               """.formatted("bgllib.h");
 
         //Everything in rules block gets put on top level in C code
         n.rules.accept(this);

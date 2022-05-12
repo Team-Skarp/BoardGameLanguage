@@ -63,6 +63,27 @@ public class Compiler {
         }
     }
 
+    private static void writeSTDLIB(ASTvisitor generator) {
+        try {
+            FileWriter fw = new FileWriter(
+                    "./src/main/bgl/BglFiles/Generated/bgllib.h",
+                    false
+            );
+            fw.write(STDLIBC.imports);
+            fw.write(STDLIBC.defines);
+            if (generator instanceof CCodeGenerator ccg) {
+                fw.write(ccg.definitions);
+            }
+            fw.close();
+
+            System.out.println("Compiled successfully");
+        } catch (IOException ex) {
+            // Print message as exception occurred when
+            // invalid path of local machine is passed
+            System.out.print("Invalid Path");
+        }
+    }
+
     public static void main(String[] args) throws IOException {
 
         // Setup
@@ -70,6 +91,7 @@ public class Compiler {
         BoardLexer lexer;
         CommonTokenStream tokens;
         BoardParser parser;
+        List<String> arguments = List.of(args);
 
         // Created AST from vist STD
         ASTNode stdAST = STDLIBC.getAST();
@@ -78,9 +100,23 @@ public class Compiler {
         SymbolHarvester stdSH= new SymbolHarvester();
         SymbolTable stdST = (SymbolTable) stdAST.accept(stdSH);
 
+        // STDLIB Code generator
+        ASTvisitor stdGenerator = getCodeGenerator(arguments, stdST, stdSH);
+
+        // STDLIB COde
+        stdAST.accept(stdGenerator);
+
+        if (stdGenerator instanceof CCodeGenerator ccg) {
+            System.out.println(STDLIBC.imports);
+            System.out.println(STDLIBC.defines);
+            System.out.println(ccg.definitions);
+        }
+
+        writeSTDLIB(stdGenerator);
+
         // User code generation
         StringBuilder userCode = new StringBuilder();
-        List<String> arguments = List.of(args);
+
 
         try(BufferedReader reader = new BufferedReader(new FileReader(handleFilePath(arguments)))) {
             List<String> productList = reader.lines().toList();

@@ -1,9 +1,6 @@
 package STDLIB;
 
-import ASTnodes.ActionDefinitionNode;
-import ASTnodes.DesignDeclarationNode;
-import ASTnodes.DesignDefinitionNode;
-import ASTnodes.IdNode;
+import ASTnodes.*;
 import SymbolTable.types.DesignRef;
 import SymbolTable.types.DesignType;
 
@@ -25,12 +22,11 @@ public class Player implements PredefinedDesign {
     public DesignDefinitionNode getDesign() {
         return new DesignDefinitionNode(
                 new IdNode("Player"),
-                new DesignDeclarationNode(
-                        "str",
+                new StringDeclarationNode(
                         "name"
                 ),
-                new DesignDeclarationNode(
-                        "Piece",
+                new ListDeclarationNode(
+                        new DesignRef("Piece"),
                         "pieces"
                 )
         );

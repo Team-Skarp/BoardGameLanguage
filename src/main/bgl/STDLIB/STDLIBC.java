@@ -12,8 +12,8 @@ public class STDLIBC {
     public static String imports =
             """
             #include <stdio.h>
-            #include<stdbool.h>
-            #include<math.h>
+            #include <stdbool.h>
+            #include <math.h>
             #include <string.h>
             #include <stdlib.h>
             """;
@@ -27,6 +27,7 @@ public class STDLIBC {
                      keep && count != size;                      \\
                      keep = !keep, count++)                      \\
                     for (item = (array) + count; keep; keep = !keep)\\
+                    
             """;
 
     public static NonScopeBlockNode getAST() {
@@ -38,7 +39,7 @@ public class STDLIBC {
         Tile stdTile     = new Tile();
 
         // PATH
-        List<ASTNode> PathAST = new ArrayList<>(List.of(stdPath.getDesign()));
+        // List<ASTNode> PathAST = new ArrayList<>(List.of(stdPath.getDesign()));
         // PathAST.addAll(stdPath.getImplementedActions());
 
         // Piece
@@ -56,7 +57,7 @@ public class STDLIBC {
         // Collected Nodes
         List<ASTNode> nodes = new ArrayList<>();
 
-        nodes.addAll(PathAST);
+        //nodes.addAll(PathAST);
         nodes.addAll(PieceAST);
         nodes.addAll(PlayerAST);
         nodes.addAll(TileAST);
