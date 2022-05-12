@@ -25,8 +25,8 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(GameNode n) {
         n.setup.accept(this);
-        n.gameloop.accept(this);
         n.rules.accept(this);
+        n.gameloop.accept(this);
 
         return ST;
     }
@@ -113,6 +113,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(GreaterThanNode n) {
+
         return ST;
     }
 
@@ -233,9 +234,6 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ActionDefinitionNode n) {
-        //Type check that return expression matches return type
-        TC = new TypeChecker(ST, TENV);
-        TC.visit(n);
 
         //Convert declarations to symbols
         List<Symbol> formalParams = new ArrayList<>();
@@ -251,18 +249,28 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         //Pass down the formal parameters to the action body
         n.body.variables = formalParams;
 
+        ST = (SymbolTable) n.body.accept(this);
+
+        //Type check that return expression matches return type
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
+
         //Visit action body
-        return (SymbolTable) n.body.accept(this);
+        return ST;
     }
 
     @Override
+    /**
+     * Dummy proof. Nothing should visit a declaration interface
+     */
     public SymbolTable visit(Declaration n) {
-        n.accept(this); //Todo: why is this required for an interface?
+        n.accept(this);
         return ST;
     }
 
     @Override
     public SymbolTable visit(ActionDeclarationNode n) {
+
         return ST;
     } //Todo: implement?
 
@@ -407,7 +415,10 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(ConditionalNode n) {
         n.ifBlock.accept(this);
-        n.elseifBlocks.forEach(elif->elif.accept(this));
+
+        if (n.elseifBlocks != null) {
+            n.elseifBlocks.forEach(elif->elif.accept(this));
+        }
         if (n.elseBlock != null) {
             n.elseBlock.accept(this);
         }
@@ -487,11 +498,17 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ReturnNode n) {
+        n.returnVal.accept(this);
         return ST;
     }
 
     @Override
     public SymbolTable visit(FieldAccessNode n) {
+
+        //Typecheck that all fields that are accessed exists
+        TC = new TypeChecker(ST, TENV);
+        n.accept(TC);
+
         return ST;
     }
 }

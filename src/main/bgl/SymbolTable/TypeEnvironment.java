@@ -94,6 +94,7 @@ public class TypeEnvironment {
         }
 
         System.out.printf("type '%s' received\n", type.name);
+
         return type;
     }
 }
