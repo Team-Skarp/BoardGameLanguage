@@ -35,6 +35,7 @@ public class GNUASMGenerationDemo {
                     action fizz(int a) {
                         print("Hej");
                     }
+                    fizz();
                 }
                 GAMELOOP {
                     fizz(5);

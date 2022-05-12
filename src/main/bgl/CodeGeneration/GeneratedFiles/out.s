@@ -8,7 +8,7 @@
 .LC1:
     .string	"false"
 .LC2:
-    .string	"Hej\n"
+    .string	"hej\n"
 .text
 .type	main, @function
 main:
@@ -23,7 +23,7 @@ main:
 	sub	rsp, 16
 	mov	DWORD PTR -20[rbp], edi
  	mov	QWORD PTR -32[rbp], rsi
-null  	leave
+  	leave
  	mov	eax, 0
 	.cfi_def_cfa 7, 8
 	ret

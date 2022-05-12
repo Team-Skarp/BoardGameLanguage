@@ -60,7 +60,8 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) {
-
+        ctx.children.forEach(c->lo.g(c.getText()));
+        lo.g(ctx.children.get(1));
         List<ASTNode> children = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {
@@ -230,6 +231,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionDefinition(BoardParser.ActionDefinitionContext ctx) {
+        lo.g("actiondefinition");
 
         //For each formal parameter create declaration
         List<Declaration> formalParameters = new ArrayList<>();
@@ -273,6 +275,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
+        lo.g("actioncall");
         List<Expression> actualParams = new ArrayList<>();
 
         ctx.expression().forEach(expressionContext ->
@@ -814,7 +817,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitArithmeticAtom(BoardParser.ArithmeticAtomContext ctx) {
-        lo.g(":D");
+
         if (ctx.INT() != null) {
             return new IntNode(Integer.parseInt(ctx.INT().getText()));
         }
