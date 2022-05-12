@@ -4,6 +4,7 @@ import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +32,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     /**
      * Both the left type and right type should be of same type
+     *
      * @return {@link TypeDenoter} of the type of assignment
      * @throws TypeErrorException if types are incompatible
      */
@@ -42,8 +44,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (idType.getClass() == exprType.getClass()) {
             return idType;          //Could be the expression type or the id type
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
@@ -55,8 +56,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (idType.getClass() == exprType.getClass()) {
             return idType;          //Could be the expression type or the id type
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
@@ -69,8 +69,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         if (idType.getClass() == exprType.getClass()) {
             System.out.println(idType.getClass() + " " + exprType.getClass()); //todo remove
             return idType;          //Could be the expression type or the id type
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
@@ -82,8 +81,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (idType.getClass() == exprType.getClass()) {
             return idType;          //Could be the expression type or the id type
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
@@ -95,8 +93,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (fieldType.getClass() == exprType.getClass()) {
             return fieldType;          //Could be the expression type or the id type
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, fieldType));
         }
     }
@@ -138,7 +135,31 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ListDeclarationNode n) {
-        return null;
+
+        List<TypeDenoter> actualTypesOfElementNodes = new ArrayList<>();
+        if (n.children != null) {
+            for (ASTNode child : n.children) {
+                System.out.println(child.accept(this));
+                actualTypesOfElementNodes.add((TypeDenoter) child.accept(this));
+            }
+
+            for (TypeDenoter actualTypesOfElementNode : actualTypesOfElementNodes) {
+                if (actualTypesOfElementNode.getClass() != n.elementType.getClass()) {
+                    throw new TypeErrorException(
+                            "Element of type %s does not match list of type %s".
+                                    formatted(actualTypesOfElementNode, n.elementType));
+                }
+            }
+        }
+
+        return n.elementType;
+    }
+
+    // [ [1,2] , [true, false, 1] ]
+    @Override
+    public TypeDenoter visit(ListElementNode n) {
+
+        return (TypeDenoter) n.accept(this);
     }
 
     @Override
@@ -184,11 +205,9 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
-        }
-        else if (leftType instanceof StringType && rightType instanceof StringType) {
+        } else if (leftType instanceof StringType && rightType instanceof StringType) {
             return new StringType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(
                     String.format("type '%s' cannot be added to type '%s'", rightType, leftType)
             );
@@ -203,8 +222,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be negated to type '%s'", rightType, leftType));
         }
     }
@@ -216,8 +234,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (operandType instanceof IntType) {
             return new IntType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("unary minus is not defined for type '%s'", operandType));
         }
     }
@@ -230,8 +247,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be multiplied with type '%s'", leftType, rightType));
         }
     }
@@ -243,8 +259,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be divided with type '%s'", leftType, rightType));
         }
     }
@@ -256,8 +271,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("modulus can not operate on type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -269,8 +283,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new IntType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("exponent can not operate on type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -295,14 +308,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
-        }
-        else if (leftType instanceof StringType && rightType instanceof StringType) {
+        } else if (leftType instanceof StringType && rightType instanceof StringType) {
             return new BoolType();
-        }
-        else if (leftType instanceof BoolType && rightType instanceof BoolType) {
+        } else if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be compared equal to type '%s'", leftType, rightType));
         }
 
@@ -315,14 +325,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
-        }
-        else if (leftType instanceof StringType && rightType instanceof StringType) {
+        } else if (leftType instanceof StringType && rightType instanceof StringType) {
             return new BoolType();
-        }
-        else if (leftType instanceof BoolType && rightType instanceof BoolType) {
+        } else if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("not equal is not defined between type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -334,8 +341,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("less than is not defined for type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -347,8 +353,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("less than is not defined for type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -360,8 +365,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("greater than or equal is not defined for type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -373,8 +377,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof IntType && rightType instanceof IntType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("less than is not defined for type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -390,8 +393,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (exprType instanceof BoolType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("negation is not defined for type: '%s'", exprType));
         }
     }
@@ -403,8 +405,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("or operator is not defined for type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -416,8 +417,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (leftType instanceof BoolType && rightType instanceof BoolType) {
             return new BoolType();
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("and operator is not defined for type '%s' and '%s'", leftType, rightType));
         }
     }
@@ -462,8 +462,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (idType.getClass() == exprType.getClass()) {
             return idType;          //Could be the expression type or the id type
-        }
-        else {
+        } else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
         }
     }
@@ -493,7 +492,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         n.ifBlock.accept(this);
 
         if (n.elseifBlocks != null) {
-            n.elseifBlocks.forEach(elif->elif.accept(this));
+            n.elseifBlocks.forEach(elif -> elif.accept(this));
         }
         if (n.elseBlock != null) {
             n.elseBlock.accept(this);
@@ -539,7 +538,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         //Check that identifier has type of string
         TypeDenoter inputType = (TypeDenoter) n.inputVariableName.accept(this);
-        if ( !(inputType instanceof StringType) ) {
+        if (!(inputType instanceof StringType)) {
             throw new TypeErrorException(
                     "input only accepts a variable of type string, but '%s' have type '%s'".formatted(
                             n.inputVariableName.name,
@@ -559,7 +558,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         if (formalParameters.size() != call.actualParameters.size()) {
             throw new TypeErrorException(
                     "action '%s' takes '%d' positional arguments but '%d' were given".
-                    formatted(actionSym.name, formalParameters.size(), call.actualParameters.size()));
+                            formatted(actionSym.name, formalParameters.size(), call.actualParameters.size()));
         }
 
         int arg = 0;
@@ -567,7 +566,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             TypeDenoter paramType = formalParameters.get(arg).type();
             TypeDenoter argumentType = visit(call.actualParameters.get(arg));
 
-            if (paramType.getClass() != argumentType.getClass()){
+            if (paramType.getClass() != argumentType.getClass()) {
                 throw new TypeErrorException(
                         "expected type '%s' on argument index '%d' but recieved type '%s'".
                                 formatted(paramType, arg, argumentType)
@@ -585,23 +584,20 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         if (isNotInAction()) {
             throw new SyntaxError("return statement must be inside an action");
-        }
-        else if (isReturningFromVoid(n)) {
+        } else if (isReturningFromVoid(n)) {
             throw new TypeErrorException(
                     "action '%s' does not expect a value to be returned".formatted(
                             currentAction.name
                     )
             );
-        }
-        else if (haveEmptyReturnWhenOneExpected(n)) {
+        } else if (haveEmptyReturnWhenOneExpected(n)) {
             throw new TypeErrorException(
                     "action '%s' expects a return type of '%s' but nothing was given".formatted(
-                        currentAction.name,
-                        currentAction.returnType
+                            currentAction.name,
+                            currentAction.returnType
                     )
             );
-        }
-        else if (nonMatchingReturnType(n)) {
+        } else if (nonMatchingReturnType(n)) {
             throw new TypeErrorException(
                     "return value of type '%s' does not match return type of '%s', expected type '%s'".formatted(
                             n.returnVal.accept(this),
@@ -616,6 +612,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     /**
      * Checks that type of return value matches current action definition
+     *
      * @param n
      */
     private boolean nonMatchingReturnType(ReturnNode n) {
@@ -626,6 +623,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     /**
      * Check that if there is no return value, then the action return type should be Void
+     *
      * @param n
      */
     private boolean haveEmptyReturnWhenOneExpected(ReturnNode n) {
@@ -634,6 +632,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     /**
      * Check that nothing is returned from a void action
+     *
      * @param n
      */
     private boolean isReturningFromVoid(ReturnNode n) {
@@ -647,18 +646,18 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     @Override
     public TypeDenoter visit(FieldAccessNode n) {
         String ref = "";
-        Symbol currentSymbol = new Symbol("tempSymbol",new IntType());
+        Symbol currentSymbol = new Symbol("tempSymbol", new IntType());
         SymbolTable temp = ST;
-        for (String field: n.fields) {
+        for (String field : n.fields) {
             currentSymbol = temp.retrieveSymbol(field);
             if (currentSymbol.type instanceof DesignRef) {
                 ref = String.valueOf(currentSymbol.type);
                 temp = TENV.receiveType(ref).fields;
             } else {
-                if (n.fields.indexOf(field) != n.fields.size()-1) {
+                if (n.fields.indexOf(field) != n.fields.size() - 1) {
                     throw new IllegalFieldAccessException(
                             "cannot access field %s in %s of type %s"
-                                    .formatted(n.fields.get(n.fields.indexOf(field)+1), field, ref));
+                                    .formatted(n.fields.get(n.fields.indexOf(field) + 1), field, ref));
                 }
             }
 

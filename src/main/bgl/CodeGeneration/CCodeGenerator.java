@@ -401,7 +401,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ListDeclarationNode n) {
-
         String braces = "[]";
         TypeDenoter finalType = n.elementType;
 
@@ -412,17 +411,50 @@ public class CCodeGenerator implements ASTvisitor<String> {
             braces += "[]";
         }
 
-        return (
-                """
-                %s %s%s;
-                """.formatted(
-                        toCType(finalType),
-                        n.name,
-                        braces
-                )
-                );
+        if (n.children == null) {
+            return (
+                    """
+                            %s %s%s;
+                            """.formatted(
+                            toCType(finalType),
+                            n.name,
+                            braces
+                    )
+            );
+        }
+        else {
+            StringBuilder rightSide = new StringBuilder();
+            rightSide.append("[");
+            for (ASTNode child: n.children) {
+                rightSide.append(child.accept(this));
+                rightSide.append(",");
+            }
+            rightSide.deleteCharAt(rightSide.length()-1);
+            rightSide.append("]");
+            return (
+                    """
+                            %s %s%s = %s;
+                            """.formatted(
+                            toCType(finalType),
+                            n.name,
+                            braces,
+                            rightSide.toString()
+                    )
+            );
+        }
     }
 
+    @Override
+    public String visit(ListElementNode n) {
+        StringBuilder str = new StringBuilder();
+        str.append("[");
+        for (ASTNode elementNode: n.children) {
+            str.append(elementNode);
+        }
+        str.append("]");
+        str.append(EOL);
+        return str.toString(); //Todo: implement
+    }
     /**
      * Maps a type denoter to a C type;
      * @param type
@@ -729,4 +761,5 @@ public class CCodeGenerator implements ASTvisitor<String> {
         str.append(EOL);
         return str.toString();
     }
+
 }

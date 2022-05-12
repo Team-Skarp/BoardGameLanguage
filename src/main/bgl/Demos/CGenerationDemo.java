@@ -31,15 +31,13 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    jump();
+                   list:int strlist = [1,2,3];
                 }
                 RULES{
-                    action jump () {
-                        print("Jump");
-                    }
+                    
                 }
                 GAMELOOP{
-                    jump();
+                   
                 }
                 """;
 

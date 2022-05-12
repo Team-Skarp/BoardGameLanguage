@@ -191,6 +191,7 @@ listType
 
 listElement
     : primitiveValue
+    | LSBRACE listElement (COMMA listElement)*  RSBRACE // Allows nested lists (see the example above)
     | IDENTIFIER
     ;
 
