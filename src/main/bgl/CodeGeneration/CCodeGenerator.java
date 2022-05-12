@@ -729,10 +729,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(FieldAccessNode n) {
         StringBuilder str = new StringBuilder();
-        for (String field : n.fields) {
-            str.append(field);
+        for (Accessable field : n.fields) {
+            str.append(field.accept(this));
         }
         str.append(EOL);
+
         return str.toString();
     }
 }

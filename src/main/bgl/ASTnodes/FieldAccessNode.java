@@ -5,9 +5,9 @@ import java.util.List;
 
 public class FieldAccessNode implements ASTNode, Expression {
 
-    public List<String> fields;
+    public List<Accessable> fields;
 
-    public FieldAccessNode(List<String> fields) {
+    public FieldAccessNode(List<Accessable> fields) {
 
         this.fields = fields;
     }

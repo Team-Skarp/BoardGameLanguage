@@ -31,23 +31,22 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    int a;
+                   int a;
+                   
                 }
                 RULES {
-                    action factorial(int n) : int {
-                        if (n == 0) {
-                            return 1;
-                        }
-                        elseif (n == 1) {
-                            return 1;
-                        }
-                        else {
-                            return n * factorial(n - 1);
-                        }
+                    action foo(int a) {
+                        print("Foo");
+                    }
+                    action bar() {
+                        print("Goo");
+                    }
+                    action goo() {
+                        print("Too");
                     }
                 }
                 GAMELOOP {
-                    a = factorial(5);
+                    foo(a);
                     print(a);
                 }
                 """;

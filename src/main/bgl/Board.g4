@@ -231,7 +231,7 @@ actionCall
     ;
 
 fieldAccess
-    : IDENTIFIER (.IDENTIFIER)+
+    : IDENTIFIER (DOT IDENTIFIER | DOT actionCall)+
     ;
 
 //INTDCL | BOOLDCL | STRDCL
