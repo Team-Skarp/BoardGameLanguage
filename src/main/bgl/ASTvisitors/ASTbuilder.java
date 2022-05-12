@@ -11,7 +11,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import SymbolTable.types.*;
 import Logging.Logger;
 
-import java.net.IDN;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -681,10 +680,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.expression() != null) {
             return ctx.expression().accept(this);
-        }else if(ctx.input() != null){
+        }
+        else if(ctx.input() != null) {
             return ctx.input().accept(this);
-        }else if(ctx.actionCall() != null) {
-            return ctx.actionCall().accept(this);
         }
         else if (ctx.returnStatement() != null) {
             return ctx.returnStatement().accept(this);
