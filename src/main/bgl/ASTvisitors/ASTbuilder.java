@@ -382,8 +382,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return null;
     }
 
-
-
     @Override
     public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
         return null;
@@ -674,7 +672,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitStatement(BoardParser.StatementContext ctx) {
-
         if (ctx.ifStatement() != null) {
             return ctx.ifStatement().accept(this);
         }
@@ -698,6 +695,8 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.returnStatement() != null) {
             return ctx.returnStatement().accept(this);
+        }else if(ctx.actionCall() != null){
+            return ctx.actionCall().accept(this);
         }
 
         return null;

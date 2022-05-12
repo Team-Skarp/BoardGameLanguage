@@ -1145,7 +1145,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ActionCallNode n) {
-        
+        System.out.println("action call "+n.actionName+n.actualParameters);
         return null;
     }
 
