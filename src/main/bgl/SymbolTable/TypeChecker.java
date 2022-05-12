@@ -44,7 +44,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
 
@@ -57,7 +57,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
 
@@ -71,7 +71,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
     }
 
@@ -84,7 +84,20 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return idType;          //Could be the expression type or the id type
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", idType, exprType));
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
+        }
+    }
+
+    @Override
+    public TypeDenoter visit(DotAssignmentNode n) {
+        TypeDenoter fieldType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (fieldType.getClass() == exprType.getClass()) {
+            return fieldType;          //Could be the expression type or the id type
+        }
+        else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, fieldType));
         }
     }
 
@@ -177,7 +190,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         }
         else {
             throw new TypeErrorException(
-                    String.format("type '%s' cannot be added to type '%s'", leftType, rightType)
+                    String.format("type '%s' cannot be added to type '%s'", rightType, leftType)
             );
         }
     }
@@ -192,7 +205,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return new IntType();
         }
         else {
-            throw new TypeErrorException(String.format("type '%s' cannot be negated to type '%s'", leftType, rightType));
+            throw new TypeErrorException(String.format("type '%s' cannot be negated to type '%s'", rightType, leftType));
         }
     }
 
@@ -599,9 +612,6 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(FieldAccessNode n) {
-        //Todo: should check that each "letter" exists in the previous design so that a<-b<-c<-d, and
-        // that the type of d matches the IdNode.type on the left of the "=" sign
-        // maybe change the FieldAccessNode to just contain a list of all the "letters"
         String ref = "";
         Symbol currentSymbol = new Symbol("tempSymbol",new IntType());
         SymbolTable temp = ST;

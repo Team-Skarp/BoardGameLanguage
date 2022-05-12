@@ -678,6 +678,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(DotAssignmentNode n) {
+        return null; //Todo: no time to implement this
+    }
+
+    @Override
     public String visit(DesignDefinitionNode n) {
         return null;
     }

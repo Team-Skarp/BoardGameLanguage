@@ -236,6 +236,21 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(DotAssignmentNode n) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < n.fieldAccessNode.fields.size() - 1; i++) {
+            str.append(n.fieldAccessNode.fields.get(i));
+        }
+        str.deleteCharAt(str.length() - 1);
+        str.append("->").append(n.fieldAccessNode.fields.get(n.fieldAccessNode.fields.size() - 1)).
+        append(" = ").append(n.expr.accept(this)).append(EOL);
+        /*str
+                n.fieldAccessNode.accept(this)+" = "+n.expr.accept(this);
+        str = str.replace(";","").replace("\n","") + EOL;*/
+        return str.toString();
+    }
+
+    @Override
     /**
      * Should only append to top level code
      */
@@ -618,7 +633,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(FieldAccessNode n) {
-        System.out.println("We have reached FieldAccessNode");
         StringBuilder str = new StringBuilder();
         for (String field : n.fields) {
             str.append(field);

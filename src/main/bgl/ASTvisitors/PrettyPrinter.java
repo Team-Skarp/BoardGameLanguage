@@ -29,6 +29,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(ArithmeticExpression n) {
+        n.accept(this);
         return null;
     }
 
@@ -358,6 +359,20 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(DotAssignmentNode n) {
+        System.out.println(TAB.repeat(indent) + "Dot assign: ");
+
+        indent++;
+
+        n.getLeft().accept(this);
+        n.getRight().accept(this);
+
+        indent--;
+
+        return null;
+    }
+
+    @Override
     public Void visit(DesignDefinitionNode n) {
         return null;
     }
@@ -413,6 +428,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(BooleanExpression n) {
+        n.accept(this);
         return null;
     }
 
@@ -645,6 +661,14 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(FieldAccessNode n) {
+        System.out.println(TAB.repeat(indent) + "Field Access");
+
+        indent++;
+
+        n.fields.forEach(System.out::println);
+
+        indent--;
+
         return null;
     }
 

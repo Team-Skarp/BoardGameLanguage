@@ -267,7 +267,7 @@ stringAssigment
     ;
 
 dotAssignment
-    : IDENTIFIER DOT IDENTIFIER ASSIGN (STR|INT|BOOL|IDENTIFIER)*
+    : fieldAccess ASSIGN (STR|INT|BOOL|IDENTIFIER|expression)
     ;
 
 choiceAssignment
