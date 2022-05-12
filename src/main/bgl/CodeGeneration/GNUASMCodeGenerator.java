@@ -25,8 +25,14 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     Logger lo =             new Logger();
     private final String EOL = ";\n";
     private PrintNode printNode;
+    //where string data is stored
     String data;
+    //bottom of the program
     String footer;
+    //a list of all declared functions
+    String functions;
+    //an incrementer to keep count of functions
+    int functionCounter = 7;
     //indicates how many variables have been declared in data section
     int dataAmount = 2;
     //pointer offset for the register
@@ -62,6 +68,12 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 .LC1:
                     .string	"false"
                 """;
+                functions = """
+                        """;
+                String str = n.setup.accept(this)+"";
+                str += n.rules.accept(this);
+                str+= n.gameloop.accept(this);
+
                 footer = """
                   	leave
                  	mov	eax, 0
@@ -77,6 +89,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 	.long	 1f - 0f
                 	.long	 4f - 1f
                 	.long	 5
+                	%s
                 0:
                 	.string	 "GNU"
                 1:
@@ -88,8 +101,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 3:
                 	.align 8
                 4:
-                """;
-        String str = n.setup.accept(this)+"";
+                """.formatted(functions);
 
         String initialize = """
                 main:
@@ -640,7 +652,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(NonScopeBlockNode n) {
-        return null;
+        String str = "";
+        for (ASTNode c: n.children){
+            str += TAB.repeat(indent) + c.accept(this);
+        }
+        return str;
     }
 
     @Override
@@ -685,13 +701,52 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(DotAssignmentNode n) {
+        return null; //Todo: no time to implement this
+    }
+
+    @Override
     public String visit(DesignDefinitionNode n) {
         return null;
     }
 
-    @Override
+    @Override //Actions are functions
     public String visit(ActionDefinitionNode n) {
-        return null;
+
+        //TODO: switch depending on return type
+        //TODO: insert formalparameters if they exist
+        System.out.println(n.returnType+"\n"+n.name+"\n"+n.formalParameters+"\n"+n.body.children);
+        String functionBlock = "";
+        for (ASTNode child: n.body.children){
+            functionBlock+=child.accept(this);
+        }
+        functionCounter++;
+        functions += """
+                	.section	.rodata
+                	.text
+                	.globl	%s                
+                	.type	%s, @function     
+                %s:                           
+                .LFB%d:                          
+                	.cfi_startproc
+                	endbr64	
+                	push	rbp	#
+                	.cfi_def_cfa_offset 16
+                	.cfi_offset 6, -16
+                	mov	rbp, rsp	#,
+                	.cfi_def_cfa_register 6
+                    %s
+                	call 	puts@PLT
+                	nop	
+                	pop	rbp	#
+                	.cfi_def_cfa 7, 8
+                	ret	
+                	.cfi_endproc
+                .LFE%d:                          
+                	.size	%s, .-%s        
+                """.formatted(n.name,n.name,n.name,functionCounter,functionBlock,functionCounter,n.name,n.name);
+
+        return "";
     }
 
     @Override
@@ -1090,6 +1145,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ActionCallNode n) {
+        
         return null;
     }
 

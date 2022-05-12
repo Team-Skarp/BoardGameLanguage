@@ -144,9 +144,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.specialDeclaration() != null) {
             throw new RuntimeException("Specials is not implemented in the current version");
         }
-        else if (ctx.choiceDeclaration() != null) {
-            throw new RuntimeException("Choice is not implemented in the current version");
-        }
         return null;
     }
 
@@ -201,11 +198,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSpecialDeclaration(BoardParser.SpecialDeclarationContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ASTNode visitChoiceDeclaration(BoardParser.ChoiceDeclarationContext ctx) {
         return null;
     }
 
@@ -281,7 +273,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
-
         List<Expression> actualParams = new ArrayList<>();
 
         ctx.expression().forEach(expressionContext ->
@@ -364,13 +355,34 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDotAssignment(BoardParser.DotAssignmentContext ctx) {
+        if(ctx.getChild(0) != null) {
+            FieldAccessNode fieldAccessNode = (FieldAccessNode) ctx.getChild(0).accept(this);
+            if (ctx.expression() != null) {
+                return new DotAssignmentNode(
+                        fieldAccessNode,
+                        ctx.getChild(2).accept(this));
+            } else if (ctx.STR() != null) {
+                return new DotAssignmentNode(
+                        fieldAccessNode,
+                        new StringNode(ctx.STR().getText()));
+            } else if (ctx.IDENTIFIER() != null) {
+                return new DotAssignmentNode(
+                        fieldAccessNode,
+                        new IdNode(ctx.IDENTIFIER().getText()));
+            } else if (ctx.BOOL() != null) {
+                return new DotAssignmentNode(
+                        fieldAccessNode,
+                        new BooleanNode(Boolean.parseBoolean(ctx.BOOL().getText())));
+            } else if (ctx.INT() != null) {
+                return new DotAssignmentNode(
+                        fieldAccessNode,
+                        new IntNode(Integer.parseInt(ctx.INT().getText())));
+            }
+        }
         return null;
     }
 
-    @Override
-    public ASTNode visitChoiceAssignment(BoardParser.ChoiceAssignmentContext ctx) {
-        return null;
-    }
+
 
     @Override
     public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
@@ -694,7 +706,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitExpression(BoardParser.ExpressionContext ctx) {
         if (ctx.booleanExpression() != null) {
-            return ctx.booleanExpression().accept(this);
+            return ctx.getChild(0).accept(this);
         }
 
         return null;
