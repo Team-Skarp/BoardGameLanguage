@@ -71,7 +71,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
 
     }
 
@@ -163,7 +163,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override

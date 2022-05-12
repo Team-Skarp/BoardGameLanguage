@@ -430,6 +430,14 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(NonScopeBlockNode n) {
+        for (ASTNode child : n.children) {
+            child.accept(this);
+        }
+        return null;
+    }
+
+    @Override
     public TypeDenoter visit(StringNode n) {
         return new StringType();
     }

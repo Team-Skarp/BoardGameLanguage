@@ -214,6 +214,21 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
+    @Override
+    public String visit(NonScopeBlockNode n) {
+        String str;
+
+        str = "{\n";
+        indent++;
+        for (ASTNode c: n.children){
+            str += TAB.repeat(indent) + c.accept(this);
+        }
+        indent--;
+        str += "}";
+
+        return str;
+    }
+
 
     @Override
     public String visit(Assignment n) {

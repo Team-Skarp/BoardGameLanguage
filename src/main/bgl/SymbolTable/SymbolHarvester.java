@@ -176,6 +176,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(NonScopeBlockNode n) {
+
+        for (ASTNode node : n.children) {
+            node.accept(this);
+        }
+
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(Assignment n) {
         return ST;
     }
