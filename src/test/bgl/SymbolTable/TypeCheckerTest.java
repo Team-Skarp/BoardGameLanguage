@@ -299,10 +299,8 @@ public class TypeCheckerTest {
 
 
         ST.enterSymbol(new Symbol(
-                "foo",
-                new ActionType(
-                        new IntType()
-                ))
+                "a",
+                new DesignRef("A"))
         );
 
         IntegerDeclarationNode i = new IntegerDeclarationNode(
