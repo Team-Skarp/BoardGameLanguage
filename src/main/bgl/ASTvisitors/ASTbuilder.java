@@ -695,8 +695,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.returnStatement() != null) {
             return ctx.returnStatement().accept(this);
-        }else if(ctx.actionCall() != null){
-            return ctx.actionCall().accept(this);
         }
 
         return null;
