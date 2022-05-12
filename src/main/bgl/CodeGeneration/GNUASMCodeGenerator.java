@@ -933,6 +933,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     public String visit(PrintNode n) {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         //TODO: implement symbol table, implement all idnodes, implement the rest of the nodes. retrieve pointer loc.
+        LAmount++;
         printNode = n;
         String str = "";
         String EOL = "";
@@ -1015,7 +1016,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                             mov eax, %s
                             mov	esi, eax
                         """.formatted(p.accept(this));
-                LAmount+=2;
+                LAmount++;
             }
             str +="""
                     \n
@@ -1026,12 +1027,60 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
             dataAmount++;
             printCount++;
         }
+        System.out.println(LAmount+" la print end");
+
         return str;
     }
 
     @Override
     public String visit(InputNode n) {
-        return null;
+        System.out.println(LAmount+" la input start");
+        dataAmount++;
+        Symbol symbol = ST.retrieveSymbol(n.inputVariableName.name);
+        String str = "";
+        if(symbol.type instanceof IntType){
+            data += """
+                    .LC%d:
+                    	.string	"%s"
+                    """.formatted(dataAmount,"%d");
+            str += """
+                    # input
+                	lea	rax, -%d[rbp]
+                	mov	rsi, rax	
+                	lea	rdi, .LC%d[rip]
+                	mov	eax, 0
+                	call	__isoc99_scanf@PLT
+                """.formatted(ptrTable.get(symbol.hashCode()),dataAmount);
+        }else if(symbol.type instanceof BoolType){
+            pointerOffset += 4;
+            ptr = pointerOffset-16;
+            LAmount++;
+            data += """
+                    .LC%d:
+                    	.string	"%s" 
+                    """.formatted(dataAmount,"%d");
+            str += """
+                    mov	DWORD PTR -%d[rbp], 1
+                    lea rax, -%d[rbp]
+                    mov	rsi, rax
+                    lea	rdi, .LC%d[rip]
+                    mov	eax, 0
+                    call	__isoc99_scanf@PLT
+                    mov	BYTE PTR -%d[rbp], -1	
+                    cmp DWORD PTR -%d[rbp], 0
+                    jle .L%d
+                    mov	BYTE PTR -%d[rbp], 0
+                .L%d:
+                """.formatted(ptr,ptr,dataAmount,ptrTable.get(symbol.hashCode()),ptr,LAmount,ptrTable.get(symbol.hashCode()),LAmount);
+            ptr+=4;
+            LAmount++;
+        }else if(symbol.type instanceof StringType){
+            //TODO: complete string input
+
+        }
+        dataAmount+=1;
+        System.out.println(LAmount+" la input");
+        return str;
     }
 
     @Override

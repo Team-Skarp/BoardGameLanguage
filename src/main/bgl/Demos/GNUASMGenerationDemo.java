@@ -29,11 +29,10 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                int a = 5;
-                     print(true and false);
-                    
+                    bool b = false;
+                    input(b);
+                    print(b);
                 }
-                
                 RULES{}
                 GAMELOOP{}
                 """;
