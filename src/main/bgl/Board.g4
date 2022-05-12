@@ -249,7 +249,6 @@ assignmentStatement
     | booleanAssigment EOL
     | stringAssigment EOL
     | dotAssignment EOL
-    | actionAssignment EOL
     | choiceAssignment
     | designAssignment EOL
     ;
@@ -322,6 +321,7 @@ statement
     | whileStatement
     | foreach
     | assignmentStatement
+    | actionCall EOL
     | print
     | input
     | expression EOL

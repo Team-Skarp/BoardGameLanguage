@@ -9,6 +9,8 @@ import SymbolTable.SymbolTable;
 import SymbolTable.types.BoolType;
 import SymbolTable.types.IntType;
 import SymbolTable.types.StringType;
+import SymbolTable.types.VoidType;
+import com.sun.jdi.IntegerType;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -936,7 +938,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
         String EOL = "";
         int printCount = 1;
         for (ASTNode p : n.prints){
-            Symbol symbol = ST.retrieveSymbol(((IdNode) p).name);
+            Symbol symbol = new Symbol("print", new VoidType());
+            if(p.getClass() == IdNode.class){
+                symbol = ST.retrieveSymbol(((IdNode) p).name);
+            }
+            System.out.println(p.getClass().toString());
             if(printCount == n.prints.size()){
                 EOL = "\\n";
             }
@@ -948,7 +954,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                             .string	"%s"
                         """.formatted(dataAmount,((StringNode) p).value+EOL);
                 str += "    mov	esi, eax";
-
             }else if(p.getClass() == IdNode.class){
                 //ID NODES
                 if(symbol.type instanceof IntType){
@@ -981,9 +986,36 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
                     //dont need anything here
                 }
-            }else if(p.getClass() == BooleanNode.class){
-                //Boolean
-
+            }else if(p instanceof BooleanExpression){
+                // BOOL
+                data +="""
+                        .LC%d:
+                            .string	"%s"
+                        """.formatted(dataAmount,"%s"+EOL);
+                str += """
+                                # bool print
+                            mov eax, %s
+                        	cmp	eax, 0
+                        	jne	.L%d
+                        	lea	rax, .LC0[rip]
+                        	jmp	.L%d
+                        .L%d:
+                        	lea	rax, .LC1[rip]
+                        .L%d:
+                            mov rsi, rax
+                        """.formatted(p.accept(this),LAmount,LAmount+1,LAmount,LAmount+1);
+                LAmount+=2;
+            }else if(p instanceof ArithmeticExpression){
+                //int
+                data +="""
+                        .LC%d:
+                            .string	"%s"
+                        """.formatted(dataAmount,"%d"+EOL);
+                str += """
+                            mov eax, %s
+                            mov	esi, eax
+                        """.formatted(p.accept(this));
+                LAmount+=2;
             }
             str +="""
                     \n

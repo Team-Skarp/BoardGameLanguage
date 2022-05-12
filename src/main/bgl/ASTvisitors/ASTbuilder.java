@@ -154,7 +154,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitUniqueDeclaration(BoardParser.UniqueDeclarationContext ctx) {
-        return null;
+        return ctx.getChild(0).accept(this);
     }
 
     @Override
@@ -640,6 +640,8 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return ctx.expression().accept(this);
         }else if(ctx.input() != null){
             return ctx.input().accept(this);
+        }else if(ctx.actionCall() != null) {
+            return ctx.actionCall().accept(this);
         }
 
         return null;

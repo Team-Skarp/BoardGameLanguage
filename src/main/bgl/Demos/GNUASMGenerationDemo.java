@@ -29,11 +29,8 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    str a = "hej";
-                    str b = "asd";
-                     a = b;
-                     b = "carlsjunio!";
-                     print(a,b);
+                int a = 5;
+                     print(true and false);
                     
                 }
                 
