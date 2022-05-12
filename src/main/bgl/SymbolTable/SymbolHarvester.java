@@ -516,7 +516,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(InputNode n) {
         //Typecheck input variable to have type string
         TC = new TypeChecker(ST, TENV);
-        n.accept(this);
+        n.inputVariableName.accept(this);
 
         return ST;
     }
