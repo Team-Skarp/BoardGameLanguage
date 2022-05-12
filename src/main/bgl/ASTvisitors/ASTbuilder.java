@@ -412,12 +412,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
-        System.out.println("found design node");
-        return null;
-    }
-
-    @Override
     public ASTNode visitListDeclaration(BoardParser.ListDeclarationContext ctx) {
         return null;
     }

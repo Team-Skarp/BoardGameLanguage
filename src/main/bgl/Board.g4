@@ -255,7 +255,6 @@ assignmentStatement
     | stringAssigment EOL
     | dotAssignment EOL
 //  | choiceAssignment
-    | designAssignment EOL
     ;
 
 intAssigment
@@ -279,14 +278,6 @@ choiceAssignment
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER COLON LBRACE print RBRACE EOL
     ;*/
-
-// Design assignment,
-designAssignment
-    : IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE
-    | IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) (COMMA ( INT | STR | BOOL | IDENTIFIER ))* RBRACE
-    | IDENTIFIER IDENTIFIER ASSIGN LBRACE LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE (COMMA ( INT | STR | BOOL ))* RBRACE
-    ;
-
 
 // Special body's
 designBody

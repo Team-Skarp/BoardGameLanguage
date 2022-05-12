@@ -47,7 +47,6 @@ public interface ASTvisitor<T> {
     T visit(StringAssignmentNode n);
     T visit(IntegerAssignmentNode n);
     T visit(BooleanAssignmentNode n);
-    T visit(DesignAssignmentNode n);
     T visit(DotAssignmentNode n);
 
     //Definitions
