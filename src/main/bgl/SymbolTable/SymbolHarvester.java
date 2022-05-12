@@ -14,12 +14,19 @@ import java.util.List;
 public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     SymbolTable ST;
-    TypeEnvironment TENV;
+    public TypeEnvironment TENV;
     TypeChecker TC;
 
+    // Blank SymbolHarvester
     public SymbolHarvester() {
         this.ST = new SymbolTable();
         this.TENV = new TypeEnvironment();
+    }
+
+    // Received after precompiling BGL standard library
+    public SymbolHarvester(SymbolTable ST, TypeEnvironment TENV) {
+        this.ST = ST;
+        this.TENV = TENV;
     }
 
     @Override
@@ -267,14 +274,28 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
             );
         }
 
+        //Enter action definition into ST
+        ST.enterSymbol(
+                new Symbol(
+                        n.varName(),
+                        new ActionType(
+                                n.returnType,
+                                n.formalParameters
+                        )
+                )
+        );
+
         //Pass down the formal parameters to the action body
         n.body.variables = formalParams;
 
+        //Create symbols
         ST = (SymbolTable) n.body.accept(this);
 
         //Type check that return expression matches return type
         TC = new TypeChecker(ST, TENV);
         TC.visit(n);
+
+
 
         //Visit action body
         return ST;

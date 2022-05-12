@@ -60,7 +60,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) {
-
         List<ASTNode> children = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {
@@ -91,7 +90,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
-        lo.g(ctx.children);
         List<ASTNode> children = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {
@@ -144,9 +142,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.specialDeclaration() != null) {
             throw new RuntimeException("Specials is not implemented in the current version");
         }
-        else if (ctx.choiceDeclaration() != null) {
-            throw new RuntimeException("Choice is not implemented in the current version");
-        }
         return null;
     }
 
@@ -165,13 +160,39 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
+    /**
+     * Visit a parse tree produced by {@link BoardParser#designBlock}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    @Override
+    public ASTNode visitDesignBlock(BoardParser.DesignBlockContext ctx) {
+        return null;
+    }
+
     @Override
     public ASTNode visitDesignDeclaration(BoardParser.DesignDeclarationContext ctx) {
+
+        if (ctx.ASSIGN() != null) {
+            List<String> childNodes = new ArrayList<>();
+            for (ParseTree child : ctx.designBlock()) {
+                //System.out.println("DesignBlock ->" + child.getText());
+                childNodes.add(child.getText());
+            }
+
+            System.out.println("DesignBlocks " + childNodes);
+
+            return new DesignDeclarationNode(
+                    ctx.IDENTIFIER(0).getText(),
+                    ctx.IDENTIFIER(1).getText(),
+                    childNodes
+            );
+        }
         return new DesignDeclarationNode(
                 ctx.IDENTIFIER(0).getText(),
                 ctx.IDENTIFIER(1).getText()
         );
-
     }
 
     @Override
@@ -201,11 +222,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSpecialDeclaration(BoardParser.SpecialDeclarationContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ASTNode visitChoiceDeclaration(BoardParser.ChoiceDeclarationContext ctx) {
         return null;
     }
 
@@ -281,7 +297,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
-
         List<Expression> actualParams = new ArrayList<>();
 
         ctx.expression().forEach(expressionContext ->
@@ -298,13 +313,19 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
+        //TODO: Implement
+        //a.b.foo().b
+        //ctx.children.forEach(
+
+        //);
+
         if (ctx.IDENTIFIER() != null) {
             List<String> fieldIds = new ArrayList<>();
 
             for (int i = 0; i < ctx.children.size(); i++) {
                 fieldIds.add(ctx.getChild(i).getText());
             }
-            return new FieldAccessNode(fieldIds);
+            return new FieldAccessNode(List.of(new IdNode("a")));
         } else {
             return null;
         }
@@ -388,16 +409,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                         new IntNode(Integer.parseInt(ctx.INT().getText())));
             }
         }
-        return null;
-    }
-
-    @Override
-    public ASTNode visitChoiceAssignment(BoardParser.ChoiceAssignmentContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
         return null;
     }
 
@@ -721,7 +732,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitStatement(BoardParser.StatementContext ctx) {
-
         if (ctx.ifStatement() != null) {
             return ctx.ifStatement().accept(this);
         }

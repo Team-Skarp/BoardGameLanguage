@@ -135,6 +135,44 @@ public class TypeCheckerTest {
         );
     }
 
+    /**
+     * action foo(int a, int b){}
+     *
+     * foo(1, 2);
+     */
+    @Test
+    public void canCallActionWithMoreThanTwoActualParameters() {
+
+        ST = new SymbolTable();
+
+        ActionDefinitionNode foo = new ActionDefinitionNode(
+                "foo",
+                new VoidType(),
+                new ParameterBlock(),
+                new IntegerDeclarationNode("a"),
+                new IntegerDeclarationNode("b")
+        );
+
+        ST.enterSymbol(new Symbol(
+                "foo",
+                new ActionType(
+                        foo.returnType,
+                        foo.formalParameters
+                )
+        ));
+
+        ActionCallNode callFoo = new ActionCallNode(
+                "foo",
+                new IntNode(5),
+                new IntNode(10)
+        );
+
+        //Initialise type checker with symbol table containing definition of foo
+        TC = new TypeChecker(ST, TENV);
+
+        TC.visit(callFoo);
+    }
+
     @Test
     public void shouldThrowTypeErrorWhenAssigningValueTypeIsNotABoolean() {
 
@@ -214,7 +252,58 @@ public class TypeCheckerTest {
         IntegerDeclarationNode i = new IntegerDeclarationNode(
                 "i",
                 new FieldAccessNode(
-                        List.of("a", "b", "c")
+                        List.of(
+                                new IdNode("a"),
+                                new IdNode("b"),
+                                new IdNode("c")
+                        )
+                )
+        );
+
+        TC = new TypeChecker(ST, TENV);
+
+        assertEquals(IntType.class, TC.visit(i).getClass());
+    }
+
+    @Test
+    /**
+     * design A {
+     *     action foo() : int;
+     * }
+     * A a;
+     * int i = a.foo();
+     */
+    public void getsTypeOfMethodCall() {
+        ST = new SymbolTable();
+        TENV = new TypeEnvironment();
+
+        TENV.enterType(
+                new DesignType(
+                        "A",
+                        new SymbolTable().enterSymbol(
+                                new Symbol(
+                                        "foo",
+                                        new ActionType(
+                                                new IntType()
+                                        )
+                        )
+                )
+        ));
+
+
+        ST.enterSymbol(new Symbol(
+                "a",
+                new DesignRef("A"))
+        );
+
+        IntegerDeclarationNode i = new IntegerDeclarationNode(
+                "i",
+                new FieldAccessNode(
+                        List.of(
+                                new IdNode("a"),
+                                new ActionCallNode(
+                                        "foo"
+                                ))
                 )
         );
 

@@ -31,13 +31,23 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                   list:int strlist = [1,2,3];
-                }
-                RULES{
-                    
-                }
-                GAMELOOP{
+                   int a;
                    
+                }
+                RULES {
+                    action foo(int a) {
+                        print("Foo");
+                    }
+                    action bar() {
+                        print("Goo");
+                    }
+                    action goo() {
+                        print("Too");
+                    }
+                }
+                GAMELOOP {
+                    foo(a);
+                    print(a);
                 }
                 """;
 
@@ -56,7 +66,7 @@ public class CGenerationDemo {
         SymbolTable ST = (SymbolTable) ast.accept(SH);
 
         // C - code generation
-        CCodeGenerator generator = new CCodeGenerator(ST);
+        CCodeGenerator generator = new CCodeGenerator(ST, SH.TENV);
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);

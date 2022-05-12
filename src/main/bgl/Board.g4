@@ -140,11 +140,17 @@ setupDeclaration
 rulesDeclaration
     : specialDeclaration
     | actionDefinition
-    | choiceDeclaration
+//  | choiceDeclaration
+    ;
+
+designBlock
+    : LBRACE ((INT | BOOL | STR) | ((INT | BOOL | STR) COMMA))* RBRACE // Nested Desgin Decl
+    | (INT | BOOL | STR | IDENTIFIER)                                               // Normal Prim in Decl
     ;
 
 designDeclaration
     : IDENTIFIER IDENTIFIER
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE designBlock (COMMA designBlock)* RBRACE
     ;
 
 //Design declerations should only appear in SETUP block
@@ -211,9 +217,9 @@ specialDeclaration
     : SPECIALDCL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
     ;
 
-choiceDeclaration
+/*choiceDeclaration
     : CHOICEDCL IDENTIFIER LPAREN IDENTIFIER IDENTIFIER RPAREN (COLON primitiveType)? rulesBlock //Should have a special choice block
-    ;
+    ;*/
 
 actionDeclaration
     : ACTIONDCL IDENTIFIER LPAREN (formalParameter | formalParameter (COMMA formalParameter)+)? RPAREN (COLON type)?
@@ -232,7 +238,7 @@ actionCall
     ;
 
 fieldAccess
-    : IDENTIFIER (.IDENTIFIER)+
+    : IDENTIFIER (DOT IDENTIFIER | DOT actionCall)+
     ;
 
 //INTDCL | BOOLDCL | STRDCL
@@ -249,8 +255,7 @@ assignmentStatement
     | booleanAssigment EOL
     | stringAssigment EOL
     | dotAssignment EOL
-    | choiceAssignment
-    | designAssignment EOL
+//  | choiceAssignment
     ;
 
 intAssigment
@@ -268,20 +273,12 @@ stringAssigment
 dotAssignment
     : fieldAccess ASSIGN (STR|INT|BOOL|IDENTIFIER|expression)
     ;
-
+/*
 choiceAssignment
     : (INT COLON)* LBRACE IDENTIFIER LPAREN (INT)* RPAREN RBRACE COMMA
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER COLON LBRACE print RBRACE EOL
-    ;
-
-// Design assignment,
-designAssignment
-    : IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE
-    | IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) (COMMA ( INT | STR | BOOL | IDENTIFIER ))* RBRACE
-    | IDENTIFIER IDENTIFIER ASSIGN LBRACE LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE (COMMA ( INT | STR | BOOL ))* RBRACE
-    ;
-
+    ;*/
 
 // Special body's
 designBody
@@ -315,7 +312,6 @@ statement
     | whileStatement
     | foreach
     | assignmentStatement
-    | actionCall EOL
     | print
     | input
     | expression EOL
@@ -359,10 +355,10 @@ unaryMinus
 
 arithmeticAtom
     : INT
+    | actionCall
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
     | fieldAccess
-    | actionCall
     ;
 
 logor

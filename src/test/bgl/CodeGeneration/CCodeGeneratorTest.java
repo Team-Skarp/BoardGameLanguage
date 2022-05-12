@@ -2,10 +2,15 @@ package CodeGeneration;
 
 import ASTnodes.*;
 import STDLIB.Tile;
+import SymbolTable.TypeEnvironment;
 import SymbolTable.SymbolHarvester;
 import SymbolTable.SymbolTable;
 import SymbolTable.types.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Type;
+
 import static CodeGeneration.CCodeGenerator.toCType;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,7 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class CCodeGeneratorTest {
 
     CCodeGenerator generator;
-    SymbolHarvester SH = new SymbolHarvester();
+    TypeEnvironment TENV;
+    SymbolHarvester SH;
+
+    @BeforeEach
+    void setup() {
+        SH = new SymbolHarvester();
+        TENV = new TypeEnvironment();
+    }
 
     @Test
     public void canCreateCCodeFromPredefinedDesign() {
@@ -23,18 +35,19 @@ class CCodeGeneratorTest {
         SymbolTable symbolTable = SH.visit(tile.getDesign());
 
         //When code generator visits tile node
-        generator = new CCodeGenerator(symbolTable);
+        generator = new CCodeGenerator(symbolTable, SH.TENV);
         generator.visit(tile.getDesign());
 
-        String actual = generator.top;
+        String actual = generator.definitions;
+
+        System.out.println(actual);
 
         //Expect C struct that works
         String expected =
                 """
-                bool isEmpty();
                 struct Tile {
-                \tstruct Tile *next;
-                \tstruct Tile *prev;
+                \tstruct Tile next;
+                \tstruct Tile prev;
                 \tstruct Piece pieces[];
                 \tbool (*isEmpty)();
                 };
@@ -128,7 +141,7 @@ class CCodeGeneratorTest {
         SH = new SymbolHarvester();
         SymbolTable symbolTable = SH.visit(biggest);
 
-        generator = new CCodeGenerator(symbolTable);
+        generator = new CCodeGenerator(symbolTable, TENV);
         generator.visit(biggest);
 
         //String actual = generator.top;

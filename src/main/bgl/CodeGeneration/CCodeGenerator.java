@@ -4,6 +4,7 @@ import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 import SymbolTable.SymbolTable;
+import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
@@ -20,40 +21,48 @@ import java.util.List;
 public class CCodeGenerator implements ASTvisitor<String> {
 
     private final SymbolTable   ST;
+    private final TypeEnvironment TENV;
+
     Logger                      lo = new Logger();
     HashMap<String,String>      foreachDict = new HashMap<>();
 
+    public String               header = "";
     public String               prototypes = "";
-    public String               top = "";
+    public String               definitions = "";
 
     private int                 indent = 0;
     private final String        TAB = "\t";
     private final String        EOL = ";\n";
 
-    public CCodeGenerator(SymbolTable ST) {
+    public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
+        this.TENV = TENV;
     }
 
     @Override
     public String visit(GameNode n) {
         String userCode;
-        top += """
-               %s
-               %s
-               """.formatted(imports, defines);
+        header += """
+               #include "%s"
+               """.formatted("bgllib.h");
+
         //Everything in rules block gets put on top level in C code
         n.rules.accept(this);
 
         userCode =
                 """
-                int main(int argc, char *argv[]) 
-                %s
+                int main(int argc, char *argv[]) {
+                    %s
+                    while(true) {
+                       %s
+                    }
+                }
                 """.formatted(
-                    n.setup.accept(this)
+                    n.setup.accept(this),
+                    n.gameloop.accept(this)
                 );
 
-
-        return (top + userCode);
+        return (header + prototypes + definitions + userCode);
     }
 
     @Override
@@ -64,7 +73,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ArithmeticExpression n) {
-        lo.g(n);
         return (String) n.accept(this);
     }
 
@@ -220,15 +228,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(NonScopeBlockNode n) {
-        String str;
+        String str = "";
 
-        str = "{\n";
-        indent++;
         for (ASTNode c: n.children){
             str += TAB.repeat(indent) + c.accept(this);
         }
-        indent--;
-        str += "}";
 
         return str;
     }
@@ -280,12 +284,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
+
             designBody += TAB.repeat(indent) + field.accept(this);
         }
         indent--;
 
         if (n.parentType != null) {
-            top +=  """
+            definitions +=  """
                     struct %s {
                     struct %s parent;
                     %s};
@@ -296,7 +301,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.typeDefinition
             );
         } else {
-            top +=  """
+            definitions +=  """
                     struct %s {
                     %s};
                     """.formatted(
@@ -312,8 +317,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ActionDefinitionNode n) {
 
-        //Actions are put on the top of the C code
-        top += """
+        //Actions definitions are put on the top of the C code. A prototype for the definition is also added
+        definitions += """
                %s %s(%s) %s
                """.formatted(
                 toCType(n.returnType),
@@ -322,12 +327,19 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 n.body.accept(this)
         );
 
+        prototypes += """
+               %s %s(%s);
+               """.formatted(
+                toCType(n.returnType),
+                n.name,
+                toCParams(n.formalParameters)
+        );
+
         return "";
     }
 
     @Override
     public String visit(Declaration n) {
-        lo.g(n);
         return (String) n.accept(this);
     }
 
@@ -349,8 +361,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCParams(n.formalParameters)
         );
 
-        //Add the action declaration as a prototype header
-        top += toCPrototype(n);
+        //Add the action declaration as a prototype
+        prototypes += toCPrototype(n);
 
         return actionDcl;
     }
@@ -389,14 +401,31 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DesignDeclarationNode n) {
-        return (
-                """
-                struct %s *%s;
-                """
-                .formatted(
-                n.ref,
-                n.name
-        ));
+
+        DesignType thisType = TENV.receiveType(n.dName);
+
+        if (n.value != null) {
+
+            // Cast parent param to struct of parent type
+            if (n.value.get(0).contains("{") && n.value.get(0).contains("}")) {
+                n.value.set(0,"(struct %s)%s".formatted(thisType.parent, n.value.get(0)));
+            }
+
+            // Joined string for init
+            String collectedString = String.join(", ", n.value);
+
+            return (
+                    """
+                    struct %s %s = {%s};
+                    """.formatted(n.dName, n.name, collectedString)
+            );
+        } else {
+            return (
+                    """
+                    struct %s %s;
+                    """.formatted(n.dName, n.name)
+            );
+        }
     }
 
     @Override
@@ -547,20 +576,16 @@ public class CCodeGenerator implements ASTvisitor<String> {
         if (n.value != null) {
             String val = (String) n.value.accept(this);
             return """
-                   %s %s = (%s) malloc(%d * sizeof(char));
-                   strcpy(%s, %s);
+                   %s %s = %s;
                    """.formatted(
                     toCType(n.type()),
-                    n.name,
-                    toCType(n.type()),
-                    val.length(),
                     n.name,
                     n.value.accept(this)
             );
         }
         else {
             return """
-                   %s %s = %s malloc(%d * sizeof(char*));
+                   %s %s;
                    """.formatted(
                     toCType(n.type()),
                     n.name,
@@ -755,10 +780,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(FieldAccessNode n) {
         StringBuilder str = new StringBuilder();
-        for (String field : n.fields) {
-            str.append(field);
+        for (Accessable field : n.fields) {
+            str.append(field.accept(this));
         }
         str.append(EOL);
+
         return str.toString();
     }
 

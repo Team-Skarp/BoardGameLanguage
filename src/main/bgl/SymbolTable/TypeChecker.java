@@ -130,7 +130,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     public TypeDenoter visit(DesignDeclarationNode n) {
 
         //Check that the type is actually in the type environment
-        return TENV.receiveType(n.ref);
+        return TENV.receiveType(n.dName);
     }
 
     @Override
@@ -644,23 +644,37 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    /**
+     * Field can have either an identifier or an action call as a sequence
+     *
+     * Ex. a.b.foo() in where the type of the last element in the chain is returned
+     */
     public TypeDenoter visit(FieldAccessNode n) {
-        String ref = "";
-        Symbol currentSymbol = new Symbol("tempSymbol", new IntType());
+        String dName = "";
+        Symbol currentSymbol = new Symbol("error", new VoidType());
         SymbolTable temp = ST;
-        for (String field : n.fields) {
-            currentSymbol = temp.retrieveSymbol(field);
-            if (currentSymbol.type instanceof DesignRef) {
-                ref = String.valueOf(currentSymbol.type);
-                temp = TENV.receiveType(ref).fields;
-            } else {
-                if (n.fields.indexOf(field) != n.fields.size() - 1) {
+
+        for (Accessable field: n.fields) {
+
+            currentSymbol = temp.retrieveSymbol(field.getAccessName());
+            if (currentSymbol.type instanceof DesignRef design) {
+                dName = design.name;
+                temp = TENV.receiveType(dName).fields;
+            }
+            else {
+                if (n.fields.indexOf(field) != n.fields.size()-1) {
                     throw new IllegalFieldAccessException(
-                            "cannot access field %s in %s of type %s"
-                                    .formatted(n.fields.get(n.fields.indexOf(field) + 1), field, ref));
+                            "cannot access field %s in %s of type %s".formatted(
+                                    n.fields.get(n.fields.indexOf(field)+1),
+                                    field.getAccessName(),
+                                    dName));
                 }
             }
+        }
 
+        //If last accessor is a function call, return the type of the call
+        if (currentSymbol.type instanceof ActionType action) {
+            return action.returnType;
         }
         return currentSymbol.type;
     }

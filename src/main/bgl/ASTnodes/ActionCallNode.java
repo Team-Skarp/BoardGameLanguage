@@ -4,7 +4,7 @@ import ASTvisitors.ASTvisitor;
 
 import java.util.List;
 
-public class ActionCallNode implements ASTNode<Object> {
+public class ActionCallNode implements ASTNode, ArithmeticExpression, Accessable {
 
     public final String             actionName;
     public final List<Expression>   actualParameters;
@@ -17,5 +17,10 @@ public class ActionCallNode implements ASTNode<Object> {
     @Override
     public Object accept(ASTvisitor v) {
         return v.visit(this);
+    }
+
+    @Override
+    public String getAccessName() {
+        return actionName;
     }
 }
