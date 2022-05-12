@@ -31,14 +31,18 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    jump();
+                    
                 }
-                RULES{
-                    action jump () {
+                RULES {
+                    action move(int n) {
+                        print("Move: ", n);
+                    }
+                    action jump() {
                         print("Jump");
                     }
                 }
-                GAMELOOP{
+                GAMELOOP {
+                    move(5);
                     jump();
                 }
                 """;

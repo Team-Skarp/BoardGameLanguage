@@ -23,8 +23,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
     Logger                      lo = new Logger();
     HashMap<String,String>      foreachDict = new HashMap<>();
 
+    public String               header = "";
     public String               prototypes = "";
-    public String               top = "";
+    public String               definitions = "";
 
     private int                 indent = 0;
     private final String        TAB = "\t";
@@ -37,10 +38,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(GameNode n) {
         String userCode;
-        top += """
+        header += """
                %s
                %s
                """.formatted(imports, defines);
+
         //Everything in rules block gets put on top level in C code
         n.rules.accept(this);
 
@@ -52,8 +54,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.setup.accept(this)
                 );
 
-
-        return (top + userCode);
+        return (header + prototypes + definitions + userCode);
     }
 
     @Override
@@ -270,7 +271,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         indent--;
 
         if (n.parentType != null) {
-            top +=  """
+            definitions +=  """
                     struct %s {
                     struct %s parent;
                     %s};
@@ -281,7 +282,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.typeDefinition
             );
         } else {
-            top +=  """
+            definitions +=  """
                     struct %s {
                     %s};
                     """.formatted(
@@ -297,14 +298,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ActionDefinitionNode n) {
 
-        //Actions are put on the top of the C code
-        top += """
+        //Actions definitions are put on the top of the C code. A prototype for the definition is also added
+        definitions += """
                %s %s(%s) %s
                """.formatted(
                 toCType(n.returnType),
                 n.name,
                 toCParams(n.formalParameters),
                 n.body.accept(this)
+        );
+
+        prototypes += """
+               %s %s(%s);
+               """.formatted(
+                toCType(n.returnType),
+                n.name,
+                toCParams(n.formalParameters)
         );
 
         return "";
@@ -334,8 +343,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCParams(n.formalParameters)
         );
 
-        //Add the action declaration as a prototype header
-        top += toCPrototype(n);
+        //Add the action declaration as a prototype
+        prototypes += toCPrototype(n);
 
         return actionDcl;
     }
@@ -500,20 +509,16 @@ public class CCodeGenerator implements ASTvisitor<String> {
         if (n.value != null) {
             String val = (String) n.value.accept(this);
             return """
-                   %s %s = (%s) malloc(%d * sizeof(char));
-                   strcpy(%s, %s);
+                   %s %s = %s;
                    """.formatted(
                     toCType(n.type()),
-                    n.name,
-                    toCType(n.type()),
-                    val.length(),
                     n.name,
                     n.value.accept(this)
             );
         }
         else {
             return """
-                   %s %s = %s malloc(%d * sizeof(char*));
+                   %s %s;
                    """.formatted(
                     toCType(n.type()),
                     n.name,
@@ -689,7 +694,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String formattedParams = String.join(",", actualParams);
 
         return """
-               %s(%s)
+               %s(%s);
                """.formatted(
                n.actionName, formattedParams
         );

@@ -26,7 +26,7 @@ class CCodeGeneratorTest {
         generator = new CCodeGenerator(symbolTable);
         generator.visit(tile.getDesign());
 
-        String actual = generator.top;
+        String actual = generator.header;
 
         //Expect C struct that works
         String expected =
