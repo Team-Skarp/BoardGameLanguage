@@ -1,15 +1,16 @@
 package Demos;
 
 import ASTnodes.ASTNode;
-import ASTvisitors.ASTbuilder;
 import CodeGeneration.CCodeGenerator;
-import SymbolTable.SymbolTable;
 import SymbolTable.SymbolHarvester;
+import SymbolTable.SymbolTable;
 import antlr.BoardLexer;
 import antlr.BoardParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+
+import ASTvisitors.ASTbuilder;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,12 +30,15 @@ public class CGenerationDemo {
         */
         String bglCodeExample =
                 """
-                SETUP {
-                    str msg = "hej";
-                    str msg2 = msg;
-                    print(msg);
+                SETUP {}
+                RULES{
+                    action biggest (int a, int b) : int {
+                      if (a < b) {
+                          return b;
+                      }
+                      return a;
+                    }
                 }
-                RULES{}
                 GAMELOOP{}
                 """;
 

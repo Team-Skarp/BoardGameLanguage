@@ -113,7 +113,7 @@ normalBlock
     ;
 
 rulesBlock
-    : LBRACE (uniqueDeclaration | statement | rulesBlock )* RBRACE
+    : LBRACE (rulesDeclaration | statement | rulesBlock )* RBRACE
     ;
 
 gameloopBlock
@@ -138,7 +138,7 @@ setupDeclaration
     | designDefinition
     ;
 
-uniqueDeclaration
+rulesDeclaration
     : specialDeclaration
     | actionDefinition
     | choiceDeclaration
@@ -220,7 +220,7 @@ actionDeclaration
     ;
 
 actionDefinition
-    : ACTIONDCL IDENTIFIER LPAREN (formalParameter | formalParameter (COMMA formalParameter)+)? RPAREN (COLON type)? rulesBlock
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameter | formalParameter (COMMA formalParameter)+)? RPAREN (COLON type)? normalBlock
     ;
 
 returnStatement

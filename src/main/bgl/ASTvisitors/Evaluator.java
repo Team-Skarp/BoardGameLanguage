@@ -160,6 +160,13 @@ public class Evaluator implements ASTvisitor<Object> {
 
     @Override
     public Object visit(ParameterBlock n) {
+        n.children.forEach(child -> child.accept(this));
+        return null;
+    }
+
+    @Override
+    public Object visit(NonScopeBlockNode n) {
+        n.children.forEach(child -> child.accept(this));
         return null;
     }
 

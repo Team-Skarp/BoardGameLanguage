@@ -46,19 +46,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.setup.accept(this)
                 );
 
+        //Everything in rules block gets put on top level in C code
+        n.rules.accept(this);
+
         return (top + userCode);
     }
 
     @Override
     public String visit(Expression n) {
-        return null;
+        return (String) n.accept(this);
     }
 
 
     @Override
     public String visit(ArithmeticExpression n) {
         lo.g(n);
-        return null;
+        return (String) n.accept(this);
     }
 
     @Override
@@ -119,7 +122,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(BooleanExpression n) {
-        return null;
+        return (String) n.accept(this);
     }
 
     @Override
@@ -211,6 +214,21 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
+    @Override
+    public String visit(NonScopeBlockNode n) {
+        String str;
+
+        str = "{\n";
+        indent++;
+        for (ASTNode c: n.children){
+            str += TAB.repeat(indent) + c.accept(this);
+        }
+        indent--;
+        str += "}";
+
+        return str;
+    }
+
 
     @Override
     public String visit(Assignment n) {
@@ -274,7 +292,27 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ActionDefinitionNode n) {
-        return null;
+
+        //Create string for formal parameters
+        String formalParams = "";
+        for (Declaration param : n.formalParameters) {
+            formalParams += param.accept(this) + ",";
+        }
+
+        //Remove trailing comma and semicolons
+        formalParams = formalParams.substring(0, formalParams.length() - 1);
+        formalParams = formalParams.replaceAll(";", "");
+
+        //Action are put on the top of the C code
+        top += """
+               %s %s(%s) %s
+               """.formatted(
+                toCType(n.returnType),
+                n.name,
+                formalParams,
+                n.body.accept(this)
+        );
+        return "";
     }
 
     @Override
@@ -479,7 +517,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(ConditionalNode n) {
         String str = "if("+n.predicate.accept(this)+")"+n.ifBlock.accept(this);
 
-        if(n.elseifBlocks.size() > 0 ){
+        if(n.elseifBlocks != null ){
             for(ASTNode elif : n.elseifBlocks){
                 str += (String) elif.accept(this);
             }
@@ -613,7 +651,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ReturnNode n) {
-        return null;
+        return """
+               return (%s);
+               """.formatted(
+                       n.returnVal.accept(this)
+        );
     }
 
     @Override

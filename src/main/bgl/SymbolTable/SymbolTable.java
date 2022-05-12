@@ -81,7 +81,7 @@ public class SymbolTable {
     public void dive() {
         if (activeBlock.getChildren().size() > 0) {
             System.out.printf("Dived into child %s%n", activeBlock.next);
-            activeBlock = activeBlock.getChildren().get(activeBlock.next); //Point to next child next time we dive in current scope
+            activeBlock = activeBlock.getChildren().get(activeBlock.next++); //Point to next child next time we dive in current scope
         }
     }
 
@@ -93,8 +93,10 @@ public class SymbolTable {
     public void climb() {
         if (activeBlock.getParent() != null) {
             activeBlock = activeBlock.getParent();
-            activeBlock.next++;
             System.out.println("Climbed to parent block");
+
+            //Reset next counter so other visitors dives correctly into the first child scope
+            activeBlock.next = 0;
         }
     }
 

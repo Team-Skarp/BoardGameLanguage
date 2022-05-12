@@ -71,7 +71,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
 
     }
 
@@ -138,6 +138,20 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitRulesDeclaration(BoardParser.RulesDeclarationContext ctx) {
+        if (ctx.actionDefinition() != null) {
+            return ctx.actionDefinition().accept(this);
+        }
+        else if (ctx.specialDeclaration() != null) {
+            throw new RuntimeException("Specials is not implemented in the current version");
+        }
+        else if (ctx.choiceDeclaration() != null) {
+            throw new RuntimeException("Choice is not implemented in the current version");
+        }
+        return null;
+    }
+
+    @Override
     public ASTNode visitRulesBlock(BoardParser.RulesBlockContext ctx) {
 
         List<ASTNode> children = new ArrayList<>();
@@ -149,12 +163,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
         }
 
-        return new BlockNode(children.toArray(new ASTNode[0]));
-    }
-
-    @Override
-    public ASTNode visitUniqueDeclaration(BoardParser.UniqueDeclarationContext ctx) {
-        return ctx.getChild(0).accept(this);
+        return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
     @Override
@@ -169,7 +178,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitDesignDefinition(BoardParser.DesignDefinitionContext ctx) {
 
-        DesignDefinitionNode dd; // Todo: never used?
         List<Declaration> fields = new ArrayList<>();
 
         for (ParseTree field : ctx.designBody().fieldRow()) {
@@ -205,6 +213,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitActionDeclaration(BoardParser.ActionDeclarationContext ctx) {
         //Spawn new ActionDeclartionNode()
+        //TODO: Implement
         return null;
     }
 
@@ -223,7 +232,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                     ctx.IDENTIFIER().getText(),
                     getType(ctx.type()),
                     new ParameterBlock(
-                            (BlockNode) ctx.rulesBlock().accept(this)
+                            ((BlockNode) ctx.normalBlock().accept(this)).children.toArray(new ASTNode[0])
                     ),
                     formalParameters.toArray(new Declaration[0])
             );
@@ -234,7 +243,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                     ctx.IDENTIFIER().getText(),
                     new VoidType(),
                     new ParameterBlock(
-                            (BlockNode) ctx.rulesBlock().accept(this)
+                            ((BlockNode) ctx.normalBlock().accept(this)).children.toArray(new ASTNode[0])
                     ),
                     formalParameters.toArray(new Declaration[0])
             );
@@ -244,12 +253,17 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitReturnStatement(BoardParser.ReturnStatementContext ctx) {
-        return null;
+
+        return new ReturnNode(
+                (Expression) ctx.expression().accept(this)
+        );
+
     }
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
         return null;
+        //TODO: Missing
     }
 
     @Override
@@ -643,6 +657,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }else if(ctx.actionCall() != null) {
             return ctx.actionCall().accept(this);
         }
+        else if (ctx.returnStatement() != null) {
+            return ctx.returnStatement().accept(this);
+        }
+        //TODO: Action call statements should go here
 
         return null;
     }
