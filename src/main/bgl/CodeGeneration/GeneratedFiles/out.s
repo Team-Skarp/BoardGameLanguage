@@ -7,11 +7,7 @@
     .string	"true"
 .LC1:
     .string	"false"
-.LC3:
-	.string	"%d"
-.LC4:
-    .string	"%s\n"
-.LC5:
+.LC2:
     .string	"hej\n"
 .text
 .type	main, @function
@@ -25,33 +21,8 @@ main:
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
 	sub	rsp, 16
-	mov	DWORD PTR -28[rbp], edi
- 	mov	QWORD PTR -40[rbp], rsi
-mov	BYTE PTR -8[rbp], -1
-    mov	DWORD PTR -12[rbp], 1
-    lea rax, -12[rbp]
-    mov	rsi, rax
-    lea	rdi, .LC3[rip]
-    mov	eax, 0
-    call	__isoc99_scanf@PLT
-    mov	BYTE PTR -8[rbp], -1
-    cmp DWORD PTR -12[rbp], 0
-    jle .L3
-    mov	BYTE PTR -8[rbp], 0
-.L3:
-	cmp	BYTE PTR -8[rbp], -1
-	je	.L5
-	lea	rax, .LC0[rip]
-	jmp	.L6
-.L5:
-	lea	rax, .LC1[rip]
-.L6:
-    mov rsi, rax
-    
-
-    lea	rdi, .LC4[rip]
-	mov	eax, 0
-	call printf@PLT
+	mov	DWORD PTR -20[rbp], edi
+ 	mov	QWORD PTR -32[rbp], rsi
   	leave
  	mov	eax, 0
 	.cfi_def_cfa 7, 8
@@ -81,7 +52,7 @@ fizz:
 	.cfi_def_cfa_register 6
         mov	esi, eax    
 
-    lea	rdi, .LC5[rip]
+    lea	rdi, .LC2[rip]
 	mov	eax, 0
 	call printf@PLT
 
