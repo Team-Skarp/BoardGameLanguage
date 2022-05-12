@@ -105,13 +105,6 @@ public class Compiler {
 
         // STDLIB COde
         stdAST.accept(stdGenerator);
-
-        if (stdGenerator instanceof CCodeGenerator ccg) {
-            System.out.println(STDLIBC.imports);
-            System.out.println(STDLIBC.defines);
-            System.out.println(ccg.definitions);
-        }
-
         writeSTDLIB(stdGenerator);
 
         // User code generation
