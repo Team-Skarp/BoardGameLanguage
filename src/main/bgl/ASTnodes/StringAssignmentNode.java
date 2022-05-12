@@ -23,7 +23,7 @@ public class StringAssignmentNode implements ASTNode<Object>, Assignment{
     }
 
     @Override
-    public ASTNode getRight() {
+    public IdNode getRight() {
         return new IdNode(literal);
     }
 }

@@ -14,8 +14,8 @@ public class ActionDeclarationNode implements ASTNode<Object>, Declaration {
 
     public ActionDeclarationNode(String name, TypeDenoter returnType, Declaration... formalParameters) {
         this.name = name;
-        this.formalParameters = List.of(formalParameters);
         this.returnType = returnType;
+        this.formalParameters = List.of(formalParameters);
     }
 
     @Override

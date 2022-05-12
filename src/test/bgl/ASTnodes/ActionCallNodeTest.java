@@ -9,9 +9,13 @@ class ActionCallNodeTest {
     DesignRef designRef;
 
     @Test
-    void accept() {
+    void shouldAcceptAnyNameWithAnyNumberOfActualParameters() {
         designRef = new DesignRef("SpecialTile");
-        fooCall = new ActionCallNode("choice", new IntNode(10), new BooleanNode(false), new StringNode("piece"));
+        fooCall = new ActionCallNode("choice",
+                new IntNode(10),
+                new BooleanNode(false),
+                new StringNode("piece")
+        );
 
         fooCall.accept(new PrettyPrinter());
     }

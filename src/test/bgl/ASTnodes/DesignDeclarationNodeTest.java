@@ -9,34 +9,34 @@ import SymbolTable.types.DesignRef;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DesignDeclarationNodeTest {
-    DesignDeclarationNode designDeclarationNode;
+    DesignDeclarationNode designDcl;
     DesignRef designRef;
     TypeEnvironment TENV;
 
     @BeforeEach
     void setup() {
         TENV = new TypeEnvironment();
+        designRef = new DesignRef("StarTile");
     }
 
     @Test
     void accept() {
+        designDcl = new DesignDeclarationNode(designRef.name, "Tile");
 
-        designDeclarationNode = new DesignDeclarationNode("StarTile", "Tile");
-
-        designDeclarationNode.accept(new PrettyPrinter());
+        designDcl.accept(new PrettyPrinter());
     }
 
     @Test
     void varName() {
-        designDeclarationNode = new DesignDeclarationNode("StarTile", "Tile");
+        designDcl = new DesignDeclarationNode(designRef.name, "Tile");
 
-        assertEquals("Tile", designDeclarationNode.varName());
+        assertEquals("Tile", designDcl.varName());
     }
 
     @Test
     void type() {
-        designDeclarationNode = new DesignDeclarationNode("StarTile", "Tile");
+        designDcl = new DesignDeclarationNode(designRef.name, "Tile");
 
-        assertEquals("StarTile", designDeclarationNode.ref);
+        assertEquals(designRef.toString(), designDcl.ref);
     }
 }
