@@ -25,8 +25,7 @@ main:
  	mov	QWORD PTR -40[rbp], rsi
     mov	DWORD PTR -8[rbp], 50
 .GAMELOOP:
-	mov eax, DWORD PTR -8[rbp]
-	push eax
+	push DWORD PTR -8[rbp]
 
 	call fizzbuzz
 	mov	eax, 0

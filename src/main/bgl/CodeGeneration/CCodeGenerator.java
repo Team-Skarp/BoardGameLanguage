@@ -34,11 +34,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
     private final String        TAB = "\t";
     private final String        EOL = ";\n";
 
-    public CCodeGenerator(SymbolTable ST) {
-        this.ST = ST;
-        this.TENV = null;
-    }
-
     public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
         this.TENV = TENV;
@@ -79,7 +74,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ArithmeticExpression n) {
-        lo.g(n);
         return (String) n.accept(this);
     }
 
@@ -347,7 +341,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(Declaration n) {
-        lo.g(n);
         return (String) n.accept(this);
     }
 
