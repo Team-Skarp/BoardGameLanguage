@@ -2,15 +2,17 @@
 	.intel_syntax noprefix
 	.text
 	.globl	main
-	.section	.rodata
+	.section .rodata
 .LC0:
     .string	"true"
 .LC1:
     .string	"false"
 .LC2:
     .string	"%d\n"
-.text
-.type	main, @function
+.LC4:
+	.string	"%d"
+    .text
+    .type	main, @function
 main:
 .LFB6:
 	.cfi_startproc
@@ -21,17 +23,20 @@ main:
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
 	sub	rsp, 16
-	mov	DWORD PTR -28[rbp], edi
- 	mov	QWORD PTR -40[rbp], rsi
-    mov	DWORD PTR -8[rbp], 50
+	mov	DWORD PTR -36[rbp], edi
+ 	mov	QWORD PTR -48[rbp], rsi
+    mov	DWORD PTR -12[rbp], 4
 .GAMELOOP:
-	mov eax, DWORD PTR -8[rbp]
-	push eax
-
+	lea	rax, -12[rbp]
+	mov	rsi, rax
+	lea	rdi, .LC4[rip]
+	mov	eax, 0
+	call	__isoc99_scanf@PLT
+	push 5
 	call fizzbuzz
 	mov	eax, 0
 
-jmp .GAMELOOP
+    jmp .GAMELOOP
   	leave
  	mov	eax, 0
 	.cfi_def_cfa 7, 8
@@ -46,7 +51,7 @@ jmp .GAMELOOP
 	.long	 1f - 0f
 	.long	 4f - 1f
 	.long	 5
-		.section	.rodata
+		.section .rodata
 	.text
 	.globl	fizzbuzz
 	.type	fizzbuzz, @function
@@ -54,27 +59,25 @@ fizzbuzz:
 .LFB8:
 	.cfi_startproc
 	endbr64
-	push	rbp	#
+	push	rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
-	mov	rbp, rsp	#,
+	mov	rbp, rsp
 	.cfi_def_cfa_register 6
-	    mov	DWORD PTR -12[rbp], 0
+	    mov	DWORD PTR -20[rbp], 0
 
-mov eax, DWORD PTR 16[rbp]
-mov	DWORD PTR -12[rbp],  eax
+    mov eax, DWORD PTR 16[rbp]
+    mov	DWORD PTR -20[rbp],  eax
 
-        mov eax, DWORD PTR -null[rbp]
+        mov eax, DWORD PTR -20[rbp]
     mov	esi, eax
-    
-
     lea	rdi, .LC2[rip]
 	mov	eax, 0
 	call printf@PLT
 
 	call 	puts@PLT
 	nop
-	pop	rbp	#
+	pop	rbp
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc

@@ -536,17 +536,6 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(InputNode n) {
-
-        //Check that identifier has type of string
-        TypeDenoter inputType = (TypeDenoter) n.inputVariableName.accept(this);
-        if ( !(inputType instanceof StringType) ) {
-            throw new TypeErrorException(
-                    "input only accepts a variable of type string, but '%s' have type '%s'".formatted(
-                            n.inputVariableName.name,
-                            inputType
-                    ));
-        }
-
         return null;
     }
 
