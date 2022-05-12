@@ -206,6 +206,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(DotAssignmentNode n) {
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(DesignDefinitionNode n) {
 
         //Create a separate symbol table that resides in the design type
@@ -281,8 +286,19 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(ActionDeclarationNode n) {
 
+        //Two action declarations with the same name is not allowed
+        ST.enterSymbol(
+                new Symbol(
+                        n.name,
+                        new ActionType(
+                                n.returnType,
+                                n.formalParameters
+                        )
+                )
+        );
+
         return ST;
-    } //Todo: implement?
+    }
 
     @Override
     public SymbolTable visit(DesignDeclarationNode n) {
@@ -498,11 +514,21 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(InputNode n) {
+        //Typecheck input variable to have type string
+        TC = new TypeChecker(ST, TENV);
+        n.inputVariableName.accept(this);
+
         return ST;
     }
 
     @Override
     public SymbolTable visit(ActionCallNode n) {
+
+        //Check actionCall for correct amount of params & correct type of params
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
+
+        //Visit action body
         return ST;
     }
 

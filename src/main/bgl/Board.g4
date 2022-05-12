@@ -118,7 +118,6 @@ rulesBlock
 
 gameloopBlock
     : LBRACE (statement | gameloopBlock)* RBRACE
-    | IDENTIFIER ASSIGN actionAssignment
     ;
 
 //Primitive type decleration
@@ -216,7 +215,7 @@ specialDeclaration
     ;*/
 
 actionDeclaration
-    : ACTIONDCL IDENTIFIER LPAREN (formalParameter)? RPAREN (COLON type)?
+    : ACTIONDCL IDENTIFIER LPAREN (formalParameter | formalParameter (COMMA formalParameter)+)? RPAREN (COLON type)?
     ;
 
 actionDefinition
@@ -266,7 +265,7 @@ stringAssigment
     ;
 
 dotAssignment
-    : IDENTIFIER DOT IDENTIFIER ASSIGN (STR|INT|BOOL|IDENTIFIER)*
+    : fieldAccess ASSIGN (STR|INT|BOOL|IDENTIFIER|expression)
     ;
 /*
 choiceAssignment
@@ -274,12 +273,6 @@ choiceAssignment
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER COLON LBRACE print RBRACE EOL
     ;*/
-
-// Action assignment, function call and method call
-actionAssignment
-    : IDENTIFIER DOT IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
-    | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
-    ;
 
 // Design assignment,
 designAssignment

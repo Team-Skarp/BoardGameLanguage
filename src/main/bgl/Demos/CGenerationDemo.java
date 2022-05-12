@@ -30,16 +30,17 @@ public class CGenerationDemo {
         */
         String bglCodeExample =
                 """
-                SETUP {}
+                SETUP {
+                    jump();
+                }
                 RULES{
-                    action biggest (int a, int b) : int {
-                      if (a < b) {
-                          return b;
-                      }
-                      return a;
+                    action jump () {
+                        print("Jump");
                     }
                 }
-                GAMELOOP{}
+                GAMELOOP{
+                    jump();
+                }
                 """;
 
         // Parse Input

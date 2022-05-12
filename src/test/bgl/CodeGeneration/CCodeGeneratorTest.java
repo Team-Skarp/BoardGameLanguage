@@ -31,6 +31,7 @@ class CCodeGeneratorTest {
         //Expect C struct that works
         String expected =
                 """
+                bool isEmpty();
                 struct Tile {
                 \tstruct Tile *next;
                 \tstruct Tile *prev;
