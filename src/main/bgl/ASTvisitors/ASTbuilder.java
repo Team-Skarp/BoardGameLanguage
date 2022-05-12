@@ -212,9 +212,29 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionDeclaration(BoardParser.ActionDeclarationContext ctx) {
-        //Spawn new ActionDeclartionNode()
-        //TODO: Implement
-        return null;
+
+        //For each formal parameter create declaration
+        List<Declaration> formalParameters = new ArrayList<>();
+        for (BoardParser.FormalParameterContext fp : ctx.formalParameter()) {
+            formalParameters.add((Declaration) fp.accept(this));
+        }
+
+        if (ctx.type() != null) {
+            //Typed action
+            return new ActionDeclarationNode(
+                    ctx.IDENTIFIER().getText(),
+                    getType(ctx.type()),
+                    formalParameters.toArray(new Declaration[0])
+            );
+        }
+        else {
+            //Void action
+            return new ActionDeclarationNode(
+                    ctx.IDENTIFIER().getText(),
+                    new VoidType(),
+                    formalParameters.toArray(new Declaration[0])
+            );
+        }
     }
 
     @Override
@@ -262,8 +282,18 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
-        return null;
-        //TODO: Missing
+
+        List<Expression> actualParams = new ArrayList<>();
+
+        ctx.expression().forEach(expressionContext ->
+                actualParams.add((Expression) expressionContext.accept(this))
+        );
+
+        return new ActionCallNode(
+                ctx.IDENTIFIER().getText(),
+                actualParams.toArray(new Expression[0])
+        );
+
     }
 
     @Override
@@ -340,11 +370,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitChoiceAssignment(BoardParser.ChoiceAssignmentContext ctx) {
-        return null;
-    }
-
-    @Override
-    public ASTNode visitActionAssignment(BoardParser.ActionAssignmentContext ctx) {
         return null;
     }
 
@@ -509,6 +534,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDesignBody(BoardParser.DesignBodyContext ctx) {
+
         return null;
     }
 
@@ -566,6 +592,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             return new ListDeclarationNode(
                     getListType(ctx.listType()),
                     ctx.IDENTIFIER(0).getText());
+        }
+        else if (ctx.actionDeclaration() != null) {
+            return ctx.actionDeclaration().accept(this);
         }
         else if (ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null) {
             return new DesignDeclarationNode(
@@ -658,7 +687,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.returnStatement() != null) {
             return ctx.returnStatement().accept(this);
         }
-        //TODO: Action call statements should go here
 
         return null;
     }
@@ -790,7 +818,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.fieldAccess() != null){
             return ctx.fieldAccess().accept(this);
         }
-        //Todo: missing impl for action call
+        else if(ctx.actionCall() != null) {
+            return ctx.actionCall().accept(this);
+        }
+
         return null;
     }
 

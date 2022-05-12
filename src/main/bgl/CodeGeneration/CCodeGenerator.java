@@ -9,7 +9,9 @@ import SymbolTable.types.*;
 
 import static STDLIB.STDLIBC.*;         //C imports and defines
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Class for generating C code.
@@ -21,6 +23,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     Logger                      lo = new Logger();
     HashMap<String,String>      foreachDict = new HashMap<>();
 
+    public String               prototypes = "";
     public String               top = "";
 
     private int                 indent = 0;
@@ -38,16 +41,17 @@ public class CCodeGenerator implements ASTvisitor<String> {
                %s
                %s
                """.formatted(imports, defines);
+        //Everything in rules block gets put on top level in C code
+        n.rules.accept(this);
 
         userCode =
                 """
-                int main(int argc, char *argv[]) %s
+                int main(int argc, char *argv[]) 
+                %s
                 """.formatted(
                     n.setup.accept(this)
                 );
 
-        //Everything in rules block gets put on top level in C code
-        n.rules.accept(this);
 
         return (top + userCode);
     }
@@ -293,25 +297,16 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ActionDefinitionNode n) {
 
-        //Create string for formal parameters
-        String formalParams = "";
-        for (Declaration param : n.formalParameters) {
-            formalParams += param.accept(this) + ",";
-        }
-
-        //Remove trailing comma and semicolons
-        formalParams = formalParams.substring(0, formalParams.length() - 1);
-        formalParams = formalParams.replaceAll(";", "");
-
-        //Action are put on the top of the C code
+        //Actions are put on the top of the C code
         top += """
                %s %s(%s) %s
                """.formatted(
                 toCType(n.returnType),
                 n.name,
-                formalParams,
+                toCParams(n.formalParameters),
                 n.body.accept(this)
         );
+
         return "";
     }
 
@@ -322,21 +317,58 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    /**
+     * Action declarations writes a prototype at the top of the file
+     */
     public String visit(ActionDeclarationNode n) {
 
-        String formalParams = "";
-        for (Declaration param : n.formalParameters) {
-            formalParams += TAB.repeat(indent) + param.accept(this);
-        }
+        String actionDcl = "";
 
-        return (
+        actionDcl +=
                 """
                 %s (*%s)(%s);
                 """
-                ).formatted(
+                .formatted(
                 toCType(n.returnType),
                 n.name,
-                formalParams
+                toCParams(n.formalParameters)
+        );
+
+        //Add the action declaration as a prototype header
+        top += toCPrototype(n);
+
+        return actionDcl;
+    }
+
+    /**
+     * Converts a list of declarations to parameters
+     *
+     * Ex. int a; str b; list:int c -> "int a, char* b, int* c"
+     */
+    private String toCParams(List<Declaration> formalParams) {
+        //Create string for formal parameters
+        String params = "";
+        for (Declaration param : formalParams) {
+            params += param.accept(this) + ",";
+        }
+
+        //Remove trailing comma and semicolons
+        if (params.length() > 0) {
+            params = params.substring(0, params.length() - 1);
+            params = params.replaceAll(";", "");
+        }
+
+        return params;
+    }
+
+    private String toCPrototype(ActionDeclarationNode n) {
+
+        return """
+               %s %s(%s);
+               """.formatted(
+                toCType(n.returnType),
+                n.name,
+                toCParams(n.formalParameters)
         );
     }
 
@@ -646,7 +678,22 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ActionCallNode n) {
-        return null;
+
+        List<String> actualParams = new ArrayList<>();
+
+        n.actualParameters.forEach(param ->
+                actualParams.add((String) param.accept(this))
+        );
+
+        //Add a delimeter between the parameters
+        String formattedParams = String.join(",", actualParams);
+
+        return """
+               %s(%s)
+               """.formatted(
+               n.actionName, formattedParams
+        );
+
     }
 
     @Override
