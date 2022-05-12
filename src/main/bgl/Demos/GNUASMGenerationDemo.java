@@ -33,8 +33,14 @@ public class GNUASMGenerationDemo {
                     input(b);
                     print(b);
                 }
-                RULES{}
-                GAMELOOP{}
+                RULES{
+                    action fizz(int a){
+                        print("hej");
+                    }
+                }
+                GAMELOOP{
+                    fizz()
+                }
                 """;
 
 

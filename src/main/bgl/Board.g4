@@ -141,7 +141,7 @@ setupDeclaration
 rulesDeclaration
     : specialDeclaration
     | actionDefinition
-    | choiceDeclaration
+//  | choiceDeclaration
     ;
 
 designDeclaration
@@ -211,9 +211,9 @@ specialDeclaration
     : SPECIALDCL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
     ;
 
-choiceDeclaration
+/*choiceDeclaration
     : CHOICEDCL IDENTIFIER LPAREN IDENTIFIER IDENTIFIER RPAREN (COLON primitiveType)? rulesBlock //Should have a special choice block
-    ;
+    ;*/
 
 actionDeclaration
     : ACTIONDCL IDENTIFIER LPAREN (formalParameter)? RPAREN (COLON type)?
@@ -249,7 +249,7 @@ assignmentStatement
     | booleanAssigment EOL
     | stringAssigment EOL
     | dotAssignment EOL
-    | choiceAssignment
+//  | choiceAssignment
     | designAssignment EOL
     ;
 
@@ -268,12 +268,12 @@ stringAssigment
 dotAssignment
     : IDENTIFIER DOT IDENTIFIER ASSIGN (STR|INT|BOOL|IDENTIFIER)*
     ;
-
+/*
 choiceAssignment
     : (INT COLON)* LBRACE IDENTIFIER LPAREN (INT)* RPAREN RBRACE COMMA
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER COLON LBRACE print RBRACE EOL
-    ;
+    ;*/
 
 // Action assignment, function call and method call
 actionAssignment

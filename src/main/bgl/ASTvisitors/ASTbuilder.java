@@ -145,9 +145,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.specialDeclaration() != null) {
             throw new RuntimeException("Specials is not implemented in the current version");
         }
-        else if (ctx.choiceDeclaration() != null) {
-            throw new RuntimeException("Choice is not implemented in the current version");
-        }
         return null;
     }
 
@@ -206,11 +203,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitChoiceDeclaration(BoardParser.ChoiceDeclarationContext ctx) {
-        return null;
-    }
-
-    @Override
     public ASTNode visitActionDeclaration(BoardParser.ActionDeclarationContext ctx) {
         //Spawn new ActionDeclartionNode()
         //TODO: Implement
@@ -262,8 +254,8 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
+
         return null;
-        //TODO: Missing
     }
 
     @Override
@@ -338,10 +330,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return null;
     }
 
-    @Override
-    public ASTNode visitChoiceAssignment(BoardParser.ChoiceAssignmentContext ctx) {
-        return null;
-    }
+
 
     @Override
     public ASTNode visitActionAssignment(BoardParser.ActionAssignmentContext ctx) {

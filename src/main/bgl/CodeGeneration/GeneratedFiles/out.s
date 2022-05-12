@@ -11,6 +11,8 @@
 	.string	"%d"
 .LC4:
     .string	"%s\n"
+.LC5:
+    .string	"hej\n"
 .text
 .type	main, @function
 main:
@@ -64,6 +66,34 @@ mov	BYTE PTR -8[rbp], -1
 	.long	 1f - 0f
 	.long	 4f - 1f
 	.long	 5
+		.section	.rodata
+	.text
+	.globl	fizz
+	.type	fizz, @function
+fizz:
+.LFB8:
+	.cfi_startproc
+	endbr64
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+        mov	esi, eax    
+
+    lea	rdi, .LC5[rip]
+	mov	eax, 0
+	call printf@PLT
+
+	call 	puts@PLT
+	nop
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE8:
+	.size	fizz, .-fizz
+
 0:
 	.string	 "GNU"
 1:
