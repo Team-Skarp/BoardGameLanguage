@@ -60,8 +60,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitGameloopBlock(BoardParser.GameloopBlockContext ctx) {
-        ctx.children.forEach(c->lo.g(c.getText()));
-        lo.g(ctx.children.get(1));
         List<ASTNode> children = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {
@@ -92,7 +90,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitNormalBlock(BoardParser.NormalBlockContext ctx) {
-        lo.g(ctx.children);
         List<ASTNode> children = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {
@@ -163,13 +160,39 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         return new NonScopeBlockNode(children.toArray(new ASTNode[0]));
     }
 
+    /**
+     * Visit a parse tree produced by {@link BoardParser#designBlock}.
+     *
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    @Override
+    public ASTNode visitDesignBlock(BoardParser.DesignBlockContext ctx) {
+        return null;
+    }
+
     @Override
     public ASTNode visitDesignDeclaration(BoardParser.DesignDeclarationContext ctx) {
+
+        if (ctx.ASSIGN() != null) {
+            List<String> childNodes = new ArrayList<>();
+            for (ParseTree child : ctx.designBlock()) {
+                //System.out.println("DesignBlock ->" + child.getText());
+                childNodes.add(child.getText());
+            }
+
+            System.out.println("DesignBlocks " + childNodes);
+
+            return new DesignDeclarationNode(
+                    ctx.IDENTIFIER(0).getText(),
+                    ctx.IDENTIFIER(1).getText(),
+                    childNodes
+            );
+        }
         return new DesignDeclarationNode(
                 ctx.IDENTIFIER(0).getText(),
                 ctx.IDENTIFIER(1).getText()
         );
-
     }
 
     @Override
@@ -231,7 +254,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionDefinition(BoardParser.ActionDefinitionContext ctx) {
-        lo.g("actiondefinition");
 
         //For each formal parameter create declaration
         List<Declaration> formalParameters = new ArrayList<>();
@@ -275,7 +297,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
-        lo.g("actioncall");
         List<Expression> actualParams = new ArrayList<>();
 
         ctx.expression().forEach(expressionContext ->
@@ -388,11 +409,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                         new IntNode(Integer.parseInt(ctx.INT().getText())));
             }
         }
-        return null;
-    }
-
-    @Override
-    public ASTNode visitDesignAssignment(BoardParser.DesignAssignmentContext ctx) {
         return null;
     }
 

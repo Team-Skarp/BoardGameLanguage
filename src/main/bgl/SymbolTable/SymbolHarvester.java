@@ -14,7 +14,7 @@ import java.util.List;
 public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     SymbolTable ST;
-    TypeEnvironment TENV;
+    public TypeEnvironment TENV;
     TypeChecker TC;
 
     public SymbolHarvester() {

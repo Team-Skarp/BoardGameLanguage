@@ -8,7 +8,7 @@
 .LC1:
     .string	"false"
 .LC2:
-    .string	"hej\n"
+    .string	"%d\n"
 .text
 .type	main, @function
 main:
@@ -21,8 +21,16 @@ main:
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
 	sub	rsp, 16
-	mov	DWORD PTR -20[rbp], edi
- 	mov	QWORD PTR -32[rbp], rsi
+	mov	DWORD PTR -28[rbp], edi
+ 	mov	QWORD PTR -40[rbp], rsi
+    mov	DWORD PTR -8[rbp], 50
+.GAMELOOP:
+	push DWORD PTR -8[rbp]
+
+	call fizzbuzz
+	mov	eax, 0
+
+jmp .GAMELOOP
   	leave
  	mov	eax, 0
 	.cfi_def_cfa 7, 8
@@ -39,9 +47,9 @@ main:
 	.long	 5
 		.section	.rodata
 	.text
-	.globl	fizz
-	.type	fizz, @function
-fizz:
+	.globl	fizzbuzz
+	.type	fizzbuzz, @function
+fizzbuzz:
 .LFB8:
 	.cfi_startproc
 	endbr64
@@ -50,7 +58,14 @@ fizz:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-        mov	esi, eax    
+	    mov	DWORD PTR -12[rbp], 0
+
+mov eax, DWORD PTR 16[rbp]
+mov	DWORD PTR -12[rbp],  eax
+
+        mov eax, DWORD PTR -null[rbp]
+    mov	esi, eax
+    
 
     lea	rdi, .LC2[rip]
 	mov	eax, 0
@@ -63,7 +78,7 @@ fizz:
 	ret
 	.cfi_endproc
 .LFE8:
-	.size	fizz, .-fizz
+	.size	fizzbuzz, .-fizzbuzz
 
 0:
 	.string	 "GNU"

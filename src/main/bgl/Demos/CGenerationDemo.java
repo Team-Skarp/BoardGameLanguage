@@ -66,7 +66,7 @@ public class CGenerationDemo {
         SymbolTable ST = (SymbolTable) ast.accept(SH);
 
         // C - code generation
-        CCodeGenerator generator = new CCodeGenerator(ST);
+        CCodeGenerator generator = new CCodeGenerator(ST, SH.TENV);
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);

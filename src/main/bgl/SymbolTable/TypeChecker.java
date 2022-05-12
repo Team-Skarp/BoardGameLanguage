@@ -133,7 +133,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     public TypeDenoter visit(DesignDeclarationNode n) {
 
         //Check that the type is actually in the type environment
-        return TENV.receiveType(n.ref);
+        return TENV.receiveType(n.dName);
     }
 
     @Override

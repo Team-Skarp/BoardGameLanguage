@@ -143,8 +143,14 @@ rulesDeclaration
 //  | choiceDeclaration
     ;
 
+designBlock
+    : LBRACE ((INT | BOOL | STR) | ((INT | BOOL | STR) COMMA))* RBRACE // Nested Desgin Decl
+    | (INT | BOOL | STR | IDENTIFIER)                                               // Normal Prim in Decl
+    ;
+
 designDeclaration
     : IDENTIFIER IDENTIFIER
+    | IDENTIFIER IDENTIFIER ASSIGN LBRACE designBlock (COMMA designBlock)* RBRACE
     ;
 
 //Design declerations should only appear in SETUP block
@@ -249,7 +255,6 @@ assignmentStatement
     | stringAssigment EOL
     | dotAssignment EOL
 //  | choiceAssignment
-    | designAssignment EOL
     ;
 
 intAssigment
@@ -273,14 +278,6 @@ choiceAssignment
     | IDENTIFIER LPAREN (IDENTIFIER | COMMA)* RPAREN
     | IDENTIFIER COLON LBRACE print RBRACE EOL
     ;*/
-
-// Design assignment,
-designAssignment
-    : IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE
-    | IDENTIFIER IDENTIFIER ASSIGN LBRACE ( INT | STR | BOOL | IDENTIFIER ) (COMMA ( INT | STR | BOOL | IDENTIFIER ))* RBRACE
-    | IDENTIFIER IDENTIFIER ASSIGN LBRACE LBRACE ( INT | STR | BOOL | IDENTIFIER ) RBRACE (COMMA ( INT | STR | BOOL ))* RBRACE
-    ;
-
 
 // Special body's
 designBody

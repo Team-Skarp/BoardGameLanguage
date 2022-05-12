@@ -40,7 +40,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     //indicates how many LC parts there has been. L is places you commonly jmp to
     int LAmount = 2;
     //creates a hashmap between a symbol from the symbol table and its pointer for assembly
-    HashMap<Integer,Integer> ptrTable = new HashMap<Integer, Integer>();
+    HashMap<Integer,Object> ptrTable = new HashMap<Integer, Object>();
     //hashtable for conditional statements, such that no dangling else problems arise
     HashMap<Integer,Integer> condTable = new HashMap<Integer, Integer>();
     //Hashtable for strings, used in conjunction with ptrtable, e.g. str a -> 32 -> "hej"
@@ -72,8 +72,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                         """;
                 String str = n.setup.accept(this)+"";
                 str += n.rules.accept(this);
-                str+= n.gameloop.accept(this);
-
+                str+= """
+                        .GAMELOOP:
+                        %s
+                        jmp .GAMELOOP
+                        """.formatted(n.gameloop.accept(this));
                 footer = """
                   	leave
                  	mov	eax, 0
@@ -712,15 +715,29 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override //Actions are functions
     public String visit(ActionDefinitionNode n) {
-
+        ST.dive();
         //TODO: switch depending on return type
         //TODO: insert formalparameters if they exist
-        System.out.println(n.returnType+"\n"+n.name+"\n"+n.formalParameters+"\n"+n.body.children);
+        //TODO: returntype
+        lo.g(n.returnType+"\n"+n.name+"\n"+n.formalParameters+"\n"+n.body.children);
         String functionBlock = "";
         for (ASTNode child: n.body.children){
             functionBlock+=child.accept(this);
         }
         functionCounter++;
+        int stackPtr = 16;
+        String formalParameters = "";
+        for(ASTNode child: n.formalParameters){
+            String variable = (String)child.accept(this);
+            String varSpliced = variable.substring(4,variable.length()-2);
+            lo.g(variable);
+            formalParameters += """
+                    %s
+                    mov eax, DWORD PTR %d[rbp]
+                    %s eax
+                    """.formatted(variable,stackPtr,varSpliced);
+            stackPtr+=8;
+        }
         functions += """
                 	.section	.rodata
                 	.text
@@ -735,6 +752,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 	.cfi_offset 6, -16
                 	mov	rbp, rsp	#,
                 	.cfi_def_cfa_register 6
+                	%s
                     %s
                 	call 	puts@PLT
                 	nop	
@@ -744,8 +762,8 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 	.cfi_endproc
                 .LFE%d:                          
                 	.size	%s, .-%s        
-                """.formatted(n.name,n.name,n.name,functionCounter,functionBlock,functionCounter,n.name,n.name);
-
+                """.formatted(n.name,n.name,n.name,functionCounter,formalParameters,functionBlock,functionCounter,n.name,n.name);
+        ST.climb();
         return "";
     }
 
@@ -784,9 +802,10 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
         ptr = pointerOffset-16;
         String str = "";
         if(n.value == null){
-            str+= """
+            str +="""
                         mov	DWORD PTR -%d[rbp], 0
                     """.formatted(ptr);
+            ptrTable.put(ptr,n.name);
         }
         else if(((String)n.value.accept(this)).contains("DWORD")){
             str+= """
@@ -1145,9 +1164,21 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ActionCallNode n) {
-        lo.g("asdads");
-        System.out.println("action call "+n.actionName+n.actualParameters);
-        return null;
+        //TODO: parameters
+        String parameters = """
+                """;
+        n.actualParameters.forEach(c->lo.g(c.accept(this)));
+        for(ASTNode parameter: n.actualParameters){
+            parameters+= """
+                    push %s
+                    """.formatted(parameter.accept(this));
+        }
+        String str = """
+                	%s
+                	call %s	
+                	mov	eax, 0
+                """.formatted(parameters,n.actionName);
+        return str;
     }
 
     @Override
