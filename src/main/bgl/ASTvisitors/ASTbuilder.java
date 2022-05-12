@@ -313,13 +313,19 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
+        //TODO: Implement
+        //a.b.foo().b
+        //ctx.children.forEach(
+
+        //);
+
         if (ctx.IDENTIFIER() != null) {
             List<String> fieldIds = new ArrayList<>();
 
             for (int i = 0; i < ctx.children.size(); i++) {
                 fieldIds.add(ctx.getChild(i).getText());
             }
-            return new FieldAccessNode(fieldIds);
+            return new FieldAccessNode(List.of(new IdNode("a")));
         } else {
             return null;
         }

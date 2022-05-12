@@ -37,6 +37,6 @@ class DesignDeclarationNodeTest {
     void type() {
         designDcl = new DesignDeclarationNode(designRef.name, "Tile");
 
-        //assertEquals(designRef.toString(), designDcl.ref);
+        designDcl.type();
     }
 }

@@ -31,23 +31,23 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                    design Piece {
-                        int speed;
-                        str owner;
-                    }
-                    
-                    design GhostPiece from Piece {
-                        bool floating;
-                    }
-                    
-                    Piece test;
-                    Piece pot = {10, "skarp"};
-                    GhostPiece wee = {pot, true};
-                    GhostPiece boo = {{10, "skarp"}, true};
+                   int a;
+                   
                 }
                 RULES {
+                    action foo(int a) {
+                        print("Foo");
+                    }
+                    action bar() {
+                        print("Goo");
+                    }
+                    action goo() {
+                        print("Too");
+                    }
                 }
                 GAMELOOP {
+                    foo(a);
+                    print(a);
                 }
                 """;
 
