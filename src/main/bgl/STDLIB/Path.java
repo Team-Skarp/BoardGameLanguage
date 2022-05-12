@@ -37,14 +37,6 @@ public class Path implements PredefinedDesign {
                         "str",
                         "direction"
                 ),
-                new DesignDeclarationNode(
-                        "Path",
-                        "next"
-                ),
-                new DesignDeclarationNode(
-                        "Path",
-                        "prev"
-                ),
                 new ActionDeclarationNode(
                         "getNext",
                         new PathType("") // TODO: ask jakob about string param

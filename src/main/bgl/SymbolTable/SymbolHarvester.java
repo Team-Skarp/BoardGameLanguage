@@ -17,9 +17,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public TypeEnvironment TENV;
     TypeChecker TC;
 
+    // Blank SymbolHarvester
     public SymbolHarvester() {
         this.ST = new SymbolTable();
         this.TENV = new TypeEnvironment();
+    }
+
+    // Received after precompiling BGL standard library
+    public SymbolHarvester(SymbolTable ST, TypeEnvironment TENV) {
+        this.ST = ST;
+        this.TENV = TENV;
     }
 
     @Override

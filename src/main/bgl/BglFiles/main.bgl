@@ -1,0 +1,18 @@
+SETUP {
+    design GhostPiece from Piece {
+        bool floating;
+    }
+
+    Piece test;
+    Piece pot = {10, "skarp"};
+    GhostPiece wee = {pot, true};
+    GhostPiece boo = {{10, "skarp"}, true};
+}
+
+RULES {
+
+}
+
+GAMELOOP {
+
+}
