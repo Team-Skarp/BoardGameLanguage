@@ -31,23 +31,34 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                   int a;
                    
+                   design Animal {
+                        action eat();
+                   }
+                   
+                   design Dog {
+                        Animal parrent;
+                        action bark();
+                        action woof();
+                   }
+                   
+                   Dog bulldog;
+                   
+                   bulldog.parrent.eat();
                 }
                 RULES {
-                    action foo(int a) {
-                        print("Foo");
+                    action eat() {
+                        print("eat!");
                     }
-                    action bar() {
-                        print("Goo");
+                    action bark() {
+                        print("bark!");
                     }
-                    action goo() {
-                        print("Too");
+                    action woof() {
+                        print("woof!");
                     }
                 }
                 GAMELOOP {
-                    foo(a);
-                    print(a);
+                    
                 }
                 """;
 

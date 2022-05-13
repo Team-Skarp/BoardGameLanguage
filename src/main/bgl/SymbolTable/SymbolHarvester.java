@@ -323,7 +323,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
         Symbol sym = new Symbol(
                 n.name,
-                new DesignRef(n.name));
+                new DesignRef(n.dName));
 
         ST.enterSymbol(sym);
         return ST;

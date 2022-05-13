@@ -4,6 +4,7 @@ import ASTnodes.*;
 import SymbolTable.TypeErrorException;
 import antlr.BoardParser;
 import antlr.BoardVisitor;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -314,21 +315,22 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
         //TODO: Implement
-        //a.b.foo().b
-        //ctx.children.forEach(
-
-        //);
-
-        if (ctx.IDENTIFIER() != null) {
-            List<String> fieldIds = new ArrayList<>();
-
-            for (int i = 0; i < ctx.children.size(); i++) {
-                fieldIds.add(ctx.getChild(i).getText());
+        int idX = 0;
+        int acX = 0;
+        List<Accessable> accessors = new ArrayList<>();
+        for (ParseTree node : ctx.children) {
+            if (node instanceof TerminalNode T) {
+                if (T.equals(ctx.IDENTIFIER(idX))) {
+                    accessors.add(new IdNode(ctx.IDENTIFIER(idX).getText()));
+                    idX++;
+                }
             }
-            return new FieldAccessNode(List.of(new IdNode("a")));
-        } else {
-            return null;
+            else {
+                accessors.add((Accessable) ctx.actionCall(acX).accept(this));
+                acX++;
+            }
         }
+        return new FieldAccessNode(accessors);
     }
 
     @Override

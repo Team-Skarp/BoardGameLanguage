@@ -5,6 +5,7 @@ import STDLIB.Tile;
 import SymbolTable.TypeEnvironment;
 import SymbolTable.SymbolHarvester;
 import SymbolTable.SymbolTable;
+import SymbolTable.Symbol;
 import SymbolTable.types.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -147,5 +148,59 @@ class CCodeGeneratorTest {
         //String actual = generator.top;
 
         //assertEquals(expected, actual);
+    }
+
+    /**
+     * Tests the code:
+     * design Dog {
+     *     action woof();
+     * }
+     * Dog bulldog;
+     */
+    @Test
+    public void generatesCCodeForDesignAction() {
+        SymbolTable ST = new SymbolTable();
+        TENV = new TypeEnvironment();
+
+        TENV.enterType(
+                new DesignType(
+                        "Dog",
+                        new SymbolTable().enterSymbol(
+                                new Symbol(
+                                        "woof",
+                                        new ActionType(
+                                                new VoidType()
+                                        )
+                                )
+                        )
+                )
+        );
+
+        ST.enterSymbol(
+                new Symbol(
+                        "bulldog",
+                        new DesignRef("Dog")
+                )
+        );
+
+        DesignDeclarationNode bulldog = new DesignDeclarationNode(
+                "Dog",
+                "bulldog"
+        );
+
+        //When code generator visits tile node
+        generator = new CCodeGenerator(ST, TENV);
+        generator.visit(bulldog);
+
+        String actual = generator.visit(bulldog);
+
+        //Expect C struct that works
+        String expected =
+                """
+                Dog bulldog;
+                bulldog.woof = &woof;
+                """;
+
+        assertEquals(expected, actual);
     }
 }

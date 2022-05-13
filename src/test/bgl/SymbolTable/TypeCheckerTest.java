@@ -253,7 +253,6 @@ public class TypeCheckerTest {
                 )
         );
 
-
         ST.enterSymbol(new Symbol("a", new DesignRef("A")));
 
         IntegerDeclarationNode i = new IntegerDeclarationNode(
