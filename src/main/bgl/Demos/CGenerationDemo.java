@@ -32,22 +32,12 @@ public class CGenerationDemo {
                 """
                 SETUP {
                    int a;
-                   
+                   list:int intList = [1,2,3];
                 }
                 RULES {
-                    action foo(int a) {
-                        print("Foo");
-                    }
-                    action bar() {
-                        print("Goo");
-                    }
-                    action goo() {
-                        print("Too");
-                    }
+                   
                 }
                 GAMELOOP {
-                    foo(a);
-                    print(a);
                 }
                 """;
 

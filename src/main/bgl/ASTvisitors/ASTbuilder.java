@@ -414,6 +414,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitListDeclaration(BoardParser.ListDeclarationContext ctx) {
+
         if (ctx.ASSIGN() != null) {
             List<ASTNode> elementNodes = new ArrayList<>();
 
@@ -422,12 +423,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
             //list:int = [1,2,3]
             return new ListDeclarationNode(
-                    ctx.IDENTIFIER().getText(),
-                    getType(ctx.type()),
-                    elementNodes);
+                    ctx.IDENTIFIER().getText(), getListType(ctx.listType()), elementNodes);
         }
         else if (ctx.IDENTIFIER() != null){
-            return new ListDeclarationNode(ctx.IDENTIFIER().getText(), getType(ctx.type()));
+            return new ListDeclarationNode(ctx.IDENTIFIER().getText(), getListType(ctx.listType()));
         }
         return null;
     }
