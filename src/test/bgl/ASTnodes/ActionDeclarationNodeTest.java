@@ -21,7 +21,7 @@ class ActionDeclarationNodeTest {
         TENV = new TypeEnvironment();
         fooType = new ActionType(new IntType(), new IntegerDeclarationNode("Dice"));
         fooDcl = new ActionDeclarationNode("piece", fooType,
-                new ListDeclarationNode(new IntType(), "redPieces"),
+                new ListDeclarationNode("redPieces", new IntType()),
                 new IntegerDeclarationNode("piece"),
                 new StringDeclarationNode("tile"),
                 new BooleanDeclarationNode("allowed"));

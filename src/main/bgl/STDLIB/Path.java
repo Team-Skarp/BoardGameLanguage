@@ -33,17 +33,8 @@ public class Path implements PredefinedDesign {
                         "Tile",
                         "tile"
                 ),
-                new DesignDeclarationNode(
-                        "str",
+                new StringDeclarationNode(
                         "direction"
-                ),
-                new DesignDeclarationNode(
-                        "Path",
-                        "next"
-                ),
-                new DesignDeclarationNode(
-                        "Path",
-                        "prev"
                 ),
                 new ActionDeclarationNode(
                         "getNext",

@@ -29,15 +29,44 @@ public class GNUASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    int i = 50;
+                    str player1 = "Hans";
+                    int player1attack = 1;
+                    int player1health = 10000;
+                    int decision = 1;
+                    str player2 = "Jakob";
+                    int player2attack = 1;
+                    int player2health = 10000;
+                    print("Welcome to the greatest game ever!");
                 }
                 RULES {
-                    action fizzbuzz(int a) {
-                        print(a);
-                    }
                 }
                 GAMELOOP {
-                    fizzbuzz(i);
+                    print("It is ",player1," turn");
+                    print("enter 1 to double your attackpower, or type 0 to expend your attackpower to attack");
+                    input(decision);
+                    if(decision == 1){
+                        print("Doubled your attack!");
+                        player1attack = player1attack*2;
+                    }else{
+                        print("Attacked!");
+                        player2health = player2health-player1attack;
+                        player1attack = 1;
+                    }
+                    print(player1,", health: ",player1health ,", attack: ",player1attack);
+                    print(player2,", health: ",player2health ,", attack: ",player2attack);
+                    print("It is ",player2," turn");
+                    input(decision);
+                    if(decision == 1){
+                        print("Doubled your attack!");
+                        player2attack = player2attack*2;
+                    }else{
+                        print("Attacked!");
+                        player1health = player1health-player2attack;
+                        player2attack = 1;
+                    }
+                    if(player2health <= 0){print("You winn!"); input(decision);}
+                    if(player1health <= 0){print("You winn!"); input(decision);}
+
                 }
                 """;
 
