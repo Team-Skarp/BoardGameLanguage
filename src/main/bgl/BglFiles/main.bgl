@@ -1,0 +1,22 @@
+SETUP {
+    design GhostPiece from Piece {
+        bool floating;
+    }
+
+    str hello = "world";
+
+    Piece test;
+    Piece pot = {10, "skarp"};
+    GhostPiece wee = {pot, true};
+    GhostPiece boo = {{10, "skarp"}, true};
+}
+
+RULES {
+
+}
+
+GAMELOOP {
+    foreach(a in hello) {
+        print(a);
+    }
+}

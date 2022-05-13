@@ -4,14 +4,23 @@ import ASTvisitors.ASTvisitor;
 import SymbolTable.types.ListType;
 import SymbolTable.types.TypeDenoter;
 
+import java.util.List;
+
 public class ListDeclarationNode implements ASTNode<Object>, Declaration {
 
     public String name;
     public TypeDenoter elementType;
+    public List<ASTNode> children;
 
-    public ListDeclarationNode(TypeDenoter elementType, String name) {
-        this.elementType = elementType;
+    public ListDeclarationNode(String name, TypeDenoter elementType) {
         this.name = name;
+        this.elementType = elementType;
+    }
+
+    public ListDeclarationNode(String name, TypeDenoter elementType, List<ASTNode> children) {
+        this.name = name;
+        this.elementType = elementType;
+        this.children = children;
     }
 
     @Override

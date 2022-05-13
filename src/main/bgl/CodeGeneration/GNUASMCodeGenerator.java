@@ -1177,4 +1177,9 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     public String visit(FieldAccessNode n) {
         return null;
     }
+
+    @Override
+    public String visit(ListElementNode n) {
+        return null;
+    }
 }

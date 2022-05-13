@@ -17,9 +17,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public TypeEnvironment TENV;
     TypeChecker TC;
 
+    // Blank SymbolHarvester
     public SymbolHarvester() {
         this.ST = new SymbolTable();
         this.TENV = new TypeEnvironment();
+    }
+
+    // Received after precompiling BGL standard library
+    public SymbolHarvester(SymbolTable ST, TypeEnvironment TENV) {
+        this.ST = ST;
+        this.TENV = TENV;
     }
 
     @Override
@@ -192,21 +199,27 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(StringAssignmentNode n) {
+        // no type check required since grammar rule enforces correct type
+        // we only even get a StringAssignmentNode if right side is a string literal
+        // limitation: function calls returning a string not allowed in grammar
         return ST;
     }
 
     @Override
     public SymbolTable visit(IntegerAssignmentNode n) {
+        n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanAssignmentNode n) {
+        n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(DotAssignmentNode n) {
+        n.accept(TC);
         return ST;
     }
 
@@ -331,7 +344,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ListDeclarationNode n) {
-        return null;
+        return ST;
     } //Todo: implement?
 
     @Override
@@ -559,6 +572,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
 
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ListElementNode n) {
         return ST;
     }
 }

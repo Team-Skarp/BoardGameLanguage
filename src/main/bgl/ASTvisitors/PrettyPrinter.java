@@ -426,6 +426,7 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
     @Override
     public Void visit(ListDeclarationNode n) {
+
         return null;
     }
 
@@ -696,6 +697,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
 
         indent--;
 
+        return null;
+    }
+
+    @Override
+    public Void visit(ListElementNode n) {
         return null;
     }
 

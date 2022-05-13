@@ -6,6 +6,7 @@ import ASTvisitors.ASTvisitor;
 import org.junit.Test;
 import SymbolTable.types.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -180,11 +181,7 @@ public class TypeCheckerTest {
         BooleanAssignmentNode assignmentNode = new BooleanAssignmentNode(new IdNode("i").name,
           new BooleanNode(true));
 
-        // ST.openScope();
         ST.enterSymbol(new Symbol("i", new IntType()));
-        // ST.climb();
-        // ST.closeScope();
-        // ST.dive();
         TC = new TypeChecker(ST, TENV);
 
         assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
@@ -197,11 +194,7 @@ public class TypeCheckerTest {
         IntegerAssignmentNode assignmentNode = new IntegerAssignmentNode(new IdNode("i"),
                 new IntNode(8));
 
-        // ST.openScope();
         ST.enterSymbol(new Symbol("i", new StringType()));
-        // ST.climb();
-        // ST.closeScope();
-        // ST.dive();
         TC = new TypeChecker(ST, TENV);
 
         assertThrows(TypeErrorException.class, () -> TC.visit(assignmentNode));
@@ -233,7 +226,7 @@ public class TypeCheckerTest {
      * A a;
      * int i = a.b.c;
      */
-    public void IntDeclarationAssignOfFieldAccessNodeValue() {
+    public void intDeclarationAssignOfFieldAccessNodeValue() {
         ST = new SymbolTable();
         TENV = new TypeEnvironment();
 
@@ -317,5 +310,21 @@ public class TypeCheckerTest {
         TC = new TypeChecker(ST, TENV);
 
         assertEquals(IntType.class, TC.visit(i).getClass());
+    }
+
+    @Test
+    public void throwsExceptionWhenElementTypeDoesNotMatchListType() {
+        ST = new SymbolTable();
+
+        List<ASTNode> elementNodes = new ArrayList<>();
+        elementNodes.add(new IntNode(1));
+        elementNodes.add(new IntNode(4));
+
+        ListDeclarationNode listNode = new ListDeclarationNode("TestNode", new BoolType(), elementNodes);
+
+        TC = new TypeChecker(ST, TENV);
+
+        assertThrows(TypeErrorException.class, ()-> TC.visit(listNode));
+
     }
 }
