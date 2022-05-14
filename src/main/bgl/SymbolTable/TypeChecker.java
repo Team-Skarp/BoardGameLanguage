@@ -5,7 +5,9 @@ import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class used to type check any given node in the AST. The class needs a symbol table in order
@@ -137,17 +139,32 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     public TypeDenoter visit(ListDeclarationNode n) {
 
         List<TypeDenoter> actualTypesOfElementNodes = new ArrayList<>();
-        if (n.children != null) {
-            for (ASTNode child : n.children) {
-                System.out.println(child.accept(this));
+
+        if (n.assignedList != null) {
+            for (ASTNode child : n.assignedList.children) {
+
                 actualTypesOfElementNodes.add((TypeDenoter) child.accept(this));
             }
 
+            System.out.println(Arrays.toString(actualTypesOfElementNodes.toArray()));
+
             for (TypeDenoter actualTypesOfElementNode : actualTypesOfElementNodes) {
-                if (actualTypesOfElementNode.getClass() != n.elementType.getClass()) {
-                    throw new TypeErrorException(
-                            "Element of type %s does not match list of type %s".
-                                    formatted(actualTypesOfElementNode, n.elementType));
+                if (true) {
+                    if ((!Objects.equals(actualTypesOfElementNode.toString(), n.elementType.toString()))) {
+                        //System.out.println("left: " + n.elementType.getClass() + " right: " + actualTypesOfElementNode.getClass());
+                        System.out.println("YIKES! " + n.elementType + " != " + actualTypesOfElementNode);
+                        throw new TypeErrorException(
+                                "Element of type %s does not match list of type %s".
+                                        formatted(actualTypesOfElementNode, n.elementType));
+                    }
+
+                    /* didn't catch incorrectly nested lists because classes were both ListType //Todo: gardening
+                    if (actualTypesOfElementNode.getClass() != n.elementType.getClass()) {
+                        throw new TypeErrorException(
+                                "Element of type %s does not match list of type %s".
+                                        formatted(actualTypesOfElementNode, n.elementType));
+                    }
+                     */
                 }
             }
         }
@@ -155,7 +172,12 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         return n.elementType;
     }
 
-    // [ [1,2] , [true, false, 1] ]
+    @Override
+    public TypeDenoter visit(ListNode n) {
+        // should probably compare all children
+        return new ListType(new ListNodeType((TypeDenoter) n.children.get(0).accept(this)));
+    }
+
     @Override
     public TypeDenoter visit(ListElementNode n) {
 

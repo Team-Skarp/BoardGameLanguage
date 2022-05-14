@@ -2,13 +2,14 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ListElementNode implements ASTNode<Object>{
+public class ListNode implements ASTNode<Object>{
 
     public List<ASTNode> children;
 
-    public ListElementNode(List<ASTNode> children) {
+    public ListNode(List<ASTNode> children) {
         this.children = children;
     }
 

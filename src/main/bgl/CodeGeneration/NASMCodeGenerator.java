@@ -354,4 +354,9 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
     public String visit(ListElementNode n) {
         return null;
     }
+
+    @Override
+    public String visit(ListNode n) {
+        return null;
+    }
 }
