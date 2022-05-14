@@ -2,7 +2,6 @@ package ASTvisitors;
 
 import ASTnodes.*;
 import Logging.Logger;
-import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * Class for printing out an AST tree
@@ -428,8 +427,8 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     @Override
     public Void visit(ListDeclarationNode n) {
 
-        if (n.assignedList != null && n.assignedList.children != null) {
-            for (ASTNode element : n.assignedList.children) {
+        if (n.assignedList != null && n.assignedList.elements != null) {
+            for (ASTNode element : n.assignedList.elements) {
                 element.accept(this);
             }
         }

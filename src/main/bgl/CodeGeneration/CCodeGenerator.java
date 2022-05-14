@@ -8,8 +8,6 @@ import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
-import static STDLIB.STDLIBC.*;         //C imports and defines
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -500,11 +498,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
             //System.out.println("IN LIST DECL NODE ELSE PART");
             StringBuilder rightSide = new StringBuilder();
             rightSide.append("[");
-            for (ASTNode child: n.assignedList.children) {
+            for (ASTNode child: n.assignedList.elements) {
                 rightSide.append(child.accept(this));
                 rightSide.append(", ");
             }
-            if (!n.assignedList.children.isEmpty()) {
+            if (!n.assignedList.elements.isEmpty()) {
                 rightSide.deleteCharAt(rightSide.length()-1);
                 rightSide.deleteCharAt(rightSide.length()-1);
             }
@@ -528,11 +526,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
         //System.out.println("IN LIST NODE");
         StringBuilder str = new StringBuilder();
         str.append("[");
-        for (ASTNode elementNode: n.children) {
+        for (ASTNode elementNode: n.elements) {
             str.append(elementNode.accept(this));
             str.append(", ");
         }
-        if (!n.children.isEmpty()) {
+        if (!n.elements.isEmpty()) {
             str.deleteCharAt(str.length()-1);
             str.deleteCharAt(str.length()-1);
         }

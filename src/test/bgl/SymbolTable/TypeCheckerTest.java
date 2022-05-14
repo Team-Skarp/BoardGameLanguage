@@ -3,7 +3,6 @@ package SymbolTable;
 import ASTnodes.*;
 
 import ASTvisitors.ASTbuilder;
-import ASTvisitors.ASTvisitor;
 import org.junit.Test;
 import SymbolTable.types.*;
 
@@ -317,8 +316,8 @@ public class TypeCheckerTest {
         ST = new SymbolTable();
 
         ListNode assignedList = new ListNode(new ArrayList<>());
-        assignedList.children.add(new IntNode(1));
-        assignedList.children.add(new IntNode(4));
+        assignedList.elements.add(new IntNode(1));
+        assignedList.elements.add(new IntNode(4));
 
         ListDeclarationNode listNode = new ListDeclarationNode("TestNode", new BoolType(), assignedList);
 

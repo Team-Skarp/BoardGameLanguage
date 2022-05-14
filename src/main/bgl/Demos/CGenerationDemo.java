@@ -44,6 +44,14 @@ public class CGenerationDemo {
                         list:int theIntList1;
                    }
                    
+                   Animal ape;
+                   Dog poodle;
+                   Dog pug;
+                   
+                   list:list:list:Dog poodleList = [ [], [[poodle, poodle], []], [[poodle, poodle]]  ];
+                   
+                   list:Dog pugList = [[[]]];
+		   
                    list:int theIntList2 = [10, 20, 30];
                    
                    list:bool theBoolList = [true, false, true];
@@ -56,7 +64,24 @@ public class CGenerationDemo {
                    
                    print("but it's still not enough!");
                    
-                   list:list:list:list:int theQuadrix = [[[[1,2],[3,4],[5,6]],[[7,8],[9,10],[11,12]]],[[[13,14],[15,16],[17,8]],[[19,20],[21,22],[23,24]]]];
+                   list:list:list:list:int theQuadrix = [
+                                                            [
+                                                                [
+                                                                    [1,2],[3,4]
+                                                                ],
+                                                                [
+                                                                    [5,6],[7,8]
+                                                                ]
+                                                            ],
+                                                            [
+                                                                [
+                                                                    [9,10],[11,12]
+                                                                ],
+                                                                [
+                                                                    [13,14],[15,16]
+                                                                ]
+                                                            ]
+                                                        ];
                    
                    Dog bulldog;
                    
@@ -77,6 +102,7 @@ public class CGenerationDemo {
                     
                 }
                 """;
+
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);

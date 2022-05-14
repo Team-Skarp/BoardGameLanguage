@@ -5,7 +5,6 @@ import ASTvisitors.ASTvisitor;
 import SymbolTable.types.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -140,22 +139,25 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         List<TypeDenoter> actualTypesOfElementNodes = new ArrayList<>();
 
+        // Collect all the types of the list elements
         if (n.assignedList != null) {
-            for (ASTNode child : n.assignedList.children) {
+            for (ASTNode listElementNode : n.assignedList.elements) {
 
-                actualTypesOfElementNodes.add((TypeDenoter) child.accept(this));
+                actualTypesOfElementNodes.add((TypeDenoter) listElementNode.accept(this));
             }
 
-            System.out.println(Arrays.toString(actualTypesOfElementNodes.toArray()));
+            //System.out.println(Arrays.toString(actualTypesOfElementNodes.toArray()));
 
-            for (TypeDenoter actualTypesOfElementNode : actualTypesOfElementNodes) {
-                if (true) {
-                    if ((!Objects.equals(actualTypesOfElementNode.toString(), n.elementType.toString()))) {
+            for (TypeDenoter actualTypeOfElementNode : actualTypesOfElementNodes) {
+                // To allow empty lists, we skip the check if their type ends with null
+                if (!actualTypeOfElementNode.toString().endsWith("null")) {
+                    System.out.println("actualTypeOfElementNode = " + actualTypeOfElementNode);
+                    if ((!Objects.equals(actualTypeOfElementNode.toString(), n.elementType.toString()))) {
                         //System.out.println("left: " + n.elementType.getClass() + " right: " + actualTypesOfElementNode.getClass());
-                        System.out.println("YIKES! " + n.elementType + " != " + actualTypesOfElementNode);
+                        System.out.println("YIKES! " + n.elementType + " != " + actualTypeOfElementNode);
                         throw new TypeErrorException(
                                 "Element of type %s does not match list of type %s".
-                                        formatted(actualTypesOfElementNode, n.elementType));
+                                        formatted(actualTypeOfElementNode, n.elementType));
                     }
 
                     /* didn't catch incorrectly nested lists because classes were both ListType //Todo: gardening
@@ -174,8 +176,56 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(ListNode n) {
-        // should probably compare all children
-        return new ListType(new ListNodeType((TypeDenoter) n.children.get(0).accept(this)));
+
+        // If visiting an empty list, we provide a null value as TypeDenoter
+        if (n.elements != null && n.elements.isEmpty()) {
+            // Todo: need to check for incorrect levels of nesting of empty lists
+            return new ListType(null);
+        }
+
+        List<TypeDenoter> actualTypesOfElementNodes = new ArrayList<>();
+
+        if (n.elements != null) {
+            for (ASTNode listElementNode : n.elements) {
+                actualTypesOfElementNodes.add((TypeDenoter) listElementNode.accept(this));
+            }
+        }
+
+        if (n.elements != null) {
+
+            // Find type of the first element in the list
+            TypeDenoter typeOfFirstListElementNode = new ListType(null);
+
+            // // Find type of the first non-empty list element in the list
+            for (ASTNode listElementNode: n.elements) {
+                typeOfFirstListElementNode = (TypeDenoter) listElementNode.accept(this);
+                if (!typeOfFirstListElementNode.toString().endsWith("null")) {
+                    break;
+                }
+            }
+
+            // Check if elements in list have matching types
+            for (TypeDenoter actualTypeOfElementNode : actualTypesOfElementNodes) {
+                // To allow empty lists, we skip the check for them
+                if (!actualTypeOfElementNode.toString().endsWith("null")) {
+
+
+                if (!Objects.equals(actualTypeOfElementNode.toString(), typeOfFirstListElementNode.toString())) {
+
+                    throw new TypeErrorException(
+                            "List contains incompatible types %s and %s".
+                                    formatted(actualTypeOfElementNode, typeOfFirstListElementNode));
+                }
+            }
+
+            }
+            return new ListType(typeOfFirstListElementNode);
+        }
+
+        else {
+            // Hopefully we never see this
+            throw new TypeErrorException("Type checking a list failed badly");
+        }
     }
 
     @Override
