@@ -82,4 +82,5 @@ public interface ASTvisitor<T> {
     T visit(ReturnNode n);
     T visit(FieldAccessNode n);
     T visit(ListElementNode n);
+    T visit(ListNode n);
 }

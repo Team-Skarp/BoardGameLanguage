@@ -25,7 +25,7 @@ class CCodeGeneratorTest {
         SH = new SymbolHarvester();
         TENV = new TypeEnvironment();
     }
-
+/*
     @Test
     public void canCreateCCodeFromPredefinedDesign() {
 
@@ -54,6 +54,8 @@ class CCodeGeneratorTest {
 
         assertEquals(expected, actual);
     }
+
+ */
 
     @Test
     public void convertBasicTypeDenotersToActualCTypes() {
@@ -197,6 +199,7 @@ class CCodeGeneratorTest {
                 """
                 struct Dog bulldog;
                 bulldog.woof = &woof;
+                
                 """;
 
         assertEquals(expected.strip(), actual.strip());

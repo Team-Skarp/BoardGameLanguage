@@ -518,6 +518,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ListDeclarationNode n) {
+        //System.out.println("IN LIST DECL NODE PART 1");
         String braces = "[]";
         TypeDenoter finalType = n.elementType;
 
@@ -528,7 +529,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
             braces += "[]";
         }
 
-        if (n.children == null) {
+        if (n.assignedList == null) {
             return (
                     """
                             %s %s%s;
@@ -540,13 +541,18 @@ public class CCodeGenerator implements ASTvisitor<String> {
             );
         }
         else {
+            //System.out.println("IN LIST DECL NODE ELSE PART");
             StringBuilder rightSide = new StringBuilder();
             rightSide.append("[");
-            for (ASTNode child: n.children) {
+            for (ASTNode child: n.assignedList.elements) {
                 rightSide.append(child.accept(this));
-                rightSide.append(",");
+                rightSide.append(", ");
             }
-            rightSide.deleteCharAt(rightSide.length()-1);
+            if (!n.assignedList.elements.isEmpty()) {
+                rightSide.deleteCharAt(rightSide.length()-1);
+                rightSide.deleteCharAt(rightSide.length()-1);
+            }
+
             rightSide.append("]");
             return (
                     """
@@ -562,16 +568,41 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ListNode n) {
+        //System.out.println("IN LIST NODE");
+        StringBuilder str = new StringBuilder();
+        str.append("[");
+        for (ASTNode elementNode: n.elements) {
+            str.append(elementNode.accept(this));
+            str.append(", ");
+        }
+        if (!n.elements.isEmpty()) {
+            str.deleteCharAt(str.length()-1);
+            str.deleteCharAt(str.length()-1);
+        }
+
+
+        str.append("]");
+
+        return str.toString();
+    }
+
+    @Override
     public String visit(ListElementNode n) {
+        //System.out.println("IN LIST ELEMENT NODE");
         StringBuilder str = new StringBuilder();
         str.append("[");
         for (ASTNode elementNode: n.children) {
             str.append(elementNode);
+            str.append(", ");
         }
+        if (!n.children.isEmpty())
+        str.deleteCharAt(str.length()-1);
         str.append("]");
-        str.append(EOL);
-        return str.toString(); //Todo: implement
+        //str.append(EOL); // Commenting this out seemingly makes no difference... weird
+        return str.toString();
     }
+
     /**
      * Maps a type denoter to a C type;
      * @param type

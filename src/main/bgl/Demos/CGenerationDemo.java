@@ -37,14 +37,55 @@ public class CGenerationDemo {
                    }
                    
                    design Dog {
-                        Animal parrent;
+                        Animal parent;
                         action bark();
                         action woof();
+                        
+                        list:int theIntList1;
                    }
+                   
+                   Animal ape;
+                   Dog poodle;
+                   Dog pug;
+                   
+                   list:list:list:Dog poodleList = [ [], [[poodle, poodle], []], [[poodle, poodle]]  ];
+                   
+                   list:Dog pugList = [[[]]];
+		   
+                   list:int theIntList2 = [10, 20, 30];
+                   
+                   list:bool theBoolList = [true, false, true];
+                   
+                   list:list:int theMatrix = [[1,2,3],[4,5,6]];
+                   
+                   print("list decls working, but we must go deeper");
+                   
+                   list:list:list:int theCubrix = [ [ [1] ], [ [2] ], [ [3] ] ];
+                   
+                   print("but it's still not enough!");
+                   
+                   list:list:list:list:int theQuadrix = [
+                                                            [
+                                                                [
+                                                                    [1,2],[3,4]
+                                                                ],
+                                                                [
+                                                                    [5,6],[7,8]
+                                                                ]
+                                                            ],
+                                                            [
+                                                                [
+                                                                    [9,10],[11,12]
+                                                                ],
+                                                                [
+                                                                    [13,14],[15,16]
+                                                                ]
+                                                            ]
+                                                        ];
                    
                    Dog bulldog;
                    
-                   bulldog.parrent.eat();
+                   bulldog.parent.eat();
                 }
                 RULES {
                     action eat() {
@@ -61,6 +102,7 @@ public class CGenerationDemo {
                     
                 }
                 """;
+
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);

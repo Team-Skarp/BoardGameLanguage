@@ -4,7 +4,7 @@ import ASTvisitors.ASTvisitor;
 
 import java.util.List;
 
-public class ListElementNode implements ASTNode{
+public class ListElementNode implements ASTNode<Object>{
 
     public List<ASTNode> children;
 

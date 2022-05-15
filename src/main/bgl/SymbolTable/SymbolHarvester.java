@@ -344,8 +344,26 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ListDeclarationNode n) {
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
+
+        Symbol sym = new Symbol(
+                n.name,
+                new ListType(n.elementType));
+
+        ST.enterSymbol(sym);
         return ST;
     } //Todo: implement?
+
+    @Override
+    public SymbolTable visit(ListNode n) {
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ListElementNode n) {
+        return ST;
+    }
 
     @Override
     public SymbolTable visit(SequentialDeclaration n) {
@@ -572,11 +590,6 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
 
-        return ST;
-    }
-
-    @Override
-    public SymbolTable visit(ListElementNode n) {
         return ST;
     }
 }

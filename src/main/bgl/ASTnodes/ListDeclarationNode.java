@@ -10,17 +10,19 @@ public class ListDeclarationNode implements ASTNode<Object>, Declaration {
 
     public String name;
     public TypeDenoter elementType;
-    public List<ASTNode> children;
+    public ListNode assignedList;
 
+    // Declaration without assignment
     public ListDeclarationNode(String name, TypeDenoter elementType) {
         this.name = name;
         this.elementType = elementType;
     }
 
-    public ListDeclarationNode(String name, TypeDenoter elementType, List<ASTNode> children) {
+    // Declaration with assignment
+    public ListDeclarationNode(String name, TypeDenoter elementType, ListNode assignedList) {
         this.name = name;
         this.elementType = elementType;
-        this.children = children;
+        this.assignedList = assignedList;
     }
 
     @Override
@@ -36,5 +38,9 @@ public class ListDeclarationNode implements ASTNode<Object>, Declaration {
     @Override
     public TypeDenoter type() {
         return new ListType(elementType);
+    }
+
+    public ListNode getAssignedList() {
+        return assignedList;
     }
 }

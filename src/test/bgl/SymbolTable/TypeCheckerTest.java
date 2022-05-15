@@ -2,7 +2,7 @@ package SymbolTable;
 
 import ASTnodes.*;
 
-import ASTvisitors.ASTvisitor;
+import ASTvisitors.ASTbuilder;
 import org.junit.Test;
 import SymbolTable.types.*;
 
@@ -315,15 +315,21 @@ public class TypeCheckerTest {
     public void throwsExceptionWhenElementTypeDoesNotMatchListType() {
         ST = new SymbolTable();
 
-        List<ASTNode> elementNodes = new ArrayList<>();
-        elementNodes.add(new IntNode(1));
-        elementNodes.add(new IntNode(4));
+        ListNode assignedList = new ListNode(new ArrayList<>());
+        assignedList.elements.add(new IntNode(1));
+        assignedList.elements.add(new IntNode(4));
 
-        ListDeclarationNode listNode = new ListDeclarationNode("TestNode", new BoolType(), elementNodes);
+        ListDeclarationNode listNode = new ListDeclarationNode("TestNode", new BoolType(), assignedList);
 
         TC = new TypeChecker(ST, TENV);
 
         assertThrows(TypeErrorException.class, ()-> TC.visit(listNode));
+
+    }
+
+    @Test
+    public void listNestingLevelMatchesAssignedList() {
+        ASTbuilder ASTB = new ASTbuilder();
 
     }
 }

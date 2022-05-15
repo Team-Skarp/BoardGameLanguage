@@ -418,23 +418,26 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitListDeclaration(BoardParser.ListDeclarationContext ctx) {
 
         if (ctx.ASSIGN() != null) {
-            List<ASTNode> elementNodes = new ArrayList<>();
 
-            for (int i = 0; i < ctx.listElement().size(); i++) {
-                elementNodes.add(ctx.listElement(i).accept(this));
-            }
-            //list:int = [1,2,3]
             return new ListDeclarationNode(
-                    ctx.IDENTIFIER().getText(), getListType(ctx.listType()), elementNodes);
+                    ctx.IDENTIFIER().getText(), getListType(ctx.listType()), (ListNode) ctx.list().accept(this));
         }
-        else if (ctx.IDENTIFIER() != null){
+        else if (ctx.IDENTIFIER() != null && ctx.ASSIGN() == null){
             return new ListDeclarationNode(ctx.IDENTIFIER().getText(), getListType(ctx.listType()));
         }
         return null;
     }
 
     @Override
-    public ASTNode visitListType(BoardParser.ListTypeContext ctx) {
+    public ASTNode visitList(BoardParser.ListContext ctx) {
+        if (ctx.listElement() != null) {
+            List<ASTNode> elements = new ArrayList<>();
+
+            for (ParseTree element: ctx.listElement()) {
+                elements.add(element.accept(this));
+            }
+            return new ListNode(elements);
+        }
         return null;
     }
 
@@ -447,11 +450,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.IDENTIFIER() != null) {
             return new IdNode(ctx.IDENTIFIER().getText());
         }
-        else if (ctx.listElement() != null) {
-            for (int i = 0; i < ctx.listElement().size(); i++) {
-                ctx.listElement(i).accept(this);
-            }
+        else if (ctx.list() != null) {
+            return ctx.list().accept(this);
         }
+        return null;
+    }
+
+    @Override
+    public ASTNode visitListType(BoardParser.ListTypeContext ctx) {
         return null;
     }
 
