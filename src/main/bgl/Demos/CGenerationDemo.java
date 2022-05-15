@@ -31,23 +31,23 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                  
                    design Animal {
                         str name;
-                        action isMammal(str type, str type2):bool;
+                        action isMammal(str name):bool;
                    }
                    
                    Animal myAnimal;
+                   str myName = "Elephant";
                 }
                 RULES {
-                    action isMammal(Animal self):bool {
+                    action isMammal(Animal self, str name):bool {
                         self.name = "Elephant";
                         return true;
                     }
                 }
                 GAMELOOP {
                     if (true) {
-                        myAnimal.isMammal();
+                        myAnimal.isMammal(myName);
                         print("I am a mammal");
                     }
                 }

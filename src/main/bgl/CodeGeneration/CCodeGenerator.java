@@ -33,13 +33,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
     private final String        TAB = "\t";
     private final String        EOL = ";\n";
 
-    private boolean             isInAction = false;
+
 
     /**
-     * Flag indicating if we are in a design definition. Used for generating different C code from within
-     * a Design Declaration.
+     * Flags for generating correct design & action signatures
      */
     private DesignDefinitionNode currentDesignDefinition = null;
+    private ActionDefinitionNode currentActionDefinition = null;
 
     public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
@@ -325,8 +325,10 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ActionDefinitionNode n) {
 
-        //Flag indicating that all design declarations should not be extended
-        isInAction = true;
+        String actionBody = (String) n.body.accept(this);
+
+        //Flag indicating that all design declarations should not be extended. Important its after the action signature
+        currentActionDefinition = n;
 
         //Actions definitions are put on the top of the C code. A prototype for the definition is also added
         definitions += """
@@ -335,7 +337,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCType(n.returnType),
                 n.name,
                 toCParams(n.formalParameters),
-                n.body.accept(this)
+                actionBody
         );
 
         prototypes += """
@@ -346,7 +348,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCParams(n.formalParameters)
         );
 
-        isInAction = false;
+        currentActionDefinition = null;
 
         return "";
     }
@@ -357,12 +359,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
-    /**
-     * Action declarations writes a prototype at the top of the file
-     */
     public String visit(ActionDeclarationNode n) {
-
-        isInAction = true;
 
         String actionDcl = "";
 
@@ -376,7 +373,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCParams(n.formalParameters)
         );
 
-        isInAction = false;
         return actionDcl;
     }
 
@@ -396,6 +392,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         if (params.length() > 0) {
             params = params.substring(0, params.length() - 1);
             params = params.replaceAll(";", "");
+            params = params.replaceAll("\n", "");
         }
 
         return params;
@@ -418,7 +415,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String actionMapping = "";
 
         //Create action mappings if outside of design definition and action definitions
-        if (currentDesignDefinition == null && !isInAction) {
+        if (currentDesignDefinition == null && currentActionDefinition == null) {
             SymbolTable initialST = TENV.receiveType(n.dName).fields;
             actionMapping = makeActionMapping(initialST, n.name);
         }
@@ -451,6 +448,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     %s
                     """.formatted(n.dName, n.name, actionMapping)
             );
+        }
+
+        if (currentActionDefinition != null && currentActionDefinition.isMethodDefinition) {
+            //If we are currently defining a method. The 1.st argument should be of pointer type
+            return  """
+                    struct %s *%s;
+                    """.formatted(n.dName, n.name);
         }
 
         return removeEmptyLines(

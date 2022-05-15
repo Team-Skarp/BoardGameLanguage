@@ -88,6 +88,10 @@ IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
 NEWLINE : '\n'      -> skip;
 WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
 
+LINE_COMMENT
+    : '//' ~[\r\n]* -> skip
+    ;
+
 game
     : setup rules gameloop
     ;

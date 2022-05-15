@@ -13,6 +13,8 @@ public class ActionDefinitionNode implements ASTNode<Object>, Declaration {
     public final TypeDenoter returnType;
     public final ParameterBlock body;
 
+    public boolean isMethodDefinition = false;
+
     public ActionDefinitionNode(String name, TypeDenoter returnType, ParameterBlock body, Declaration... formalParameters) {
         this.name = name;
         this.formalParameters = List.of(formalParameters);

@@ -291,6 +291,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
                 )
         );
 
+        //Set method flag
+        if (isMethod(n)) {
+            n.isMethodDefinition = true;
+        }
+
         //Pass down the formal parameters to the action body
         n.body.variables = formalParams;
 
@@ -303,6 +308,44 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
         //Visit action body
         return ST;
+    }
+
+    /**
+     * Checks if a given action definition is actually a method definition belonging to a design
+     * @param action
+     * @return true if action exists in a design
+     */
+    private boolean isMethod(ActionDefinitionNode action) {
+
+        //Check if first formal parameter is a design declaration
+        if (!(action.formalParameters.get(0) instanceof DesignDeclarationNode)) {
+            return false;
+        }
+
+        //If action signature matches a design definitions action then its a method
+        try {
+            SymbolTable designST = TENV
+                    .receiveType(((DesignDeclarationNode) action.formalParameters.get(0)).dName)
+                    .fields;
+
+            //Check if design have the name of the action
+            Symbol sym = designST.retrieveSymbol(action.name);
+
+            //If symbol recieved is an action with the exact same formal param types, then it's a method
+            if (sym.type instanceof ActionType method && method.formalParameters.size() == action.formalParameters.size()) {
+                int pX = 0;
+                while (pX < method.formalParameters.size()) {
+                       if (action.formalParameters.get(pX).type().getClass() != method.formalParameters.get(pX).type().getClass()) {
+                           return false;
+                       }
+                       pX++;
+                }
+                return true;
+            }
+        } catch (ReferenceErrorException err) {
+            return false;
+        }
+        return false;
     }
 
     @Override
