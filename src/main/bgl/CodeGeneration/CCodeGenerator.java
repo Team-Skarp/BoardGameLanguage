@@ -35,6 +35,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
     private final String        TAB = "\t";
     private final String        EOL = ";\n";
 
+    /**
+     * Flag indicating if we are in a design definition. Used for generating different C code from within
+     * a Design Declaration.
+     */
+    private boolean isInsideDesignDefinition = false;
+
     public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
         this.TENV = TENV;
@@ -282,6 +288,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
      * Should only append to top level code
      */
     public String visit(DesignDefinitionNode n) {
+        //Design declarations should be handled differently inside a design
+        isInsideDesignDefinition = true;
+
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
@@ -311,6 +320,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.typeDefinition
                     );
         }
+
+        isInsideDesignDefinition = false;
 
         return "";
     }
@@ -403,6 +414,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(DesignDeclarationNode n) {
 
+        String actionMapping = "";
+
+        //Create action mappings if outside of design definition
+        if (!isInsideDesignDefinition) {
+            SymbolTable initialST = TENV.receiveType(n.dName).fields;
+            actionMapping = makeActionMapping(initialST, n.name);
+        }
+
         DesignType thisType = TENV.receiveType(n.dName);
 
         if (n.value != null) {
@@ -415,28 +434,26 @@ public class CCodeGenerator implements ASTvisitor<String> {
             // Joined string for init
             String collectedString = String.join(", ", n.value);
 
-            //Create action mappings
-            SymbolTable initialST = TENV.receiveType(n.dName).fields;
-            String actionMapping = makeActionMapping(initialST, n.name);
-
-            return (
+            return removeEmptyLines(
                     """
                     struct %s %s = {%s};
                     %s
                     """.formatted(n.dName, n.name, collectedString, actionMapping)
             );
-        } else {
-
-            //Create action mappings
-            SymbolTable initialST = TENV.receiveType(n.dName).fields;
-            String actionMapping = makeActionMapping(initialST, n.name);
-            return (
-                    """
-                    struct %s %s;
-                    %s
-                    """.formatted(n.dName, n.name, actionMapping)
-            );
         }
+
+        return removeEmptyLines(
+                """
+                struct %s %s;
+                %s
+                """.formatted(n.dName, n.name, actionMapping)
+        );
+
+    }
+
+    private String removeEmptyLines(String code) {
+
+        return code.replaceAll("\n+", "\n");
     }
 
     /**

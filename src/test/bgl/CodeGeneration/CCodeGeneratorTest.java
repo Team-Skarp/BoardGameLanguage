@@ -197,10 +197,10 @@ class CCodeGeneratorTest {
         //Expect C struct that works
         String expected =
                 """
-                Dog bulldog;
+                struct Dog bulldog;
                 bulldog.woof = &woof;
                 """;
 
-        assertEquals(expected, actual);
+        assertEquals(expected.strip(), actual.strip());
     }
 }
