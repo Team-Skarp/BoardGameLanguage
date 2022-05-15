@@ -237,12 +237,13 @@ class CCodeGeneratorTest {
 
         SymbolTable generatedST = SH.visit(block);
         CCodeGenerator generator = new CCodeGenerator(generatedST, SH.TENV);
+        generator.visit(block);
 
         String expectedDefinition =
                 """
-                void bark(Dog *self);
+                void bark(struct Dog *self);
                 """;
 
-        assertEquals(expectedDefinition, generator.definitions);
+        assertEquals(expectedDefinition, generator.prototypes);
     }
 }

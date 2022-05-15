@@ -40,20 +40,21 @@ public class CGenerationDemo {
                    str myName = "Elephant";
                 }
                 RULES {
-                    action isMammal(Animal self, str name):bool {
+                    action isMammal(Animal self):bool {
                         self.name = "Elephant";
                         return true;
                     }
                 }
+                
                 GAMELOOP {
                     if (true) {
-                        myAnimal.isMammal(myName);
+                        //myAnimal.isMammal(myName);
+                        isMammal(myAnimal);
                         print("I am a mammal");
                     }
                 }
                 """;
-
-
+        
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);
         lexer   = new BoardLexer(input);
