@@ -4,7 +4,6 @@ import ASTnodes.*;
 import SymbolTable.TypeErrorException;
 import antlr.BoardParser;
 import antlr.BoardVisitor;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -294,6 +293,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                 (Expression) ctx.expression().accept(this)
         );
 
+    }
+
+    @Override
+    public ASTNode visitExitStatement(BoardParser.ExitStatementContext ctx) {
+        return new ExitNode();
     }
 
     @Override
@@ -762,6 +766,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.returnStatement() != null) {
             return ctx.returnStatement().accept(this);
+        }
+        else if (ctx.exitStatement() != null) {
+            return ctx.exitStatement().accept(this);
         }
 
         return null;

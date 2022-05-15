@@ -31,7 +31,7 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                   
+                   int a = 2;
                    design Animal {
                         action eat();
                    }
@@ -86,6 +86,7 @@ public class CGenerationDemo {
                    Dog bulldog;
                    
                    bulldog.parent.eat();
+                   exit;
                 }
                 RULES {
                     action eat() {
@@ -96,10 +97,17 @@ public class CGenerationDemo {
                     }
                     action woof() {
                         print("woof!");
+                      
                     }
+                    exit;
                 }
                 GAMELOOP {
                     
+                    
+                    input(a);
+                    print(a);
+                    exit;
+                    return 1;
                 }
                 """;
 

@@ -361,6 +361,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(ExitNode n) {
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(ListElementNode n) {
         return ST;
     }
