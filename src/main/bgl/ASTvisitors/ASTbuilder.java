@@ -314,10 +314,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
-        //TODO: Implement
         int idX = 0;
         int acX = 0;
         List<Accessable> accessors = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
             if (node instanceof TerminalNode T) {
                 if (T.equals(ctx.IDENTIFIER(idX))) {
@@ -326,7 +326,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                 }
             }
             else {
-                accessors.add((Accessable) ctx.actionCall(acX).accept(this));
+                accessors.add(new MethodCallNode(
+                        (ActionCallNode) ctx.actionCall(acX).accept(this),
+                        ctx.IDENTIFIER(idX - 1).getText())
+                );
                 acX++;
             }
         }

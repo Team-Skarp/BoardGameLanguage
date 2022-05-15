@@ -33,6 +33,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
     private final String        TAB = "\t";
     private final String        EOL = ";\n";
 
+    private boolean             isInAction = false;
+
     /**
      * Flag indicating if we are in a design definition. Used for generating different C code from within
      * a Design Declaration.
@@ -242,7 +244,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
-
     @Override
     public String visit(Assignment n) {
         return null;
@@ -270,14 +271,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(DotAssignmentNode n) {
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < n.fieldAccessNode.fields.size() - 1; i++) {
-            str.append(n.fieldAccessNode.fields.get(i));
+            str.append(n.fieldAccessNode.fields.get(i).getAccessName());
         }
         str.deleteCharAt(str.length() - 1);
         str.append("->").append(n.fieldAccessNode.fields.get(n.fieldAccessNode.fields.size() - 1)).
         append(" = ").append(n.expr.accept(this)).append(EOL);
-        /*str
-                n.fieldAccessNode.accept(this)+" = "+n.expr.accept(this);
-        str = str.replace(";","").replace("\n","") + EOL;*/
+
         return str.toString();
     }
 
@@ -326,6 +325,9 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ActionDefinitionNode n) {
 
+        //Flag indicating that all design declarations should not be extended
+        isInAction = true;
+
         //Actions definitions are put on the top of the C code. A prototype for the definition is also added
         definitions += """
                %s %s(%s) %s
@@ -344,6 +346,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCParams(n.formalParameters)
         );
 
+        isInAction = false;
+
         return "";
     }
 
@@ -358,6 +362,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
      */
     public String visit(ActionDeclarationNode n) {
 
+        isInAction = true;
+
         String actionDcl = "";
 
         actionDcl +=
@@ -370,9 +376,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCParams(n.formalParameters)
         );
 
-        //Add the action declaration as a prototype
-        //prototypes += toCPrototype(n);
-
+        isInAction = false;
         return actionDcl;
     }
 
@@ -413,8 +417,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         String actionMapping = "";
 
-        //Create action mappings if outside of design definition
-        if (currentDesignDefinition == null) {
+        //Create action mappings if outside of design definition and action definitions
+        if (currentDesignDefinition == null && !isInAction) {
             SymbolTable initialST = TENV.receiveType(n.dName).fields;
             actionMapping = makeActionMapping(initialST, n.name);
         }
@@ -443,7 +447,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
             //Add pointer to self, if design definition contains a reference to itself to handle incomplete C struct
             return removeEmptyLines(
                     """
-                    struct %s %s*;
+                    struct %s *%s;
                     %s
                     """.formatted(n.dName, n.name, actionMapping)
             );
@@ -881,10 +885,30 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         return """
                %s(%s)
-               """.formatted(
-               n.actionName, formattedParams
+               """.formatted(n.actionName, formattedParams);
+
+    }
+
+    @Override
+    public String visit(MethodCallNode n) {
+        List<String> actualParams = new ArrayList<>();
+
+        //Actual parameters contains self as the first argument
+        n.actualParameters.forEach(param ->
+                actualParams.add((String) param.accept(this))
         );
 
+        //Add address to self argument
+        String self = "&" + actualParams.get(0);
+        actualParams.remove(0);
+        actualParams.add(0, self);
+
+        //Add a delimeter between the parameters
+        String formattedParams = String.join(",", actualParams);
+
+        return """
+               %s(%s);
+               """.formatted(n.actionName, formattedParams);
     }
 
     @Override

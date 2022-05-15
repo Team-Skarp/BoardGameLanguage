@@ -300,8 +300,9 @@ public class TypeCheckerTest {
                 new FieldAccessNode(
                         List.of(
                                 new IdNode("a"),
-                                new ActionCallNode(
-                                        "foo"
+                                new MethodCallNode(
+                                        "foo",
+                                        "a"
                                 ))
                 )
         );

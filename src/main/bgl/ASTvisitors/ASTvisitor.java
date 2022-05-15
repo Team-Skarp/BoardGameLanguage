@@ -75,12 +75,17 @@ public interface ASTvisitor<T> {
     T visit(WhileNode n);
     T visit(ForeachNode n);
 
-    //Misc
+    //IO
     T visit(PrintNode n);
     T visit(InputNode n);
+
+    //Calls
     T visit(ActionCallNode n);
-    T visit(ReturnNode n);
+    T visit(MethodCallNode n);
     T visit(FieldAccessNode n);
+
+    //Misc
+    T visit(ReturnNode n);
     T visit(ListElementNode n);
     T visit(ListNode n);
 }

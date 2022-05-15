@@ -18,11 +18,11 @@ struct Piece {
 };
 struct Player {
 	char* name;
-	struct Piece pieces[];
+	struct pieces Piece[];
 };
 struct Tile {
-	struct Tile next;
-	struct Tile prev;
+	struct Tile next*;
+	struct Tile prev*;
 	struct Piece pieces[];
 	bool (*isEmpty)();
 };

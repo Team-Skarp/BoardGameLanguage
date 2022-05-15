@@ -652,6 +652,15 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    //Hand control over to the type checking of an action call
+    public TypeDenoter visit(MethodCallNode n) {
+        return visit(new ActionCallNode(
+                n.actionName,
+                n.actualParameters
+        ));
+    }
+
+    @Override
     public TypeDenoter visit(ReturnNode n) {
 
         if (isNotInAction()) {

@@ -207,18 +207,21 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(IntegerAssignmentNode n) {
+        TC = new TypeChecker(ST, TENV);
         n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanAssignmentNode n) {
+        TC = new TypeChecker(ST, TENV);
         n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(DotAssignmentNode n) {
+        TC = new TypeChecker(ST, TENV);
         n.accept(TC);
         return ST;
     }
@@ -229,10 +232,13 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         //Create a separate symbol table that resides in the design type
         SymbolTable fields = new SymbolTable();
 
-        //Write in all the declarations into that symbol table
+        //Write in all the declarations into the designs symbol table
         Symbol sym;
 
         for (Declaration field : n.fields) {
+            if (field instanceof ActionDeclarationNode action) {
+                injectSelfActionDcl(n, action);
+            }
             sym = new Symbol(field.varName(), field.type());
             fields.enterSymbol(sym);
         }
@@ -295,8 +301,6 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         TC.visit(n);
 
-
-
         //Visit action body
         return ST;
     }
@@ -325,6 +329,32 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         );
 
         return ST;
+    }
+
+    /**
+     * Sets the first argument in an action to 'self' to point to the design its in
+     *
+     * Mutates the action declaration
+     * @param action
+     */
+    private void injectSelfActionDcl(DesignDefinitionNode self, ActionDeclarationNode action) {
+
+        //Make a copy of the formal parameters and inject self parameter
+        List<Declaration> copy = new ArrayList<>(action.formalParameters);
+
+        DesignDeclarationNode selfArg = new DesignDeclarationNode(self.dName, "self");
+        copy.add(0, selfArg);
+
+        action.formalParameters = copy;
+    }
+
+    private void injectSelfMethodCall(MethodCallNode method) {
+        //Make a copy of the actual parameters and inject self parameter
+        List<Expression> copy = new ArrayList<>(method.actualParameters);
+
+        copy.add(0, new IdNode(method.calledBy));
+
+        method.actualParameters = copy;
     }
 
     @Override
@@ -573,7 +603,19 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         TC.visit(n);
 
-        //Visit action body
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(MethodCallNode n) {
+
+        //Inject self as the 1. argument
+        injectSelfMethodCall(n);
+
+        //Check method call for correct amount of params & correct type of params
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
+
         return ST;
     }
 
@@ -586,9 +628,14 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(FieldAccessNode n) {
 
+        for (Accessable field : n.fields) {
+            field.accept(this);
+        }
+
         //Typecheck that all fields that are accessed exists
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
+
 
         return ST;
     }
