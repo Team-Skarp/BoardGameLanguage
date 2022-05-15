@@ -330,6 +330,11 @@ public class Evaluator implements ASTvisitor<Object> {
     }
 
     @Override
+    public Object visit(MethodCallNode n) {
+        return null;
+    }
+
+    @Override
     public Object visit(ReturnNode n) {
         return null;
     }

@@ -26,7 +26,7 @@ public class Tile implements PredefinedDesign {
          * }
          */
         return new DesignDefinitionNode(
-                new IdNode("Tile"),
+                "Tile",
                 new DesignDeclarationNode(
                         "Tile",
                         "next"

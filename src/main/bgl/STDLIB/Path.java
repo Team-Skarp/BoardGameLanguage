@@ -28,7 +28,7 @@ public class Path implements PredefinedDesign {
          *      action getPrev() : Path;
          */
         return new DesignDefinitionNode(
-                new IdNode("Path"),
+                "Path",
                 new DesignDeclarationNode(
                         "Tile",
                         "tile"
