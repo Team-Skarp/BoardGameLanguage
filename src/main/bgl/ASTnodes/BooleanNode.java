@@ -13,4 +13,11 @@ public class BooleanNode implements ASTNode, BooleanExpression{
     public Object accept(ASTvisitor v) {
         return v.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "BooleanNode{" +
+                "value=" + value +
+                '}';
+    }
 }

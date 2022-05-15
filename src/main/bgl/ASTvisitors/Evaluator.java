@@ -339,4 +339,19 @@ public class Evaluator implements ASTvisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(ListElementNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ListNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ExitNode n) {
+        return null;
+    }
+
 }

@@ -199,21 +199,27 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(StringAssignmentNode n) {
+        // no type check required since grammar rule enforces correct type
+        // we only even get a StringAssignmentNode if right side is a string literal
+        // limitation: function calls returning a string not allowed in grammar
         return ST;
     }
 
     @Override
     public SymbolTable visit(IntegerAssignmentNode n) {
+        n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanAssignmentNode n) {
+        n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(DotAssignmentNode n) {
+        n.accept(TC);
         return ST;
     }
 
@@ -330,7 +336,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
         Symbol sym = new Symbol(
                 n.name,
-                new DesignRef(n.name));
+                new DesignRef(n.dName));
 
         ST.enterSymbol(sym);
         return ST;
@@ -338,8 +344,31 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(ListDeclarationNode n) {
-        return null;
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
+
+        Symbol sym = new Symbol(
+                n.name,
+                new ListType(n.elementType));
+
+        ST.enterSymbol(sym);
+        return ST;
     } //Todo: implement?
+
+    @Override
+    public SymbolTable visit(ListNode n) {
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ExitNode n) {
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ListElementNode n) {
+        return ST;
+    }
 
     @Override
     public SymbolTable visit(SequentialDeclaration n) {

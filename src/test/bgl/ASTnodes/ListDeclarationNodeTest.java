@@ -20,7 +20,7 @@ class ListDeclarationNodeTest {
     void setup() {
         idNodeList = new IdNode("List");
         TENV = new TypeEnvironment();
-        listDeclarationNode = new ListDeclarationNode(new IntType(), idNodeList.name);
+        listDeclarationNode = new ListDeclarationNode(idNodeList.name, new IntType());
     }
 
     @Test
@@ -29,8 +29,7 @@ class ListDeclarationNodeTest {
     }
 
     @Test
-    void getIdentifier() {
-        listDeclarationNode.accept(new TypeChecker(new SymbolTable(), TENV));
+    void listIdNameMatchesIdNodeUsedInConstructor() {
         assertEquals(idNodeList.name, listDeclarationNode.varName());
     }
 

@@ -25,9 +25,8 @@ public class Player implements PredefinedDesign {
                 new StringDeclarationNode(
                         "name"
                 ),
-                new ListDeclarationNode(
-                        new DesignRef("Piece"),
-                        "pieces"
+                new ListDeclarationNode("Piece",
+                        new DesignRef("pieces")
                 )
         );
     }

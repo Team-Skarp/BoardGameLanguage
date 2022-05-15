@@ -36,8 +36,8 @@ public class Tile implements PredefinedDesign {
                         "prev"
                 ),
                 new ListDeclarationNode(
-                        new DesignRef("Piece"),
-                        "pieces"
+                        "pieces",
+                        new DesignRef("Piece")
                 ),
                 new ActionDeclarationNode(
                         "isEmpty",

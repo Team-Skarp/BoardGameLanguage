@@ -70,6 +70,7 @@ STATIC_DIR  : 'static';
 
 PRINT       : 'print';
 INPUT       : 'input';
+EXIT        : 'exit';
 
 //Delimiters
 LPAREN      : '(';
@@ -181,8 +182,19 @@ stringDeclaration
     ;
 
 listDeclaration
-    : COLON listType IDENTIFIER ASSIGN LSBRACE (listElement? | listElement (COMMA listElement)*)  RSBRACE
+//    : COLON listType IDENTIFIER ASSIGN LSBRACE (listElement? | listElement (COMMA listElement)*)  RSBRACE
+    : COLON listType IDENTIFIER ASSIGN list
     | COLON listType IDENTIFIER
+    ;
+
+list
+    : LSBRACE (listElement (COMMA listElement)*)? RSBRACE
+    ;
+
+listElement
+    : primitiveValue
+    | list // Allows nested lists -> list:list:int matrix = [[1,2,3], [1,2,3]];
+    | IDENTIFIER
     ;
 
 listType
@@ -191,13 +203,6 @@ listType
     | BOOLDCL
     | STRDCL
     | LISTDCL COLON listType //To define lists of lists
-    ;
-
-//list:list:int matrix = [[1,2,3], [1,2,3]]
-
-listElement
-    : primitiveValue
-    | IDENTIFIER
     ;
 
 pathDeclaration
@@ -230,6 +235,10 @@ actionDefinition
 
 returnStatement
     : RETURN expression
+    ;
+
+exitStatement
+    : EXIT
     ;
 
 actionCall
@@ -315,6 +324,7 @@ statement
     | input
     | expression EOL
     | returnStatement EOL
+    | exitStatement EOL
     ;
 
 expression

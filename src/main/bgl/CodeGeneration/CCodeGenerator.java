@@ -8,11 +8,10 @@ import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
-import static STDLIB.STDLIBC.*;         //C imports and defines
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class for generating C code.
@@ -362,7 +361,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         );
 
         //Add the action declaration as a prototype
-        prototypes += toCPrototype(n);
+        //prototypes += toCPrototype(n);
 
         return actionDcl;
     }
@@ -414,23 +413,66 @@ public class CCodeGenerator implements ASTvisitor<String> {
             // Joined string for init
             String collectedString = String.join(", ", n.value);
 
+            //Create action mappings
+            SymbolTable initialST = TENV.receiveType(n.dName).fields;
+            String actionMapping = makeActionMapping(initialST, n.name);
+
             return (
                     """
                     struct %s %s = {%s};
-                    """.formatted(n.dName, n.name, collectedString)
+                    %s
+                    """.formatted(n.dName, n.name, collectedString, actionMapping)
             );
         } else {
+
+            //Create action mappings
+            SymbolTable initialST = TENV.receiveType(n.dName).fields;
+            String actionMapping = makeActionMapping(initialST, n.name);
             return (
                     """
                     struct %s %s;
-                    """.formatted(n.dName, n.name)
+                    %s
+                    """.formatted(n.dName, n.name, actionMapping)
             );
         }
     }
 
+    /**
+     * Maps every action in a design to the address of the C function
+     *
+     * design Animal {
+     *     action eat();
+     * }
+     * design Dog {
+     *     Animal parrent();
+     *     action bark();
+     * }
+     *
+     * Dog bulldog;
+     *
+     * -> bulldog.bark = &bark;
+     * -> bulldog.parrent.eat = &eat;
+     *
+     * @return
+     */
+    private String makeActionMapping(SymbolTable localST, String lastFieldName) {
+        String localMapping = "";
+        SymbolTable next;
+        for (Map.Entry<String, Symbol> entry : localST.getActiveBlock().getSymbolMapping().entrySet()) {
+            if (entry.getValue().type instanceof DesignRef design) {
+                next = TENV.receiveType(design.name).fields;
+                localMapping += lastFieldName + "." + makeActionMapping(next, entry.getKey());
+            }
+            else if (entry.getValue().type instanceof ActionType action) {
+                localMapping += lastFieldName + "." + entry.getKey() + " = &" + entry.getKey() + ";\n";
+            }
+        }
+        return localMapping;
+    }
+
     @Override
     public String visit(ListDeclarationNode n) {
-
+        //System.out.println("IN LIST DECL NODE PART 1");
         String braces = "[]";
         TypeDenoter finalType = n.elementType;
 
@@ -441,15 +483,78 @@ public class CCodeGenerator implements ASTvisitor<String> {
             braces += "[]";
         }
 
-        return (
-                """
-                %s %s%s;
-                """.formatted(
-                        toCType(finalType),
-                        n.name,
-                        braces
-                )
-                );
+        if (n.assignedList == null) {
+            return (
+                    """
+                            %s %s%s;
+                            """.formatted(
+                            toCType(finalType),
+                            n.name,
+                            braces
+                    )
+            );
+        }
+        else {
+            //System.out.println("IN LIST DECL NODE ELSE PART");
+            StringBuilder rightSide = new StringBuilder();
+            rightSide.append("[");
+            for (ASTNode child: n.assignedList.elements) {
+                rightSide.append(child.accept(this));
+                rightSide.append(", ");
+            }
+            if (!n.assignedList.elements.isEmpty()) {
+                rightSide.deleteCharAt(rightSide.length()-1);
+                rightSide.deleteCharAt(rightSide.length()-1);
+            }
+
+            rightSide.append("]");
+            return (
+                    """
+                            %s %s%s = %s;
+                            """.formatted(
+                            toCType(finalType),
+                            n.name,
+                            braces,
+                            rightSide.toString()
+                    )
+            );
+        }
+    }
+
+    @Override
+    public String visit(ListNode n) {
+        //System.out.println("IN LIST NODE");
+        StringBuilder str = new StringBuilder();
+        str.append("[");
+        for (ASTNode elementNode: n.elements) {
+            str.append(elementNode.accept(this));
+            str.append(", ");
+        }
+        if (!n.elements.isEmpty()) {
+            str.deleteCharAt(str.length()-1);
+            str.deleteCharAt(str.length()-1);
+        }
+
+
+        str.append("]");
+
+        return str.toString();
+    }
+
+    @Override
+    public String visit(ListElementNode n) {
+        //System.out.println("IN LIST ELEMENT NODE");
+        StringBuilder str = new StringBuilder();
+        str.append("[");
+        for (ASTNode elementNode: n.children) {
+            str.append(elementNode);
+            str.append(", ");
+        }
+        if (!n.children.isEmpty())
+        str.deleteCharAt(str.length()-1);
+        str.append("]");
+        //str.append(EOL); // Commenting this out seemingly makes no difference... weird
+        return str.toString();
     }
 
     /**
@@ -747,12 +852,19 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(FieldAccessNode n) {
-        StringBuilder str = new StringBuilder();
-        for (Accessable field : n.fields) {
-            str.append(field.accept(this));
-        }
-        str.append(EOL);
+        List<String> sequence = new ArrayList<>();
 
-        return str.toString();
+        for (Accessable field : n.fields) {
+            sequence.add((String)field.accept(this));
+        }
+
+        return String.join(".", sequence);
+    }
+
+    @Override
+    public String visit(ExitNode n) {
+        return """
+               exit(EXIT_SUCCESS);
+               """;
     }
 }

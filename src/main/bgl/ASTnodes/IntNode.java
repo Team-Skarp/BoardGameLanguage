@@ -14,4 +14,11 @@ public class IntNode implements ASTNode, ArithmeticExpression {
     public Object accept(ASTvisitor v) {
         return v.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "IntNode{" +
+                "value=" + value +
+                '}';
+    }
 }

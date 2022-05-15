@@ -46,4 +46,8 @@ public class Block {
     void setParent(Block block) {
         parent = block;
     }
+
+    public Map<String, Symbol> getSymbolMapping() {
+        return symbols;
+    }
 }

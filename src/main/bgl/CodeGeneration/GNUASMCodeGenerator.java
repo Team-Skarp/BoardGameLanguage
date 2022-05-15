@@ -49,8 +49,8 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     String lastIdNode;
     //this is the last ptr used
     int ptr = 0;
-    //this is the pointer currently used to declare a variable
-    int assignPtr = 0;
+    //how many pushes to the stack, to be used to align stack
+    int pushes = 0;
     public GNUASMCodeGenerator(SymbolTable ST) {
         this.ST = ST;
     }
@@ -62,6 +62,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 	.intel_syntax noprefix
                 	.text
                 	.globl	main
+                	.type main, @function
                 	.section .rodata
                 .LC0:
                     .string	"true"
@@ -116,10 +117,10 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 	.cfi_offset 6, -16
                 	mov	rbp, rsp
                 	.cfi_def_cfa_register 6
-                	sub	rsp, 16
+                	sub rsp, %d
                 	mov	DWORD PTR -%d[rbp], edi
                  	mov	QWORD PTR -%d[rbp], rsi
-                """.formatted(pointerOffset,pointerOffset+12);
+                """.formatted(pushes%2 == 1 ? 8: 16,pointerOffset,pointerOffset+12);
         data += """
                             .text
                             .type	main, @function
@@ -641,7 +642,15 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ParameterBlock n) {
-        return null;
+        String str = "";
+        //Go down into the scope of this block
+        ST.dive();
+        for (ASTNode c: n.children){
+            str += TAB.repeat(indent) + c.accept(this);
+        }
+        //When finished, climb back to parrent scope
+        ST.climb();
+        return str;
     }
 
     @Override
@@ -706,23 +715,31 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     @Override //Actions are functions
     public String visit(ActionDefinitionNode n) {
         ST.dive();
+
         //TODO: switch depending on return type
         //TODO: insert formalparameters if they exist
         //TODO: returntype
-
         functionCounter++;
         int stackPtr = 16;
         String formalParameters = "";
         for(ASTNode child: n.formalParameters){
             String variable = (String)child.accept(this);
-            String varSpliced = variable.substring(4,variable.length()-2);
-            formalParameters += """
+            if(child instanceof IntegerDeclarationNode){
+                formalParameters += """
                     %s
-                        mov eax, DWORD PTR %d[rbp]
+                        mov eax, DWORD PTR %d[rbp] 
                         %s eax
-                    """.formatted(variable,stackPtr,varSpliced);
+                    """.formatted(variable,stackPtr,variable.substring(4,variable.length()-2));
+            }else if(child instanceof BooleanDeclarationNode){
+                formalParameters += """
+                    %s
+                        mov eax, DWORD PTR %d[rbp] 
+                        mov DWORD %s eax
+                    """.formatted(variable,stackPtr,variable.substring(9,variable.length()-4));
+            }
             stackPtr+=8;
         }
+
         String functionBlock = "";
         for (ASTNode child: n.body.children){
             functionBlock+=child.accept(this);
@@ -753,6 +770,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 	.size	%s, .-%s        
                 """.formatted(n.name,n.name,n.name,functionCounter,formalParameters,functionBlock,functionCounter,n.name,n.name);
         ST.climb();
+
         return "";
     }
 
@@ -791,6 +809,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
         ptr = pointerOffset-16;
         String str = "";
         if(n.value == null){
+            lo.g("1");
             str +="""
                         mov	DWORD PTR -%d[rbp], 0
                     """.formatted(ptr);
@@ -1065,6 +1084,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 LAmount++;
             }
             str +="""
+                    \n
                     lea	rdi, .LC%d[rip]
                 	mov	eax, 0
                 	call printf@PLT
@@ -1131,10 +1151,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
         for(ASTNode parameter: n.actualParameters){
             String parm = parameter.accept(this).toString();
             if(parm.contains("DWORD")){
-                parm = "Q"+parameter.accept(this).toString().substring(1);
+                parm = "Q"+parm.substring(1);
             }
             parameters+= """
-                    push %s""".formatted(parm);
+                    \npush %s""".formatted(parm);
+            pushes++;
         }
         String str = """
                 	%s
@@ -1146,11 +1167,29 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ReturnNode n) {
-        return null;
+        String str = """
+                mov eax, %s
+                """.formatted(n.returnVal.accept(this));
+        return str;
     }
 
     @Override
     public String visit(FieldAccessNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(ListElementNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(ListNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(ExitNode n) {
         return null;
     }
 }

@@ -31,7 +31,7 @@ class SequentialDeclarationTest {
         declarations.add(new IntegerDeclarationNode(idNodeInt.name, new IntNode(4)));
         declarations.add(new StringDeclarationNode(idNodeString.name));
         declarations.add(new BooleanDeclarationNode(idNodeBoolean.name));
-        declarations.add(new ListDeclarationNode(new IntType(), idNodeList.name));
+        declarations.add(new ListDeclarationNode(idNodeList.name, new IntType()));
 
         sequentialDeclaration = new SequentialDeclaration(new DesignRef("pieces"), declarations.get(2));
 
