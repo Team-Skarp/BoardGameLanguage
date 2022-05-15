@@ -933,7 +933,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
         }
 
         return String.join(".", sequence);
-
     }
 
+    @Override
+    public String visit(ExitNode n) {
+        return """
+               exit(EXIT_SUCCESS);
+               """;
+    }
 }

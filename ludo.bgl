@@ -1,5 +1,4 @@
 SETUP {
-
     Piece piece1Player1;
     Piece piece2Player1;
     Piece piece3Player1;
@@ -30,87 +29,86 @@ SETUP {
     Player player3 = {"Blue", player3Pieces};
     Player player4 = {"Yellow", player4Pieces};
 
-    Path mainPath[4*13];
+    path mainPath[52];
 
-    Path player1EndPath[6];
-    Path playerEnd2Path[6];
-    Path player3EndPath[6];
-    Path player4EndPath[6];
+    path player1EndPath[6];
+    path playerEnd2Path[6];
+    path player3EndPath[6];
+    path player4EndPath[6];
 
     list:Path endPaths = [player1EndPath, player2EndPath, player3EndPath, player4EndPath];
 
     int currentPlayer = 1;
-    int rollValue; // random int 1-6 is this working?
+    int rollValue;
     int pieceNumber;
-    Piece selectedPiece;
 }
 
 RULES {
-
-    action movePiece (Tile from, Tile to): void {
-    // do we have a built in move piece function that works?
-    }
-
     action selectPiece(): int {
         int number = 0;
         while (number < 1 || number > 4) {
-            print("Select a piece number between 1 and 4")
+            print("Select a piece number between 1 and 4");
             input(number);
         }
         return number;
     }
-
 }
 
 GAMELOOP {
-
     if (toast == 0) {
-        print("Welcome to basic Ludo, where there are almost no rules, you just have to get 4 pieces into goal before any other player. May the luckiest player win ;)");
+        print("Welcome to basic Ludo, where there are almost no rules, you just have to get 4 pieces into goal before any other player. May the luckiest player win :)");
         toast = 1;
     }
 
-    if (currentPlayer == 4) {
+    if (currentPlayer == 5) {
         currentPlayer = 1;
     }
 
-    print("Player %s's turn", players[i]);
-
+    print("Player", currentPlayer, "'s turn");
     print("Simulated dice roll");
+    rollValue = rollDice();
+    print("You rolled a ", diceNumber);
 
-    rollValue = rollDice(); //how do we limit the die to 6 values
+    if (diceNumber == 6) {
 
-    print("You rolled a %d", diceNumber);
+        int plchoice = -1;
 
-    if (diceNumber = 6) {
-        int choice = -1;
-
-        while (choice < 0 || choice > 6) {
+        while (plchoice < 0 || plchoice > 6) {
             print("Enter 0 to move a piece from home to start, or select a piece number between 1 and 6 to move");
-            input(choice);
+            input(plchoic);
         }
-
     }
 
-    // move a piece from home area
-    if (choice == 0) {
-        (how to find the next piece in home area?)jump(); // how does this move piece to start tile?
+    if (plchoice == 0) {
+        jump();
     }
-    else if (players[i].piecesOnPath != 0) {
-        pieceNumber = choice;
-        players[i].pieces[pieceNumber].move(rollValue); // how does the piece actually move from one tile to the next?
+    elseif (players[i].piecesOnPath != 0) {
+        pieceNumber = plchoice;
+        players[i].pieces[pieceNumber].move(rollValue);
     }
 
-    // win condition:
-    // check if the end tile for the current player has its fourth slot occupied
     if (endPaths[i].[6].pieces[4] != null) {
-        print(players[i].name + "has won. Congratulations!");
+        print(players[i].name, "has won. Congratulations!");
         exit;
     }
 
     currentPlayer++;
-
 }
 
-issues:
-do we need a comment feature in our language? /* identifer */
-how do we keep track of where each piece is?
+"win condition:";
+"check if the end tile for the current player has its fourth slot occupied";
+
+"issues:";
+
+"piece is not defined"
+"how to move from main path to end paths";
+"how does the piece actually move from one tile to the next?";
+"do we need a comment feature in our language? /* identifer */";
+"how do we keep track of where each piece is?";
+"do we have a built in move piece function that works?";
+"how do we limit the die to 6 values";
+"random int 1-6 is this working?";
+"move a piece from home area";
+"how to find the next piece in home area?";
+"how does this move piece to start tile?";
+                                                              

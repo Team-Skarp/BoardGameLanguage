@@ -70,6 +70,7 @@ STATIC_DIR  : 'static';
 
 PRINT       : 'print';
 INPUT       : 'input';
+EXIT        : 'exit';
 
 //Delimiters
 LPAREN      : '(';
@@ -240,6 +241,10 @@ returnStatement
     : RETURN expression
     ;
 
+exitStatement
+    : EXIT
+    ;
+
 actionCall
     : IDENTIFIER LPAREN (expression | expression (COMMA expression )+)? RPAREN
     ;
@@ -323,6 +328,7 @@ statement
     | input
     | expression EOL
     | returnStatement EOL
+    | exitStatement EOL
     ;
 
 expression

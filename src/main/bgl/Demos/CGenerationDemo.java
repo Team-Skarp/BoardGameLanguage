@@ -44,6 +44,7 @@ public class CGenerationDemo {
                         self.name = "Elephant";
                         return true;
                     }
+                    exit;
                 }
                 
                 GAMELOOP {

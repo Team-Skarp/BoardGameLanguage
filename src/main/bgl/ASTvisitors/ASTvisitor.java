@@ -82,6 +82,7 @@ public interface ASTvisitor<T> {
     //Calls
     T visit(ActionCallNode n);
     T visit(MethodCallNode n);
+    T visit(ExitNode n);
     T visit(FieldAccessNode n);
 
     //Misc
