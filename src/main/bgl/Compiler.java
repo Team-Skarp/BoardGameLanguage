@@ -108,7 +108,7 @@ public class Compiler {
 
             // "/c" - creates a new shell, execute the provided command, and exit from the shell automatically
             if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                builder.command("cmd.exe", "/c", "gcc", "./src/main/bgl/BglFiles/Generated/test.c");
+                builder.command("cmd.exe", "/c", "gcc", "src/main/bgl/BglFiles/Generated/test.c");
             } else {
                 builder.command("cmd", "gcc", inputFilePath, "-o", outputFilePath);
             }
