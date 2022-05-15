@@ -229,6 +229,13 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(ExitNode n) {
+        return null;
+    }
+
+
+
+    @Override
     public TypeDenoter visit(ListElementNode n) {
 
         return (TypeDenoter) n.accept(this);

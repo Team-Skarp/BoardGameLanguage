@@ -717,4 +717,10 @@ public class PrettyPrinter implements ASTvisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visit(ExitNode n) {
+        System.out.println("such a pretty exit node");
+        return null;
+    }
+
 }
