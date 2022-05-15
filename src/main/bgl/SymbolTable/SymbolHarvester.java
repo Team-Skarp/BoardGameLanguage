@@ -240,16 +240,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         //Save design type inside type environment
         DesignType type;
 
-        if (n.parentType == null) {
+        if (n.parentDName == null) {
             type = new DesignType(
-                    n.typeDefinition.name,
+                    n.dName,
                     fields
             );
         }
         else {
             type = new DesignType(
-                    n.typeDefinition.name,
-                    n.parentType.name,
+                    n.dName,
+                    n.parentDName,
                     fields
             );
         }

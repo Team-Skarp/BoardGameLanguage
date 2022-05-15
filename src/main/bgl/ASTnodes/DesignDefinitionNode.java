@@ -6,20 +6,20 @@ import java.util.List;
 
 public class DesignDefinitionNode implements ASTNode<Object> {
 
-    public final IdNode typeDefinition;          //Type to be defined
+    public final String dName;          //Type to be defined
     public List<Declaration> fields;             //Fields of the design definition
-    public final IdNode parentType;              //*Optional parrent type when extending from another type
+    public final String parentDName;              //*Optional parrent type when extending from another type
 
-    public DesignDefinitionNode(IdNode typeDefinition, IdNode parentType, Declaration... fields) {
-        this.typeDefinition = typeDefinition;
+    public DesignDefinitionNode(String dName, String parentDName, Declaration... fields) {
+        this.dName = dName;
         this.fields = List.of(fields);
-        this.parentType = parentType;
+        this.parentDName = parentDName;
     }
 
-    public DesignDefinitionNode(IdNode typeDefinition, Declaration... fields) {
-        this.typeDefinition = typeDefinition;
+    public DesignDefinitionNode(String dName, Declaration... fields) {
+        this.dName = dName;
         this.fields = List.of(fields);
-        this.parentType = null;
+        this.parentDName = null;
     }
 
     @Override

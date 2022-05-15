@@ -8,8 +8,6 @@ import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
-import static STDLIB.STDLIBC.*;         //C imports and defines
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +37,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
      * Flag indicating if we are in a design definition. Used for generating different C code from within
      * a Design Declaration.
      */
-    private boolean isInsideDesignDefinition = false;
+    private DesignDefinitionNode currentDesignDefinition = null;
 
     public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
@@ -289,39 +287,38 @@ public class CCodeGenerator implements ASTvisitor<String> {
      */
     public String visit(DesignDefinitionNode n) {
         //Design declarations should be handled differently inside a design
-        isInsideDesignDefinition = true;
+        currentDesignDefinition = n;
 
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
-
             designBody += TAB.repeat(indent) + field.accept(this);
         }
         indent--;
 
-        if (n.parentType != null) {
+        if (n.parentDName != null) {
             definitions +=  """
                     struct %s {
                     struct %s parent;
                     %s};
                     """.formatted(
-                    n.typeDefinition.name,
-                    n.parentType.name,
+                    n.dName,
+                    n.parentDName,
                     designBody,
-                    n.typeDefinition
+                    n.dName
             );
         } else {
             definitions +=  """
                     struct %s {
                     %s};
                     """.formatted(
-                    n.typeDefinition.name,
+                    n.dName,
                     designBody,
-                    n.typeDefinition
+                    n.dName
                     );
         }
 
-        isInsideDesignDefinition = false;
+        currentDesignDefinition = null;
 
         return "";
     }
@@ -417,7 +414,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String actionMapping = "";
 
         //Create action mappings if outside of design definition
-        if (!isInsideDesignDefinition) {
+        if (currentDesignDefinition == null) {
             SymbolTable initialST = TENV.receiveType(n.dName).fields;
             actionMapping = makeActionMapping(initialST, n.name);
         }
@@ -442,6 +439,16 @@ public class CCodeGenerator implements ASTvisitor<String> {
             );
         }
 
+        if (hasSelfReference(n)) {
+            //Add pointer to self, if design definition contains a reference to itself to handle incomplete C struct
+            return removeEmptyLines(
+                    """
+                    struct %s %s*;
+                    %s
+                    """.formatted(n.dName, n.name, actionMapping)
+            );
+        }
+
         return removeEmptyLines(
                 """
                 struct %s %s;
@@ -449,6 +456,26 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 """.formatted(n.dName, n.name, actionMapping)
         );
 
+    }
+
+    /**
+     * Checks weather or not the design definition have a reference to itself
+     *
+     * Ex: design Node {
+     *     Node next; <-- References its own type
+     *     Node prev;
+     * }
+     *
+     * @param n
+     * @return
+     */
+    private boolean hasSelfReference(DesignDeclarationNode n) {
+
+        if (currentDesignDefinition == null) {
+            return false;
+        }
+
+        return n.dName.equals(currentDesignDefinition.dName);
     }
 
     private String removeEmptyLines(String code) {

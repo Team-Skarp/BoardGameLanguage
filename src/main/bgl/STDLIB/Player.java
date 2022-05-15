@@ -21,7 +21,7 @@ public class Player implements PredefinedDesign {
     @Override
     public DesignDefinitionNode getDesign() {
         return new DesignDefinitionNode(
-                new IdNode("Player"),
+                "Player",
                 new StringDeclarationNode(
                         "name"
                 ),

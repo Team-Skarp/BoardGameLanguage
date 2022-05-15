@@ -207,14 +207,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
         if (ctx.FROM() != null) {
             return new DesignDefinitionNode(
-                    new IdNode(ctx.IDENTIFIER(0).getText()),
-                    new IdNode(ctx.IDENTIFIER(1).getText()),
+                    ctx.IDENTIFIER(0).getText(),
+                    ctx.IDENTIFIER(1).getText(),
                     fields.toArray(new Declaration[0])
             );
         }
         else {
             return new DesignDefinitionNode(
-                    new IdNode(ctx.IDENTIFIER(0).getText()),
+                    ctx.IDENTIFIER(0).getText(),
                     fields.toArray(new Declaration[0])
             );
         }

@@ -62,7 +62,7 @@ public class SymbolHarvesterTest {
         symbolHarvester = new SymbolHarvester();
 
         DesignDefinitionNode playerDefinition = new DesignDefinitionNode(
-                new IdNode("Player"),
+                "Player",
                 new StringDeclarationNode("name")
         );
 
@@ -76,12 +76,12 @@ public class SymbolHarvesterTest {
         symbolHarvester = new SymbolHarvester();
 
         DesignDefinitionNode Color = new DesignDefinitionNode(
-                new IdNode("Color"),
+                "Color",
                 new StringDeclarationNode("name")
         );
 
         DesignDefinitionNode Player = new DesignDefinitionNode(
-                new IdNode("Player"),
+                "Player",
                 new DesignDeclarationNode(
                         "Color",
                         "color")

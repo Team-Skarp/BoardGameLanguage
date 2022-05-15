@@ -10,8 +10,6 @@ import SymbolTable.types.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Type;
-
 import static CodeGeneration.CCodeGenerator.toCType;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,8 +45,8 @@ class CCodeGeneratorTest {
         String expected =
                 """
                 struct Tile {
-                \tstruct Tile next;
-                \tstruct Tile prev;
+                \tstruct Tile next*;
+                \tstruct Tile prev*;
                 \tstruct Piece pieces[];
                 \tbool (*isEmpty)();
                 };
