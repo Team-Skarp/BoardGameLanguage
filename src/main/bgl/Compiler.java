@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 public class Compiler {
 
     // Code for StreamGobbler Taken from: https://www.baeldung.com/run-shell-command-in-java
-    private record StreamGobbler(
+    private record ProcessStreamGobbler(
             InputStream inputStream,
             Consumer<String> consumer
     ) implements Runnable {
@@ -33,7 +33,7 @@ public class Compiler {
         }
     }
 
-    private static String handleFileNaming(List<String> args) {
+    private static String checkArgsForFileNameOrDefault(List<String> args) {
         String outputFileName;
 
         // check for "-o" flag
@@ -50,7 +50,7 @@ public class Compiler {
         return outputFileName;
     }
 
-    private static String handleFilePath(List<String> args) {
+    private static String checkArgsForFilePath(List<String> args) {
         String inputFilePath = "";
         for (String arg: args) {
             if (arg.contains(".bgl")) {
@@ -61,7 +61,7 @@ public class Compiler {
         return inputFilePath;
     }
 
-    private static ASTvisitor getCodeGenerator(List<String> args, SymbolTable ST, SymbolHarvester SH) {
+    private static ASTvisitor createCodeGeneratorBasedOnArgs(List<String> args, SymbolTable ST, SymbolHarvester SH) {
         // C code generation - specified
         if (args.contains("-c")) {
             return new CCodeGenerator(ST, SH.TENV);
@@ -94,7 +94,7 @@ public class Compiler {
         }
     }
 
-    private static void writeBinary(String outputFileName) throws IOException, InterruptedException {
+    private static void writeExecutable(String outputFileName) throws IOException, InterruptedException {
         // Locate C files.
         File stdlibFile = new File("./src/main/bgl/BglFiles/Generated/bgllib.h");
         File userFile = new File("./src/main/bgl/BglFiles/Generated/%s".formatted(outputFileName));
@@ -108,23 +108,21 @@ public class Compiler {
 
             // "/c" - creates a new shell, execute the provided command, and exit from the shell automatically
             if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                builder.command("cmd.exe", "/c", "gcc", "src/main/bgl/BglFiles/Generated/test.c");
+                builder.command("cmd.exe", "/c", "gcc", "-std=gnu11" , inputFilePath , "-o", outputFilePath);
             } else {
-                builder.command("cmd", "gcc", inputFilePath, "-o", outputFilePath);
+                builder.command("sh", "-c", "gcc", inputFilePath, "-o", outputFilePath);
             }
 
-//            if (System.getProperty("os.name").toLowerCase().startsWith("windows")){
-//                builder.command("cmd.exe", "/c", "dir");
-//            } else {
-//                builder.command("sh", "-c", "ls");
-//            }
-
+            // Start Process and Process Stream Gobbler
             Process process = builder.start();
-            StreamGobbler gobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+            ProcessStreamGobbler gobbler = new ProcessStreamGobbler(process.getInputStream(), System.out::println);
             Executors.newSingleThreadExecutor().submit(gobbler);
 
-            int exitCode = process.waitFor();
-            assert exitCode == 0;
+            if (process.waitFor() == 0) {
+                System.out.println(outputFileName + " compiled successfully");
+                process.destroy();
+                System.exit(0);
+            }
         }
     }
 
@@ -145,7 +143,7 @@ public class Compiler {
         SymbolTable stdST = (SymbolTable) stdAST.accept(stdSH);
 
         // STDLIB Code generator
-        ASTvisitor stdGenerator = getCodeGenerator(arguments, stdST, stdSH);
+        ASTvisitor stdGenerator = createCodeGeneratorBasedOnArgs(arguments, stdST, stdSH);
 
         // STDLIB COde
         stdAST.accept(stdGenerator);
@@ -155,13 +153,13 @@ public class Compiler {
         StringBuilder userCode = new StringBuilder();
 
 
-        try(BufferedReader reader = new BufferedReader(new FileReader(handleFilePath(arguments)))) {
+        try(BufferedReader reader = new BufferedReader(new FileReader(checkArgsForFilePath(arguments)))) {
             List<String> productList = reader.lines().toList();
             for (String str: productList) {
                 userCode.append(str);
             }
         } catch (IOException e) {
-            throw new IOException("No such file found: %s".formatted(handleFilePath(arguments)));
+            throw new IOException("No such file found: %s".formatted(checkArgsForFilePath(arguments)));
         }
 
         // Parse Input
@@ -179,13 +177,14 @@ public class Compiler {
         SymbolTable ST = (SymbolTable) ast.accept(SH);
 
         // Generator and file naming
-        ASTvisitor generator = getCodeGenerator(arguments, ST, SH);
-        String outputFileName = handleFileNaming(arguments);
+        ASTvisitor generator = createCodeGeneratorBasedOnArgs(arguments, ST, SH);
+        String outputFileName = checkArgsForFileNameOrDefault(arguments);
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);
         String outputPath = "./src/main/bgl/BglFiles/Generated/%s".formatted(outputFileName);
 
+        // Write generated C-code to specified output file
         try (FileWriter fw = new FileWriter(outputPath, false)) {
             fw.write(code);
         } catch (IOException ex) {
@@ -194,7 +193,7 @@ public class Compiler {
 
         // if output file format is C and -full flag is present compile with GCC
         if (arguments.contains("-full") && arguments.contains("-c")) {
-            writeBinary(outputFileName);
+            writeExecutable(outputFileName);
         }
 
     }
