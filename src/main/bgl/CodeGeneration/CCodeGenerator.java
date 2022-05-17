@@ -58,13 +58,18 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         userCode =
                 """
-                int main(int argc, char *argv[]) {
-                    %s
-                    while(true) {
-                       %s
-                    }
-                }
-                """.formatted(
+                        int main(int argc, char *argv[]) {
+                           time_t t;
+                           
+                           /* Intializes random number generator */
+                           srand((unsigned) time(&t));
+                           int rollDice = rand();
+                            %s
+                            while(true) {
+                               %s
+                            }
+                        }
+                        """.formatted(
                     n.setup.accept(this),
                     n.gameloop.accept(this)
                 );
@@ -813,8 +818,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 if(symbol.type instanceof IntType){
                     str +="%d";
                     endPart += (","+((IdNode) p).name);
-
-                }else if(symbol.type instanceof StringType){
+                } else if(symbol.type instanceof StringType){
                     if(foreachDict.get(symbol.name) == "c"){
                         str +="%c";
                         endPart += (",*"+((IdNode) p).name);
@@ -940,5 +944,16 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return """
                exit(EXIT_SUCCESS);
                """;
+    }
+
+    @Override
+    public String visit(RandomNode n) {
+        String rand = "printf(\"%d\", rand() % ";
+
+        rand += """
+               %d);
+               """.formatted(n.diceSize.value);
+
+        return rand;
     }
 }

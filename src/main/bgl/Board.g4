@@ -67,6 +67,7 @@ IN          : 'in';
 UNI_DIR     : 'uni';
 BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
+RANDOM      : 'random';
 
 PRINT       : 'print';
 INPUT       : 'input';
@@ -245,6 +246,10 @@ exitStatement
     : EXIT
     ;
 
+randomCall
+    : RANDOM LPAREN IDENTIFIER RPAREN
+    ;
+
 actionCall
     : IDENTIFIER LPAREN (expression | expression (COMMA expression )+)? RPAREN
     ;
@@ -329,6 +334,7 @@ statement
     | expression EOL
     | returnStatement EOL
     | exitStatement EOL
+    | randomCall EOL
     ;
 
 expression
@@ -431,7 +437,7 @@ foreach
     ;
 
 print
-    : PRINT LPAREN (STR | booleanExpression)? (COMMA (STR | booleanExpression))* RPAREN EOL
+    : PRINT LPAREN (STR | booleanExpression | randomCall)? (COMMA (STR | booleanExpression) | randomCall)* RPAREN EOL
     ;
 
 input

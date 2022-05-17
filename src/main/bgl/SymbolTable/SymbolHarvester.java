@@ -439,6 +439,17 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(RandomNode n) {
+        TC = new TypeChecker(ST, TENV);
+
+        if ((n.diceSize != null) && (n.diceSize.accept(TC).getClass() != IntType.class)) {
+            throw new TypeErrorException("Types in assignment did not match");
+        }
+
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(ListElementNode n) {
         return ST;
     }

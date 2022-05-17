@@ -233,6 +233,10 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         return null;
     }
 
+    @Override
+    public TypeDenoter visit(RandomNode n) {
+        return null;
+    }
 
 
     @Override

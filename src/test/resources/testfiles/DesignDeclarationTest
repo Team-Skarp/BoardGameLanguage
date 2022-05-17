@@ -1,6 +1,8 @@
-SETUP {
+GAME {
+    SETUP {
 
-    design LudoPiece {
-        str color;
+        design LudoPiece {
+            str color;
+        }
     }
 }
