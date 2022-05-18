@@ -951,7 +951,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String str = "printf(\"Dice number: %d\", rand() % ";
 
         str += """
-               %d);
+               %d + 1);
                """.formatted(n.diceSize.value);
         str += EOL;
 
