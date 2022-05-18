@@ -237,7 +237,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
         for (Declaration field : n.fields) {
             if (field instanceof ActionDeclarationNode action) {
-                injectSelfActionDcl(n, action);
+                injectSelfAsParam(n, action);
             }
             sym = new Symbol(field.varName(), field.type());
             fields.enterSymbol(sym);
@@ -318,7 +318,9 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     private boolean isMethod(ActionDefinitionNode action) {
 
         //Check if first formal parameter is a design declaration
-        if (!(action.formalParameters.get(0) instanceof DesignDeclarationNode)) {
+        if (!  (action.formalParameters.size() > 0 &&
+                action.formalParameters.get(0) instanceof DesignDeclarationNode)
+        ) {
             return false;
         }
 
@@ -380,7 +382,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
      * Mutates the action declaration
      * @param action
      */
-    private void injectSelfActionDcl(DesignDefinitionNode self, ActionDeclarationNode action) {
+    private void injectSelfAsParam(DesignDefinitionNode self, ActionDeclarationNode action) {
 
         //Make a copy of the formal parameters and inject self parameter
         List<Declaration> copy = new ArrayList<>(action.formalParameters);

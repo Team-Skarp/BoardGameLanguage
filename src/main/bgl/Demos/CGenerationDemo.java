@@ -49,8 +49,8 @@ public class CGenerationDemo {
                 
                 GAMELOOP {
                     if (true) {
-                        //myAnimal.isMammal(myName);
-                        isMammal(myAnimal);
+                        myAnimal.isMammal(myName);
+                        //isMammal(myAnimal);
                         print("I am a mammal");
                     }
                 }
