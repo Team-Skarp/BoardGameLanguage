@@ -247,7 +247,7 @@ exitStatement
     ;
 
 randomCall
-    : RANDOM LPAREN IDENTIFIER RPAREN
+    : RANDOM LPAREN INT RPAREN
     ;
 
 actionCall
