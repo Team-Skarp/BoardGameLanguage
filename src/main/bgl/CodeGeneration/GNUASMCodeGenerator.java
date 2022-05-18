@@ -3,19 +3,13 @@ package CodeGeneration;
 import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import Logging.Logger;
-import SymbolTable.Block;
 import SymbolTable.Symbol;
 import SymbolTable.SymbolTable;
 import SymbolTable.types.BoolType;
 import SymbolTable.types.IntType;
 import SymbolTable.types.StringType;
 import SymbolTable.types.VoidType;
-import com.sun.jdi.IntegerType;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.util.HashMap;
-import java.util.List;
 
 public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
@@ -49,8 +43,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     String lastIdNode;
     //this is the last ptr used
     int ptr = 0;
-    //how many pushes to the stack, to be used to align stack
-    int pushes = 0;
     public GNUASMCodeGenerator(SymbolTable ST) {
         this.ST = ST;
     }
@@ -107,6 +99,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 4:
                 """.formatted(functions);
 
+                //make sure we subtract the right amount so not to get segmentation fault
+                int subrsp = 8;
+                while(pointerOffset > subrsp){
+                    subrsp*=2;
+                }
         String initialize = """
                 main:
                 .LFB6:
@@ -120,7 +117,7 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 	sub rsp, %d
                 	mov	DWORD PTR -%d[rbp], edi
                  	mov	QWORD PTR -%d[rbp], rsi
-                """.formatted(pushes%2 == 1 ? 8: 16,pointerOffset,pointerOffset+12);
+                """.formatted(subrsp,pointerOffset,pointerOffset+12);
         data += """
                             .text
                             .type	main, @function
@@ -140,12 +137,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PlusNode n) {
-        //String str = " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
-        /*pointerOffset += 4;
-        ptr = pointerOffset-16;
-        String str = (n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this);
-        str += (n.right.getClass() == IntNode.class || n.right.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.right.accept(this)) : (String) n.right.accept(this);
-        */
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -166,11 +157,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(MinusNode n) {
-        //String str = " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
-        /*String str = (n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this);
-        str += (n.right.getClass() == IntNode.class || n.right.getClass() == UnaryMinusNode.class) ? "\n\tsub DWORD PTR -%d[rbp], %s".formatted(ptr,n.right.accept(this)) : (String) n.right.accept(this);
-        */
-        //return str;
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -190,41 +176,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(UnaryMinusNode n) {
-        //String str = " ( -( "+n.operand.accept(this)+" ) ) ";
         return "-"+n.operand.accept(this);
     }
 
     @Override
     public String visit(MultNode n) {
-        //String str = " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
-        //(n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tsub DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this);
-        /*ptr = pointerOffset-16;
-        String str2 = """
-                    %s
-                	mov	eax, DWORD PTR -%d[rbp]
-                	sub eax, 2
-                	mov	DWORD PTR -%d[rbp], 0	
-                	jmp	.L%d
-                .L%d:
-                	add	DWORD PTR -%d[rbp], ebx
-                	add	DWORD PTR -%d[rbp], 1	
-                .L%d:
-                	cmp	DWORD PTR -%d[rbp], eax
-                	jle	.L%d
-                """.formatted((n.left.getClass() == IntNode.class || n.left.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.left.accept(this)) : (String) n.left.accept(this)
-                        ,ptr,ptr+4,LAmount,LAmount+1,ptr+8,ptr+4,LAmount,ptr+4,LAmount+1);
-        LAmount+=2;
-        pointerOffset += 8;
-        ptr = pointerOffset-16;
-        String str1 = """
-                mov DWORD PTR -%d[rbp], 0
-                %s
-                mov ebx, DWORD PTR -%d[rbp]     
-                """.formatted(ptr,
-                (n.right.getClass() == IntNode.class || n.right.getClass() == UnaryMinusNode.class) ? "\n\tadd DWORD PTR -%d[rbp], %s".formatted(ptr,n.right.accept(this)) : (String) n.right.accept(this)
-                ,ptr);
-
-        return str1+str2;*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -240,16 +196,10 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                     """.formatted(n.left.accept(this),n.right.accept(this));
             return str;
         }
-        /*String str = """
-                	mov eax, DWORD PTR -%d[rbp]
-                	imul eax, %s
-                	mov DWORD PTR -8[rbp], eax
-                """.formatted(ptr);*/
     }
 
     @Override
     public String visit(DivNode n) {
-        //String str = " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -271,7 +221,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ModNode n) {
-        //String str = " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -294,38 +243,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PowNode n) {
-       /* String str = """
-                	mov	DWORD PTR -%d[rbp], %s
-                	mov	DWORD PTR -%d[rbp], %s
-                	mov	eax, DWORD PTR -%d[rbp]	
-                	mov	DWORD PTR -%d[rbp], eax	
-                	mov	DWORD PTR -%d[rbp], 1	
-                	jmp	.L%d	
-                .L%d:
-                	mov	eax, DWORD PTR -%d[rbp]	
-                	mov	DWORD PTR -%d[rbp], eax	
-                	mov	DWORD PTR -%d[rbp], 1	
-                	jmp	.L%d	
-                .L%d:
-                	mov	eax, DWORD PTR -%d[rbp]	
-                	add	DWORD PTR -%d[rbp], eax	
-                	add	DWORD PTR -%d[rbp], 1	
-                .L%d:
-                	mov	eax, DWORD PTR -%d[rbp]	
-                	cmp	eax, DWORD PTR -%d[rbp]	
-                	jl	.L%d	
-                	add	DWORD PTR -%d[rbp], 1
-                .L%d:
-                	mov	eax, DWORD PTR -%d[rbp]	
-                	cmp	eax, DWORD PTR -%d[rbp]	
-                	jl	.L%d
-                """.formatted(ptrVarDecl,n.left.accept(this),ptr+12,n.right.accept(this),ptrVarDecl,ptr+8,ptr+20,LAmount,LAmount+3,
-                    ptrVarDecl, ptr+4, ptr+16,LAmount+1,LAmount+2,ptr+4,ptrVarDecl,ptr+16,LAmount+1,ptr+16,ptr+8,LAmount+2,ptr+20
-                    ,LAmount,ptr+20,ptr+12,LAmount+3
-                    );
-        pointerOffset += 24;
-        ptr = pointerOffset-16;
-        LAmount+=4;*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -356,8 +273,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                     """.formatted(n.left.accept(this),ptr,temp+1,temp,ptr,temp+1,n.right.accept(this),temp);
             return str;
         }
-        //String str = ""+n.right.accept(this);
-        //return str;
     }
     @Override
     public String visit(IdNode n) {
@@ -393,10 +308,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(EqualNode n) {
-        /*String a = n.left.accept(this)+"";
-        String b = n.right.accept(this)+"";
-        String str = "(!("+a+">"+b+")&&!("+a+"<"+b+"))";
-        return str;*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -424,10 +335,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(NotEqualNode n) {
-        /*String a = n.left.accept(this)+"";
-        String b = n.right.accept(this)+"";
-        String str = "(("+a+">"+b+")||("+a+"<"+b+"))";
-        return str;*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -454,8 +361,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(LessThanNode n) {
-        /*String str = " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
-        return str;*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -482,8 +387,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(GreaterThanNode n) {
-        /*String str = " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
-        return str;*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -510,10 +413,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(GreaterThanEqualsNode n) {
-        /*String a = n.left.accept(this)+"";
-        String b = n.right.accept(this)+"";
-        String str = "((!("+a+">"+b+")&&!("+a+"<"+b+"))||("+a+">"+b+"))";
-        return str;*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -540,15 +439,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(LessThanEqualsNode n) {
-        /*String a = n.left.accept(this)+"";
-        String b = n.right.accept(this)+"";
-        String str = "((!("+a+">"+b+")&&!("+a+"<"+b+"))||("+a+"<"+b+"))";
-        return str;*/
-        /*if(n.left.accept(this) <= n.right.accept(this)){
-            return "1";
-        }else{
-            return "0";
-        }*/
         try{
             int a = Integer.parseInt((String)n.left.accept(this));
             int b = Integer.parseInt((String)n.right.accept(this));
@@ -575,8 +465,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(NegationNode n) {
-        /*String str = " ( !( "+n.child.accept(this)+" ) )";
-        return str;*/
         if(n.child.accept(this) == "0"){
             return "-1";
         }else if(n.child.accept(this) == "-1"){
@@ -591,8 +479,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(OrNode n) {
-        /*String str = " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
-        return str;*/
         if((n.left.accept(this) == "-1" && n.right.accept(this) == "0")||
                 (n.left.accept(this) == "0" && n.right.accept(this) == "-1")||
                 (n.left.accept(this) == "0" && n.right.accept(this) == "0")){
@@ -612,7 +498,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(AndNode n) {
-        //String str = " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
         if(n.left.accept(this) == "0" && n.right.accept(this) == "0"){
             return "0";
         }else if((n.left.accept(this) == "-1" && n.right.accept(this) == "0")||(n.left.accept(this) == "0" && n.right.accept(this) == "-1")||(n.left.accept(this) == "-1" && n.right.accept(this) == "-1")){
@@ -998,7 +883,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(PrintNode n) {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        //TODO: implement symbol table, implement all idnodes, implement the rest of the nodes. retrieve pointer loc.
         LAmount++;
         printNode = n;
         String str = "";
@@ -1155,7 +1039,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
             }
             parameters+= """
                     \npush %s""".formatted(parm);
-            pushes++;
         }
         String str = """
                 	%s
@@ -1195,6 +1078,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ExitNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(RandomNode n) {
         return null;
     }
 }

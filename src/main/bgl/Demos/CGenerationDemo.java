@@ -31,10 +31,12 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
+                   int a = 3;
                    design Animal {
                         str name;
                         action isMammal(str name):bool;
                    }
+                   exit;
                    
                    Animal myAnimal;
                    str myName = "Elephant";
@@ -52,6 +54,9 @@ public class CGenerationDemo {
                         myAnimal.isMammal(myName);
                         //isMammal(myAnimal);
                         print("I am a mammal");
+                        random(6);
+                        exit;
+                        print(a);
                     }
                 }
                 """;

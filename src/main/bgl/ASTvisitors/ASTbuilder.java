@@ -301,6 +301,16 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitRandomCall(BoardParser.RandomCallContext ctx) {
+
+        if(ctx.INT() != null) {
+            return new RandomNode(new IntNode(Integer.parseInt(ctx.INT().getText()))
+            );
+        }
+        return null;
+    }
+
+    @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
         List<Expression> actualParams = new ArrayList<>();
 
@@ -772,6 +782,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.exitStatement() != null) {
             return ctx.exitStatement().accept(this);
+        }
+        else if (ctx.randomCall() != null) {
+            return ctx.randomCall().accept(this);
         }
 
         return null;
