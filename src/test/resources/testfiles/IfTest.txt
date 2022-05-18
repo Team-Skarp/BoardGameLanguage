@@ -1,4 +1,5 @@
-SETUP {
-
-    if (a > b) {int a = 3;}
+GAME {
+    SETUP {
+        if (a > b) {int a = 3;}
+    }
 }

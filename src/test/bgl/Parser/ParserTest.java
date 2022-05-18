@@ -35,7 +35,6 @@ public class ParserTest {
             parser.removeErrorListeners();
             parser.addErrorListener(SyntaxErrorListener.INSTANCE);
 
-
             try {
                 ParseTree walker = parser.arithmeticExpression(); // parse the input stream!
 

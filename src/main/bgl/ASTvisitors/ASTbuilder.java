@@ -4,7 +4,6 @@ import ASTnodes.*;
 import SymbolTable.TypeErrorException;
 import antlr.BoardParser;
 import antlr.BoardVisitor;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -207,14 +206,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
         if (ctx.FROM() != null) {
             return new DesignDefinitionNode(
-                    new IdNode(ctx.IDENTIFIER(0).getText()),
-                    new IdNode(ctx.IDENTIFIER(1).getText()),
+                    ctx.IDENTIFIER(0).getText(),
+                    ctx.IDENTIFIER(1).getText(),
                     fields.toArray(new Declaration[0])
             );
         }
         else {
             return new DesignDefinitionNode(
-                    new IdNode(ctx.IDENTIFIER(0).getText()),
+                    ctx.IDENTIFIER(0).getText(),
                     fields.toArray(new Declaration[0])
             );
         }
@@ -297,6 +296,21 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitExitStatement(BoardParser.ExitStatementContext ctx) {
+        return new ExitNode();
+    }
+
+    @Override
+    public ASTNode visitRandomCall(BoardParser.RandomCallContext ctx) {
+
+        if(ctx.INT() != null) {
+            return new RandomNode(new IntNode(Integer.parseInt(ctx.INT().getText()))
+            );
+        }
+        return null;
+    }
+
+    @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
         List<Expression> actualParams = new ArrayList<>();
 
@@ -314,10 +328,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
-        //TODO: Implement
         int idX = 0;
         int acX = 0;
         List<Accessable> accessors = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
             if (node instanceof TerminalNode T) {
                 if (T.equals(ctx.IDENTIFIER(idX))) {
@@ -326,7 +340,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                 }
             }
             else {
-                accessors.add((Accessable) ctx.actionCall(acX).accept(this));
+                accessors.add(new MethodCallNode(
+                        (ActionCallNode) ctx.actionCall(acX).accept(this),
+                        ctx.IDENTIFIER(idX - 1).getText())
+                );
                 acX++;
             }
         }
@@ -762,6 +779,12 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if (ctx.returnStatement() != null) {
             return ctx.returnStatement().accept(this);
+        }
+        else if (ctx.exitStatement() != null) {
+            return ctx.exitStatement().accept(this);
+        }
+        else if (ctx.randomCall() != null) {
+            return ctx.randomCall().accept(this);
         }
 
         return null;

@@ -62,7 +62,7 @@ public class SymbolHarvesterTest {
         symbolHarvester = new SymbolHarvester();
 
         DesignDefinitionNode playerDefinition = new DesignDefinitionNode(
-                new IdNode("Player"),
+                "Player",
                 new StringDeclarationNode("name")
         );
 
@@ -76,12 +76,12 @@ public class SymbolHarvesterTest {
         symbolHarvester = new SymbolHarvester();
 
         DesignDefinitionNode Color = new DesignDefinitionNode(
-                new IdNode("Color"),
+                "Color",
                 new StringDeclarationNode("name")
         );
 
         DesignDefinitionNode Player = new DesignDefinitionNode(
-                new IdNode("Player"),
+                "Player",
                 new DesignDeclarationNode(
                         "Color",
                         "color")
@@ -151,6 +151,34 @@ public class SymbolHarvesterTest {
         ST.dive();
         ST.retrieveSymbol("a");
         ST.retrieveSymbol("b");
+
+    }
+
+    @Test
+    public void action_declarations_saves_first_argument_as_self() {
+
+        symbolHarvester = new SymbolHarvester();
+
+        DesignDefinitionNode Animal = new DesignDefinitionNode(
+                "Animal",
+                new ActionDeclarationNode(
+                        "isMammal",
+                        new BoolType()
+                )
+        );
+
+        symbolHarvester.visit(Animal);
+        TypeEnvironment TENV = symbolHarvester.TENV;
+
+        //Grab action within design
+        SymbolTable AnimalST = TENV.receiveType("Animal").fields;
+        ActionType isMammal = (ActionType) AnimalST.retrieveSymbol("isMammal").type;
+
+        //We hope to find that the action have one formal parameter, namely 'self' of type Animal;
+        assertEquals(1, isMammal.formalParameters.size());
+        assertEquals("self", isMammal.formalParameters.get(0).varName());
+        assertEquals("Animal", isMammal.formalParameters.get(0).type().toString());
+
 
     }
 

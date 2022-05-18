@@ -1,0 +1,114 @@
+SETUP {
+    Piece piece1Player1;
+    Piece piece2Player1;
+    Piece piece3Player1;
+    Piece piece4Player1;
+
+    Piece piece1Player2;
+    Piece piece2Player2;
+    Piece piece3Player2;
+    Piece piece4Player2;
+
+    Piece piece1Player3;
+    Piece piece2Player3;
+    Piece piece3Player3;
+    Piece piece4Player3;
+
+    Piece piece1Player4;
+    Piece piece2Player4;
+    Piece piece3Player4;
+    Piece piece4Player4;
+
+    list:Piece player1Pieces = [piece1Player1, piece2Player1, piece3Player1, piece4Player1];
+    list:Piece player2Pieces = [piece1Player2, piece2Player2, piece3Player2, piece4Player2];
+    list:Piece player3Pieces = [piece1Player3, piece2Player3, piece3Player3, piece4Player3];
+    list:Piece player4Pieces = [piece1Player4, piece2Player4, piece3Player4, piece4Player4];
+
+    Player player1 = {"Red", player1Pieces};
+    Player player2 = {"Green", player2Pieces};
+    Player player3 = {"Blue", player3Pieces};
+    Player player4 = {"Yellow", player4Pieces};
+
+    path mainPath[52];
+
+    path player1EndPath[6];
+    path playerEnd2Path[6];
+    path player3EndPath[6];
+    path player4EndPath[6];
+
+    list:Path endPaths = [player1EndPath, player2EndPath, player3EndPath, player4EndPath];
+
+    int currentPlayer = 1;
+    int rollValue;
+    int pieceNumber;
+}
+
+RULES {
+    action selectPiece(): int {
+        int number = 0;
+        while (number < 1 || number > 4) {
+            print("Select a piece number between 1 and 4");
+            input(number);
+        }
+        return number;
+    }
+}
+
+GAMELOOP {
+    if (toast == 0) {
+        print("Welcome to basic Ludo, where there are almost no rules, you just have to get 4 pieces into goal before any other player. May the luckiest player win :)");
+        toast = 1;
+    }
+
+    if (currentPlayer == 5) {
+        currentPlayer = 1;
+    }
+
+    print("Player", currentPlayer, "'s turn");
+    print("Simulated dice roll");
+    rollValue = rollDice();
+    print("You rolled a ", diceNumber);
+
+    if (diceNumber == 6) {
+
+        int plchoice = -1;
+
+        while (plchoice < 0 || plchoice > 6) {
+            print("Enter 0 to move a piece from home to start, or select a piece number between 1 and 6 to move");
+            input(plchoic);
+        }
+    }
+
+    if (plchoice == 0) {
+        jump();
+    }
+    elseif (players[i].piecesOnPath != 0) {
+        pieceNumber = plchoice;
+        players[i].pieces[pieceNumber].move(rollValue);
+    }
+
+    if (endPaths[i].[6].pieces[4] != null) {
+        print(players[i].name, "has won. Congratulations!");
+        exit;
+    }
+
+    currentPlayer++;
+}
+
+"win condition:";
+"check if the end tile for the current player has its fourth slot occupied";
+
+"issues:";
+
+"piece is not defined"
+"how to move from main path to end paths";
+"how does the piece actually move from one tile to the next?";
+"do we need a comment feature in our language? /* identifer */";
+"how do we keep track of where each piece is?";
+"do we have a built in move piece function that works?";
+"how do we limit the die to 6 values";
+"random int 1-6 is this working?";
+"move a piece from home area";
+"how to find the next piece in home area?";
+"how does this move piece to start tile?";
+                                                              

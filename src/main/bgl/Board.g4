@@ -67,9 +67,11 @@ IN          : 'in';
 UNI_DIR     : 'uni';
 BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
+RANDOM      : 'random';
 
 PRINT       : 'print';
 INPUT       : 'input';
+EXIT        : 'exit';
 
 //Delimiters
 LPAREN      : '(';
@@ -87,6 +89,10 @@ COMMA       : ',';
 IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
 NEWLINE : '\n'      -> skip;
 WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
+
+LINE_COMMENT
+    : '//' ~[\r\n]* -> skip
+    ;
 
 game
     : setup rules gameloop
@@ -236,6 +242,14 @@ returnStatement
     : RETURN expression
     ;
 
+exitStatement
+    : EXIT
+    ;
+
+randomCall
+    : RANDOM LPAREN IDENTIFIER RPAREN
+    ;
+
 actionCall
     : IDENTIFIER LPAREN (expression | expression (COMMA expression )+)? RPAREN
     ;
@@ -319,6 +333,8 @@ statement
     | input
     | expression EOL
     | returnStatement EOL
+    | exitStatement EOL
+    | randomCall EOL
     ;
 
 expression
@@ -421,7 +437,7 @@ foreach
     ;
 
 print
-    : PRINT LPAREN (STR | booleanExpression)? (COMMA (STR | booleanExpression))* RPAREN EOL
+    : PRINT LPAREN (STR | booleanExpression | randomCall)? (COMMA (STR | booleanExpression) | randomCall)* RPAREN EOL
     ;
 
 input

@@ -1,7 +1,9 @@
-SETUP {
+GAME {
+    SETUP {
 
-    action foo(int:a, int:b):bool {}
-    action boo(int:a, int:b) {}
-    action zoo(int:b):str {}
-    action too() {}
+        action foo(int:a, int:b):bool {}
+        action boo(int:a, int:b) {}
+        action zoo(int:b):str {}
+        action too() {}
+    }
 }

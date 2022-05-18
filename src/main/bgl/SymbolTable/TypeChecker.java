@@ -229,6 +229,17 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(ExitNode n) {
+        return null;
+    }
+
+    @Override
+    public TypeDenoter visit(RandomNode n) {
+        return null;
+    }
+
+
+    @Override
     public TypeDenoter visit(ListElementNode n) {
 
         return (TypeDenoter) n.accept(this);
@@ -649,6 +660,15 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         }
 
         return action.returnType;
+    }
+
+    @Override
+    //Hand control over to the type checking of an action call
+    public TypeDenoter visit(MethodCallNode n) {
+        return visit(new ActionCallNode(
+                n.actionName,
+                n.actualParameters
+        ));
     }
 
     @Override

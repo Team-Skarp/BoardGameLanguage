@@ -1,5 +1,7 @@
-SETUP {
+GAME {
+    SETUP {
 
-    if (3 > 4) {}
-    else {}
+        if (3 > 4) {}
+        else {}
+    }
 }

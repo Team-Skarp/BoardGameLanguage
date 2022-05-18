@@ -14,17 +14,14 @@ class DesignDefinitionNodeTest {
 
     @Test
     void acceptsWithDesignDefinitionNode() {
-        typeDefinition = new IdNode("StarTile");
-        idNodeParent = new IdNode("Tile");
-        designDefinitionNode = new DesignDefinitionNode(typeDefinition, idNodeParent);
+        designDefinitionNode = new DesignDefinitionNode("StarTile", "Tile");
 
         designDefinitionNode.accept(new PrettyPrinter());
     }
 
     @Test
     void acceptsWithoutDesignDefinitionNode() {
-        typeDefinition = new IdNode("StarTile");
-        designDefinitionNode = new DesignDefinitionNode(typeDefinition);
+        designDefinitionNode = new DesignDefinitionNode("StarTile");
 
         designDefinitionNode.accept(new PrettyPrinter());
     }
