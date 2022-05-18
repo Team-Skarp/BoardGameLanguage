@@ -948,12 +948,13 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(RandomNode n) {
-        String rand = "printf(\"%d\", rand() % ";
+        String str = "printf(\"Dice number: %d\", rand() % ";
 
-        rand += """
+        str += """
                %d);
                """.formatted(n.diceSize.value);
+        str += EOL;
 
-        return rand;
+        return str;
     }
 }
