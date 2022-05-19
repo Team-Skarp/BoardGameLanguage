@@ -31,33 +31,16 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                   int a = 3;
-                   design Animal {
-                        str name;
-                        action isMammal(str name):bool;
-                   }
-                   exit;
-                   
-                   Animal myAnimal;
-                   str myName = "Elephant";
+                    int b = 5;
+                    int a = random(6);
+                    int c = random(12);
+                    print(a);
                 }
+                
                 RULES {
-                    action isMammal(Animal self):bool {
-                        self.name = "Elephant";
-                        return true;
-                    }
-                    exit;
                 }
                 
                 GAMELOOP {
-                    if (true) {
-                        myAnimal.isMammal(myName);
-                        //isMammal(myAnimal);
-                        print("I am a mammal");
-                        random(6);
-                        exit;
-                        print(a);
-                    }
                 }
                 """;
         
