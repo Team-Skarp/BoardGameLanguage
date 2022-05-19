@@ -669,6 +669,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(IntegerDeclarationNode n) {
         //TODO Fix indent somewhere between this and sequential decl. Also fix sequential decl.
+        System.out.println(n.value);
         if (n.value != null) {
             return """
                    %s %s = %s;
@@ -677,13 +678,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.name,
                     n.value.accept(this)
             );
-        } else if(n.randomNode != null) {
-            return """
-                   %s %s = %s
-                   """.formatted(
-                    toCType(n.type()),
-                    n.name,
-                    n.randomNode.accept(this));
         }
         else {
             return """
@@ -956,9 +950,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(RandomNode n) {
         String str = "(rand() % ";
 
-        str += """
-               %d + 1);
-               """.formatted(n.diceSize.value);
+        str += "%d + 1)".formatted(n.diceSize.value);
         return str;
     }
 }

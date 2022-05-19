@@ -365,7 +365,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
-
         if (ctx.ASSIGN() != null) {
             return new IntegerAssignmentNode(
                     new IdNode(ctx.IDENTIFIER().getText()),

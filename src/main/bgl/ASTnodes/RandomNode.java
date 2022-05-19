@@ -2,7 +2,7 @@ package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
 
-public class RandomNode implements ASTNode {
+public class RandomNode implements ASTNode,ArithmeticExpression {
 
     public final IntNode diceSize;
 

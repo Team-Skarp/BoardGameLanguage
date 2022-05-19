@@ -8,17 +8,12 @@ public class IntegerDeclarationNode implements ASTNode<Object>, Declaration {
 
     public  String name;
     public ASTNode value;
-    public RandomNode randomNode;
 
     public IntegerDeclarationNode(String name) {
         this.name = name;
     }
     public IntegerDeclarationNode(String name, ASTNode value) {
-        if(value.getClass() == IntNode.class) {
-            this.value = value;
-        }else if(value.getClass() == RandomNode.class){
-            this.randomNode = (RandomNode) value;
-        }
+        this.value = value;
         this.name = name;
     }
 

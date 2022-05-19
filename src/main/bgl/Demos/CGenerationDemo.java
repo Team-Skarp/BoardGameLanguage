@@ -32,15 +32,21 @@ public class CGenerationDemo {
                 """
                 SETUP {
                     int b = 5;
-                    int a = random(6);
-                    int c = random(12);
-                    print(a);
+                    int a = random(5);
+                    int dice = random(6);
                 }
                 
                 RULES {
+                    action throwDice():int{
+                        return random(6);
+                    }
                 }
                 
                 GAMELOOP {
+                    a = throwDice();
+                    if(a == 1){print("Oh no, critical failure");}
+                    else{print(a);}
+                    if(a == 2) {exit;}
                 }
                 """;
         

@@ -235,7 +235,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     public TypeDenoter visit(RandomNode n) {
-        return null;
+        return new IntType();
     }
 
 
