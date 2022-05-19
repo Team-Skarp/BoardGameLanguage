@@ -3,6 +3,8 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
+
 #define foreach(item, array)                         \
     for (int keep = 1,                               \
              count = 0,                              \
