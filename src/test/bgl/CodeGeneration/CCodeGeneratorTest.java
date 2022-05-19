@@ -47,8 +47,8 @@ class CCodeGeneratorTest {
                 struct Tile {
                 \tstruct Tile *next;
                 \tstruct Tile *prev;
-                \tstruct Piece pieces[];
                 \tbool (*isEmpty)();
+                \tstruct Piece pieces[];
                 };
                 """;
 
