@@ -24,7 +24,6 @@ ACTIONDCL   : 'action';
 CHOICEDCL   : 'choice';
 PATHDCL     : 'path';
 GRIDDCL     : 'grid';
-VOIDDCL     : 'void';
 
 //Primitive types
 INT     : [0-9]+;

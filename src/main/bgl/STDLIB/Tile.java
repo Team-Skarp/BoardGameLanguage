@@ -21,8 +21,8 @@ public class Tile implements PredefinedDesign {
          * design Tile {
          *     Tile next;
          *     Tile prev;
-         *     list:Piece pieces;
          *     action isEmpty() : bool;
+         *     list:Piece pieces;
          * }
          */
         return new DesignDefinitionNode(
@@ -35,31 +35,39 @@ public class Tile implements PredefinedDesign {
                         "Tile",
                         "prev"
                 ),
-                new ListDeclarationNode(
-                        "pieces",
-                        new DesignRef("Piece")
-                ),
                 new ActionDeclarationNode(
                         "isEmpty",
                         new BoolType()
+                ),
+                new ListDeclarationNode(
+                        "pieces",
+                        new DesignRef("Piece")
                 )
         );
     }
 
     @Override
     public List<ActionDefinitionNode> getImplementedActions() {
-
         /**
          * action isEmpty(Tile self) : bool {
-         *     return self.peices.length > 0
+         *     return self.pieces.length < 0
          * }
          */
         ActionDefinitionNode isEmpty = new ActionDefinitionNode(
                 "isEmpty",
                 new BoolType(),
-                new ParameterBlock()
-                //TODO: Implemented rest of the action
-
+                new ParameterBlock(
+                        new LessThanNode(
+                                new ReturnNode(
+                                        new FieldAccessNode(List.of(
+                                                new IdNode("self"),
+                                                new IdNode("pieces"),
+                                                new IdNode("length"))
+                                        )
+                                ),
+                                new IntNode(0)
+                        )
+                )
         );
 
         return List.of(isEmpty);

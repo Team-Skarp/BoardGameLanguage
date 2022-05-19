@@ -32,7 +32,7 @@ SETUP {
     path mainPath[52];
 
     path player1EndPath[6];
-    path playerEnd2Path[6];
+    path player2EndPath[6];
     path player3EndPath[6];
     path player4EndPath[6];
 
