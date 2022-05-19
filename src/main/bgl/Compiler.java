@@ -101,16 +101,17 @@ public class Compiler {
 
         if (stdlibFile.exists() && userFile.exists()) {
             String inputFilePath = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.c");
-            String outputFilePath = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.exe");
+            String outputFilePathWin = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.exe");
+            String outputFilePathUnix = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.exe");
 
             // CMD command to compile with GNU compiler
             ProcessBuilder builder = new ProcessBuilder();
 
             // "/c" - creates a new shell, execute the provided command, and exit from the shell automatically
             if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                builder.command("cmd.exe", "/c", "gcc", "-std=gnu11" , inputFilePath , "-o", outputFilePath);
+                builder.command("cmd.exe", "/c", "gcc", "-std=gnu11" , inputFilePath , "-o", outputFilePathWin);
             } else {
-                builder.command("sh", "-c", "gcc", inputFilePath, "-o", outputFilePath);
+                builder.command("sh", "-c", "gcc", inputFilePath, "-o", outputFilePathUnix);
             }
 
             // Start Process and Process Stream Gobbler
@@ -151,7 +152,6 @@ public class Compiler {
 
         // User code generation
         StringBuilder userCode = new StringBuilder();
-
 
         try(BufferedReader reader = new BufferedReader(new FileReader(checkArgsForFilePath(arguments)))) {
             List<String> productList = reader.lines().toList();
