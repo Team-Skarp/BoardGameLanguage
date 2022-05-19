@@ -949,8 +949,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(RandomNode n) {
         String str = "(rand() % ";
-
-        str += "%d + 1)".formatted(n.diceSize.value);
+        str += "%s + 1)".formatted(n.diceSize.accept(this));
         return str;
     }
 }

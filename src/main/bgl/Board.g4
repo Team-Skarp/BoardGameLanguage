@@ -242,7 +242,7 @@ exitStatement
     ;
 
 randomCall
-    : RANDOM LPAREN INT RPAREN
+    : RANDOM LPAREN (INT | arithmeticExpression) RPAREN
     ;
 
 actionCall

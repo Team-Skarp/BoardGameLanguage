@@ -37,16 +37,14 @@ public class CGenerationDemo {
                 }
                 
                 RULES {
-                    action throwDice():int{
-                        return random(6);
+                    action throwDice(int start, int end):int{
+                        return random(end-start+1) +start-1;
                     }
                 }
                 
                 GAMELOOP {
-                    a = throwDice();
-                    if(a == 1){print("Oh no, critical failure");}
-                    else{print(a);}
-                    if(a == 2) {exit;}
+                    a = throwDice(100,250);
+                    print(a);
                 }
                 """;
         

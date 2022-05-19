@@ -302,9 +302,8 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitRandomCall(BoardParser.RandomCallContext ctx) {
-        if(ctx.INT() != null) {
-            return new RandomNode(new IntNode(Integer.parseInt(ctx.INT().getText()))
-            );
+        if(ctx.arithmeticExpression() != null) {
+            return new RandomNode((ArithmeticExpression)  ctx.arithmeticExpression().accept(this));
         }
         return null;
     }

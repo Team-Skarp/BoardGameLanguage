@@ -11,23 +11,21 @@ throwDice:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
+	subq	$16, %rsp
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
 	call	rand@PLT
-	movl	%eax, %ecx
-	movslq	%ecx, %rax
-	imulq	$715827883, %rax, %rax
-	shrq	$32, %rax
-	movq	%rax, %rdx
-	movl	%ecx, %eax
-	sarl	$31, %eax
-	subl	%eax, %edx
+	movl	-8(%rbp), %edx
+	subl	-4(%rbp), %edx
+	leal	1(%rdx), %ecx
+	cltd
+	idivl	%ecx
 	movl	%edx, %eax
-	addl	%eax, %eax
+	leal	1(%rax), %edx
+	movl	-4(%rbp), %eax
 	addl	%edx, %eax
-	addl	%eax, %eax
-	subl	%eax, %ecx
-	movl	%ecx, %edx
-	leal	1(%rdx), %eax
-	popq	%rbp
+	subl	$1, %eax
+	leave
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
@@ -35,8 +33,6 @@ throwDice:
 	.size	throwDice, .-throwDice
 	.section	.rodata
 .LC0:
-	.string	"Oh no, critical failure"
-.LC1:
 	.string	"%d\n"
 	.text
 	.globl	main
@@ -61,61 +57,18 @@ main:
 	call	time@PLT
 	movl	%eax, %edi
 	call	srand@PLT
-	movl	$5, -28(%rbp)
-	call	rand@PLT
-	movl	%eax, %ecx
-	movslq	%ecx, %rax
-	imulq	$1717986919, %rax, %rax
-	shrq	$32, %rax
-	movl	%eax, %edx
-	sarl	%edx
-	movl	%ecx, %eax
-	sarl	$31, %eax
-	subl	%eax, %edx
-	movl	%edx, %eax
-	sall	$2, %eax
-	addl	%edx, %eax
-	subl	%eax, %ecx
-	movl	%ecx, %edx
-	leal	1(%rdx), %eax
-	movl	%eax, -24(%rbp)
-	call	rand@PLT
-	movl	%eax, %ecx
-	movslq	%ecx, %rax
-	imulq	$715827883, %rax, %rax
-	shrq	$32, %rax
-	movq	%rax, %rdx
-	movl	%ecx, %eax
-	sarl	$31, %eax
-	subl	%eax, %edx
-	movl	%edx, %eax
-	addl	%eax, %eax
-	addl	%edx, %eax
-	addl	%eax, %eax
-	subl	%eax, %ecx
-	movl	%ecx, %edx
-	leal	1(%rdx), %eax
-	movl	%eax, -20(%rbp)
-.L7:
-	movl	$0, %eax
-	call	throwDice
-	movl	%eax, -24(%rbp)
-	cmpl	$1, -24(%rbp)
-	jne	.L4
-	leaq	.LC0(%rip), %rdi
-	call	puts@PLT
-	jmp	.L5
+	movl	$5, -24(%rbp)
 .L4:
-	movl	-24(%rbp), %eax
+	movl	$250, %esi
+	movl	$100, %edi
+	call	throwDice
+	movl	%eax, -20(%rbp)
+	movl	-20(%rbp), %eax
 	movl	%eax, %esi
-	leaq	.LC1(%rip), %rdi
+	leaq	.LC0(%rip), %rdi
 	movl	$0, %eax
 	call	printf@PLT
-.L5:
-	cmpl	$2, -24(%rbp)
-	jne	.L7
-	movl	$0, %edi
-	call	exit@PLT
+	jmp	.L4
 	.cfi_endproc
 .LFE7:
 	.size	main, .-main
