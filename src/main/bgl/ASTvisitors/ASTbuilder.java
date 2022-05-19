@@ -302,7 +302,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitRandomCall(BoardParser.RandomCallContext ctx) {
-
         if(ctx.INT() != null) {
             return new RandomNode(new IntNode(Integer.parseInt(ctx.INT().getText()))
             );
@@ -904,7 +903,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitArithmeticAtom(BoardParser.ArithmeticAtomContext ctx) {
-
         if (ctx.INT() != null) {
             return new IntNode(Integer.parseInt(ctx.INT().getText()));
         }
@@ -914,11 +912,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.arithmeticExpression() != null){
             return ctx.arithmeticExpression().accept(this);
         }
-        else if(ctx.fieldAccess() != null){
-            return ctx.fieldAccess().accept(this);
-        }
         else if(ctx.actionCall() != null) {
             return ctx.actionCall().accept(this);
+        }
+        else if(ctx.randomCall() != null) {
+            return ctx.randomCall().accept(this);
+        }
+        else if(ctx.fieldAccess() != null){
+            return ctx.fieldAccess().accept(this);
         }
 
         return null;
