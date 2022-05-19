@@ -220,15 +220,10 @@ gridDeclaration
     | GRIDDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT COMMA INT RSBRACE
     ;
 
-
 //Special and choice declarations should only be found in Rules block
 specialDeclaration
     : SPECIALDCL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
     ;
-
-/*choiceDeclaration
-    : CHOICEDCL IDENTIFIER LPAREN IDENTIFIER IDENTIFIER RPAREN (COLON primitiveType)? rulesBlock //Should have a special choice block
-    ;*/
 
 actionDeclaration
     : ACTIONDCL IDENTIFIER LPAREN (formalParameter | formalParameter (COMMA formalParameter)+)? RPAREN (COLON type)?
@@ -247,7 +242,7 @@ exitStatement
     ;
 
 randomCall
-    : RANDOM LPAREN IDENTIFIER RPAREN
+    : RANDOM LPAREN INT RPAREN
     ;
 
 actionCall
@@ -377,6 +372,7 @@ arithmeticAtom
     | actionCall
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
+    | randomCall
     | fieldAccess
     ;
 

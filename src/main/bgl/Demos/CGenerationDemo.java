@@ -31,11 +31,12 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                   int a = 5;
-                   str b = "hej";
-                   b = "favrel";
-                   bool c = true;
+                    int b = 5;
+                    int a = random(6);
+                    int c = random(12);
+                    print(a);
                 }
+                
                 RULES {
                 }
                 

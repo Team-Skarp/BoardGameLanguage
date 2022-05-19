@@ -63,7 +63,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                            
                            /* Intializes random number generator */
                            srand((unsigned) time(&t));
-                           int rollDice = rand();
                             %s
                             while(true) {
                                %s
@@ -292,7 +291,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(DesignDefinitionNode n) {
         //Design declarations should be handled differently inside a design
         currentDesignDefinition = n;
-
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
@@ -679,7 +677,15 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.name,
                     n.value.accept(this)
             );
-        } else {
+        } else if(n.randomNode != null) {
+            return """
+                   %s %s = %s
+                   """.formatted(
+                    toCType(n.type()),
+                    n.name,
+                    n.randomNode.accept(this));
+        }
+        else {
             return """
                    %s %s;
                    """.formatted(
@@ -948,12 +954,11 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(RandomNode n) {
-        String rand = "printf(\"%d\", rand() % ";
+        String str = "(rand() % ";
 
-        rand += """
-               %d);
+        str += """
+               %d + 1);
                """.formatted(n.diceSize.value);
-
-        return rand;
+        return str;
     }
 }
