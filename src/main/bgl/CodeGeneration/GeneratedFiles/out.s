@@ -57,13 +57,87 @@ main:
 	call	time@PLT
 	movl	%eax, %edi
 	call	srand@PLT
-	movl	$5, -24(%rbp)
+	movl	$5, -28(%rbp)
+	call	rand@PLT
+	movl	%eax, %ecx
+	movslq	%ecx, %rax
+	imulq	$1717986919, %rax, %rax
+	shrq	$32, %rax
+	movl	%eax, %edx
+	sarl	%edx
+	movl	%ecx, %eax
+	sarl	$31, %eax
+	subl	%eax, %edx
+	movl	%edx, %eax
+	sall	$2, %eax
+	addl	%edx, %eax
+	subl	%eax, %ecx
+	movl	%ecx, %edx
+	leal	1(%rdx), %eax
+	movl	%eax, -24(%rbp)
+	call	rand@PLT
+	movl	%eax, %ecx
+	movslq	%ecx, %rax
+	imulq	$715827883, %rax, %rax
+	shrq	$32, %rax
+	movq	%rax, %rdx
+	movl	%ecx, %eax
+	sarl	$31, %eax
+	subl	%eax, %edx
+	movl	%edx, %eax
+	addl	%eax, %eax
+	addl	%edx, %eax
+	addl	%eax, %eax
+	subl	%eax, %ecx
+	movl	%ecx, %edx
+	leal	1(%rdx), %eax
+	movl	%eax, -20(%rbp)
 .L4:
 	movl	$250, %esi
 	movl	$100, %edi
 	call	throwDice
-	movl	%eax, -20(%rbp)
-	movl	-20(%rbp), %eax
+	movl	%eax, -24(%rbp)
+	movl	-24(%rbp), %eax
+	movl	%eax, %esi
+	leaq	.LC0(%rip), %rdi
+	movl	$0, %eax
+	call	printf@PLT
+	call	rand@PLT
+	movl	%eax, %ecx
+	movslq	%ecx, %rax
+	imulq	$1717986919, %rax, %rax
+	shrq	$32, %rax
+	movl	%eax, %edx
+	sarl	%edx
+	movl	%ecx, %eax
+	sarl	$31, %eax
+	subl	%eax, %edx
+	movl	%edx, %eax
+	sall	$2, %eax
+	addl	%edx, %eax
+	subl	%eax, %ecx
+	movl	%ecx, %edx
+	leal	1(%rdx), %eax
+	movl	%eax, %esi
+	leaq	.LC0(%rip), %rdi
+	movl	$0, %eax
+	call	printf@PLT
+	call	rand@PLT
+	cltd
+	idivl	-24(%rbp)
+	movl	%edx, %eax
+	addl	$1, %eax
+	movl	%eax, %esi
+	leaq	.LC0(%rip), %rdi
+	movl	$0, %eax
+	call	printf@PLT
+	call	rand@PLT
+	movl	-24(%rbp), %edx
+	leal	5(%rdx), %ecx
+	cltd
+	idivl	%ecx
+	movl	%edx, %eax
+	addl	$1, %eax
 	movl	%eax, %esi
 	leaq	.LC0(%rip), %rdi
 	movl	$0, %eax

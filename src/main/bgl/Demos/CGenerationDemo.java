@@ -45,6 +45,9 @@ public class CGenerationDemo {
                 GAMELOOP {
                     a = throwDice(100,250);
                     print(a);
+                    print(random(5));
+                    print(random(a));
+                    print(random(a+5));
                 }
                 """;
         
