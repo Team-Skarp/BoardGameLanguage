@@ -1,42 +1,95 @@
 SETUP {
-    Piece piece1Player1;
-    Piece piece2Player1;
-    Piece piece3Player1;
-    Piece piece4Player1;
 
-    Piece piece1Player2;
-    Piece piece2Player2;
-    Piece piece3Player2;
-    Piece piece4Player2;
+    str questions = "
+                       "win condition:";
+                       "check if the end tile for the current player has its fourth slot occupied";
 
-    Piece piece1Player3;
-    Piece piece2Player3;
-    Piece piece3Player3;
-    Piece piece4Player3;
+                       "issues:";
 
-    Piece piece1Player4;
-    Piece piece2Player4;
-    Piece piece3Player4;
-    Piece piece4Player4;
+                       "how do we check if a tile's list of pieces is empty?"
+                       "what do we compile null into in C?"
 
-    list:Piece player1Pieces = [piece1Player1, piece2Player1, piece3Player1, piece4Player1];
-    list:Piece player2Pieces = [piece1Player2, piece2Player2, piece3Player2, piece4Player2];
-    list:Piece player3Pieces = [piece1Player3, piece2Player3, piece3Player3, piece4Player3];
-    list:Piece player4Pieces = [piece1Player4, piece2Player4, piece3Player4, piece4Player4];
+                       "how to move from main path to end paths";
+                       "how does the piece actually move from one tile to the next?";
+                       "do we need a comment feature in our language? /* STR */";
+                       "how do we keep track of where each piece is?";
+                       "do we have a built in move piece function that works?";
+                       "how do we limit the die to 6 values";
+                       "random int 1-6 is this working?";
+                       "move a piece from home area";
+                       "how to find the next piece in home area?";
+                       "how does this move piece to start tile?";
+                       "
 
-    Player player1 = {"Red", player1Pieces};
-    Player player2 = {"Green", player2Pieces};
-    Player player3 = {"Blue", player3Pieces};
-    Player player4 = {"Yellow", player4Pieces};
+    piece piece1Player1;
+    piece piece2Player1;
+    piece piece3Player1;
+    piece piece4Player1;
+
+    piece piece1Player2;
+    piece piece2Player2;
+    piece piece3Player2;
+    piece piece4Player2;
+
+    piece piece1Player3;
+    piece piece2Player3;
+    piece piece3Player3;
+    piece piece4Player3;
+
+    piece piece1Player4;
+    piece piece2Player4;
+    piece piece3Player4;
+    piece piece4Player4;
+
+    list:piece player1Pieces;
+    player1Pieces[1] = piece1Player1;
+    player1Pieces[2] = piece2Player1;
+    player1Pieces[3] = piece3Player1;
+    player1Pieces[4] = piece4Player1;
+
+    list:piece player2Pieces;
+    player2Pieces[1] = piece1Player2;
+    player2Pieces[2] = piece2Player2;
+    player2Pieces[3] = piece3Player2;
+    player2Pieces[4] = piece4Player2;
+
+    list:piece player3Pieces;
+    player3Pieces[1] = piece1Player3;
+    player3Pieces[2] = piece2Player3;
+    player3Pieces[3] = piece3Player3;
+    player3Pieces[4] = piece4Player3;
+
+    list:piece player4Pieces;
+    player4Pieces[1] = piece1Player4;
+    player4Pieces[2] = piece2Player4;
+    player4Pieces[3] = piece3Player4;
+    player4Pieces[4] = piece4Player4;
+
+    player player1 = {"Red", player1Pieces};
+    player player2 = {"Green", player2Pieces};
+    player player3 = {"Blue", player3Pieces};
+    player player4 = {"Yellow", player4Pieces};
+
+    list:player players;
+
+    players[1] = player1;
+    players[2] = player2;
+    players[3] = player3;
+    players[4] = player4;
 
     path mainPath[52];
 
     path player1EndPath[6];
-    path playerEnd2Path[6];
+    path player2EndPath[6];
     path player3EndPath[6];
     path player4EndPath[6];
 
-    list:Path endPaths = [player1EndPath, player2EndPath, player3EndPath, player4EndPath];
+    list:path endPaths;
+
+    endPaths[1] = player1EndPath;
+    endPaths[2] = player2EndPath;
+    endPaths[3] = player3EndPath;
+    endPaths[4] = player4EndPath;
 
     int currentPlayer = 1;
     int rollValue;
@@ -82,33 +135,17 @@ GAMELOOP {
     if (plchoice == 0) {
         jump();
     }
-    elseif (players[i].piecesOnPath != 0) {
+    elseif (players[currentPlayer].piecesOnPath != 0) {
         pieceNumber = plchoice;
-        players[i].pieces[pieceNumber].move(rollValue);
+        players[currentPlayer].pieces[pieceNumber].move(rollValue);
     }
 
-    if (endPaths[i].[6].pieces[4] != null) {
-        print(players[i].name, "has won. Congratulations!");
+    if (endPaths[currentPlayer].tiles[6].pieces[4] != null) {
+        print(players[currentPlayer].name, "has won. Congratulations!");
         exit;
     }
 
     currentPlayer++;
 }
 
-"win condition:";
-"check if the end tile for the current player has its fourth slot occupied";
-
-"issues:";
-
-"piece is not defined"
-"how to move from main path to end paths";
-"how does the piece actually move from one tile to the next?";
-"do we need a comment feature in our language? /* identifer */";
-"how do we keep track of where each piece is?";
-"do we have a built in move piece function that works?";
-"how do we limit the die to 6 values";
-"random int 1-6 is this working?";
-"move a piece from home area";
-"how to find the next piece in home area?";
-"how does this move piece to start tile?";
                                                               
