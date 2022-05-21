@@ -95,8 +95,11 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         if (fieldType.getClass() == exprType.getClass()) {
             return fieldType;          //Could be the expression type or the id type
         } else {
-            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, fieldType));
+            System.out.println("left type: %s, right type: %s".formatted(fieldType.getClass(), exprType.getClass()));
+            System.out.println("exception thrown at type check for dotAssignment disabled");
+            //throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, fieldType));
         }
+        return fieldType;
     }
 
     @Override
@@ -179,7 +182,6 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
         // If visiting an empty list, we provide a null value as TypeDenoter
         if (n.elements != null && n.elements.isEmpty()) {
-            // Todo: need to check for incorrect levels of nesting of empty lists
             return new ListType(null);
         }
 
@@ -188,6 +190,33 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         if (n.elements != null) {
             for (ASTNode listElementNode : n.elements) {
                 actualTypesOfElementNodes.add((TypeDenoter) listElementNode.accept(this));
+            }
+        }
+        System.out.println("actualTypesOfElementNodes = " + actualTypesOfElementNodes);
+
+        List<String> typesAsStrings = actualTypesOfElementNodes.stream().map(type->type.toString()).toList();
+        if (actualTypesOfElementNodes != null) {
+            // Todo: need to check for incorrect levels of nesting of empty lists,
+            //  must match other list elements and the main list decl
+            int previousIndex = 0;
+            int count = 0;
+            for (String typeAsString: typesAsStrings) {
+
+                 {
+                    int indexOfLastColonInThisString = typeAsString.lastIndexOf(":");
+                    if (count != 0) {
+
+                        if (previousIndex != indexOfLastColonInThisString) {
+                            throw new TypeErrorException("Incorrect nesting of list element");
+                        }
+
+                    }
+                    else {
+                        previousIndex = indexOfLastColonInThisString;
+                        System.out.println("indexOfLastColon = " + indexOfLastColonInThisString);
+                    }
+                    count++;
+                }
             }
         }
 
@@ -226,6 +255,66 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             // Hopefully we never see this
             throw new TypeErrorException("Type checking a list failed badly");
         }
+    }
+
+    @Override
+    public TypeDenoter visit(IndexAccessNode n) {
+        for (ASTNode node: n.childrenAsASTNode) {
+            if (node instanceof IdNode IdN) {
+                // check that the symbol is declared
+                Symbol temp = ST.retrieveSymbol(IdN.getAccessName());
+                // Todo: can't always check value of identifier unless that information is stored in symbol table
+                // a value field has been added to IdNode and is set on assignment
+                // if unassigned, value if identifier should be 0
+
+                System.out.println("Identifier %s has value %d".formatted(temp.name, temp.value));
+
+                if (temp.value == 0) {
+                    throw new IndexOutOfBoundsException("BGL indexing starts from 1, unlike C which starts from 0");
+                }
+                else return temp.type;
+
+            }
+            if (node instanceof IntNode IntN) {
+                if (IntN.value == 0) {
+                    throw new IndexOutOfBoundsException("BGL indexing starts from 1, unlike C which starts from 0");
+                }
+                else return new IntType();
+            }
+        }
+
+        /*
+        // Case listname[INT]
+        if (n.valueOfIndex != 0) {
+            assert (n.children.size() >= 4);
+            // get the name of the last list being indexed...
+            Symbol valueParentList = ST.retrieveSymbol(n.children.get(n.children.size() - 4));
+            assert (valueParentList != null);
+            /*
+            if (valueParentList.size() <= n.value) { //Todo: make it so we can check size of a list in symbol table
+                throw new IndexOutOfBoundsException(
+                        "Index %s greater than list %s's size".
+                        formatted(n.value, valueParentList.name));
+            }
+
+            return valueParentList.type;
+        }
+        // Case listname[IDENTIFIER]
+        else if (n.varNameOfIndex == null) {
+            Symbol valueParentList = ST.retrieveSymbol(n.varNameOfIndex);
+            assert (valueParentList != null);
+            return valueParentList.type;
+
+        }
+        */
+
+            return null;
+    }
+
+
+    @Override
+    public TypeDenoter visit(ListIndexAssignmentNode n) {
+        return null; //Todo: implement return type of whatever is the last index
     }
 
     @Override
@@ -727,35 +816,102 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
      * Field can have either an identifier or an action call as a sequence
      *
      * Ex. a.b.foo() in where the type of the last element in the chain is returned
+     *
+     * Now it can also have index access nodes which we don't record the type of!
      */
     public TypeDenoter visit(FieldAccessNode n) {
         String dName = "";
         Symbol currentSymbol = new Symbol("error", new VoidType());
         SymbolTable temp = ST;
 
-        for (Accessable field: n.fields) {
-
-            currentSymbol = temp.retrieveSymbol(field.getAccessName());
-            if (currentSymbol.type instanceof DesignRef design) {
-                dName = design.name;
-                temp = TENV.receiveType(dName).fields;
+        List<Accessable> accessibles =  new ArrayList<>();
+        for (ASTNode node: n.fields) {
+            if (node instanceof Accessable A) {
+                accessibles.add(A);
             }
-            else {
-                if (n.fields.indexOf(field) != n.fields.size()-1) {
-                    throw new IllegalFieldAccessException(
-                            "cannot access field %s in %s of type %s".formatted(
-                                    n.fields.get(n.fields.indexOf(field)+1),
-                                    field.getAccessName(),
-                                    dName));
+        }
+
+        System.out.println("accessibles in FAN = " + accessibles);
+/*
+        if (n.fields.get(n.fields.size() - 1) instanceof ActionCallNode AC) {
+        /todo: find out why this fails a test
+            return (TypeDenoter) AC.accept(this);
+            guess is because we have to look in a's scope to check b in a.b
+        }
+
+ else
+         if (n.fields.get(n.fields.size() - 1) instanceof IdNode IdN) {
+            return ST.retrieveSymbol(IdN.getAccessName()).type;  //(TypeDenoter) IdN.accept(this);
+        }
+        else */{
+
+            for (Accessable field : accessibles) {
+
+                currentSymbol = temp.retrieveSymbol(field.getAccessName());
+                if (currentSymbol.type instanceof DesignRef design) {
+                    dName = design.name;
+                    temp = TENV.receiveType(dName).fields;
+                }
+
+                /*
+                // meeting something that's not a design
+                else { // if (!(field instanceof IdNode))
+                    // what goes on here? Todo: Since indexAccess can now be last in fields this breaks
+                    if (n.fields.indexOf(field) != n.fields.size() - 1) {
+                        throw new IllegalFieldAccessException(
+                                "cannot access field %s in %s of type %s".formatted(
+                                        n.fields.get(n.fields.indexOf(field) + 1),
+                                        field.getAccessName(),
+                                        dName));
+                    }
+                }*/
+            }
+
+            //If last accessor is a function call, return the type of the call
+            if (currentSymbol.type instanceof ActionType action) {
+                return action.returnType;
+            }
+            return currentSymbol.type;
+        }
+    }
+
+    @Override
+    public TypeDenoter visit(FieldAccessLHNode n) {
+
+        //To understand how our scopes work; how do we look for b in a.b? look in visit(FieldAccessNode) above
+
+        /*
+        * for each Accessible get its symbol and check for next accessible in that symbol's scope / type env
+        * return type of the last one found
+        *
+        * */
+
+        String dName = "";
+        Symbol currentSymbol = new Symbol("error", new VoidType());
+        SymbolTable temp = ST;
+
+        List<Accessable> accessibles =  new ArrayList<>();
+        for (ASTNode node: n.fields) {
+            if (node instanceof Accessable A) {
+                accessibles.add(A);
+            }
+        }
+
+        System.out.println("accessibles in FANLH = " + accessibles.toArray());
+
+
+            for (Accessable field : accessibles) {
+
+                currentSymbol = temp.retrieveSymbol(field.getAccessName());
+                if (currentSymbol.type instanceof DesignRef design) {
+                    dName = design.name;
+                    temp = TENV.receiveType(dName).fields;
                 }
             }
-        }
+            return currentSymbol.type;
 
-        //If last accessor is a function call, return the type of the call
-        if (currentSymbol.type instanceof ActionType action) {
-            return action.returnType;
-        }
-        return currentSymbol.type;
+        // should find the last node and call accept, because we need to look in container's body
+        // return (TypeDenoter) n.fields.get(n.fields.size() - 1).accept(this);
     }
 
     @Override

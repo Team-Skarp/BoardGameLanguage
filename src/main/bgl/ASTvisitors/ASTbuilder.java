@@ -12,7 +12,9 @@ import SymbolTable.types.*;
 import Logging.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class which converts antlers auto-generated CST into our desired AST
@@ -320,7 +322,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
         //TODO: Implement
         int idX = 0;
-        int acX = 0;
+        List<ASTNode> indexAccessNodes = new ArrayList<>();
         List<Accessable> accessors = new ArrayList<>();
         for (ParseTree node : ctx.children) {
             if (node instanceof TerminalNode T) {
@@ -329,12 +331,101 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                     idX++;
                 }
             }
+            else if (node.equals(ctx.actionCall())) {
+                System.out.println("GOODNESS building AC");
+                accessors.add((Accessable) node.accept(this));
+
+            }
+            else if (ctx.indexAccess().contains(node)) {
+                System.out.println("GOODNESS building IA");
+                indexAccessNodes.add(node.accept(this));
+
+            }
             else {
-                accessors.add((Accessable) ctx.actionCall(acX).accept(this));
-                acX++;
+                System.out.println("BADNESS building FAN");
+                System.out.println(ctx.indexAccess());
+                System.out.println(node.getClass());
+                System.out.println(node.getText());
+                System.out.println(ctx.getPayload());
             }
         }
-        return new FieldAccessNode(accessors);
+        List<ASTNode> returnList = new ArrayList<>();
+        returnList.addAll(accessors);
+        returnList.addAll(indexAccessNodes);
+
+
+        System.out.println("YOYOOOO" + returnList);
+
+        return new FieldAccessNode(returnList);
+    }
+
+    @Override
+    public ASTNode visitFieldAccessLH(BoardParser.FieldAccessLHContext ctx) {
+        List<String> children = new ArrayList<>();
+        int idX = 0;
+
+        List<ASTNode> astNodes = new ArrayList<>();
+        for (ParseTree node : ctx.children) {
+            //System.out.println("node.getText() = " + node.getText());
+            children.add(node.getText());
+            if (node instanceof TerminalNode T) {
+                if (T.equals(ctx.IDENTIFIER(idX))) {
+                    astNodes.add(new IdNode(ctx.IDENTIFIER(idX).getText()));
+                    idX++;
+                }
+            }
+            else {
+                //System.out.println("adding to accessors");
+                astNodes.add(node.accept(this));
+                System.out.println("accessors of LH = " + astNodes);
+            }
+        }
+        return new FieldAccessLHNode(astNodes, children);
+    }
+
+    @Override
+    public ASTNode visitIndexAccess(BoardParser.IndexAccessContext ctx) {
+        List<String> childrenAsString = new ArrayList<>();
+        List<ASTNode> childrenAsAST = new ArrayList<>();
+
+        for (ParseTree child: ctx.children) {
+            // find numbers
+            if (child.getText().matches("[0-9]+")) {
+                // throw exception if number begins with 0
+                if (child.toString().substring(0, 1).contains("0")) {
+                    throw new IndexOutOfBoundsException("BGL indexing starts from 1, unlike C which starts from 0");
+                }
+                childrenAsAST.add(new IntNode(Integer.parseInt(child.getText())));
+            }
+            // find identifiers
+            else if (child.getText().matches("[a-zA-Z]+")) {
+                childrenAsAST.add(new IdNode(child.getText()));
+            }
+
+            // add everything to childrenAsString for easy C conversion
+            childrenAsString.add(child.getText());
+        }
+
+        return new IndexAccessNode(childrenAsString, childrenAsAST);
+    }
+
+    @Override
+    public ASTNode visitListIndexAssignment(BoardParser.ListIndexAssignmentContext ctx) {
+        List<String> children = new ArrayList<>();
+
+        for (ParseTree child: ctx.children) {
+            if (ctx.fieldAccessLH() != null || ctx.expression() != null) {
+                children.add(child.getText());
+                System.out.println("child of list index assignment = " + child);
+                System.out.println(child);
+
+                if (child.toString().substring(0, 1).contains("0")) {
+                    throw new IndexOutOfBoundsException("BGL indexing starts from 1, unlike C which starts from 0");
+                }
+            }
+        }
+
+        return null ; //new ListIndexAssignmentNode(children); //Todo: implement
     }
 
     @Override
@@ -354,7 +445,17 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
 
-        if (ctx.ASSIGN() != null) {
+        Expression expr = (Expression) ctx.arithmeticExpression().accept(this);
+        if (expr.getClass() == IntNode.class) {
+            System.out.println("WE have an int node");
+
+            return new IntegerAssignmentNode(
+                    new IdNode(ctx.IDENTIFIER().getText(), ((IntNode) expr).value),
+                    (ArithmeticExpression) ctx.arithmeticExpression().accept(this)
+            );
+        }
+        else if (ctx.ASSIGN() != null) {
+
             return new IntegerAssignmentNode(
                     new IdNode(ctx.IDENTIFIER().getText()),
                     (ArithmeticExpression) ctx.arithmeticExpression().accept(this)
@@ -391,27 +492,29 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDotAssignment(BoardParser.DotAssignmentContext ctx) {
-        if(ctx.getChild(0) != null) {
-            FieldAccessNode fieldAccessNode = (FieldAccessNode) ctx.getChild(0).accept(this);
+        if(ctx.getChild(0) == ctx.fieldAccessLH()) {
+        System.out.println("building dotAss " + ctx.getChild(0).getText());
+            FieldAccessLHNode fieldAccessLHNode = (FieldAccessLHNode) ctx.fieldAccessLH().accept(this);
             if (ctx.expression() != null) {
+                System.out.println("EXPRESSION IS NOT NULL");
                 return new DotAssignmentNode(
-                        fieldAccessNode,
+                        fieldAccessLHNode,
                         ctx.getChild(2).accept(this));
             } else if (ctx.STR() != null) {
                 return new DotAssignmentNode(
-                        fieldAccessNode,
+                        fieldAccessLHNode,
                         new StringNode(ctx.STR().getText()));
             } else if (ctx.IDENTIFIER() != null) {
                 return new DotAssignmentNode(
-                        fieldAccessNode,
+                        fieldAccessLHNode,
                         new IdNode(ctx.IDENTIFIER().getText()));
             } else if (ctx.BOOL() != null) {
                 return new DotAssignmentNode(
-                        fieldAccessNode,
+                        fieldAccessLHNode,
                         new BooleanNode(Boolean.parseBoolean(ctx.BOOL().getText())));
             } else if (ctx.INT() != null) {
                 return new DotAssignmentNode(
-                        fieldAccessNode,
+                        fieldAccessLHNode,
                         new IntNode(Integer.parseInt(ctx.INT().getText())));
             }
         }

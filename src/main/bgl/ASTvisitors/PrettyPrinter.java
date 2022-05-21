@@ -400,6 +400,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(ListIndexAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public Void visit(DesignDefinitionNode n) {
         return null;
     }
@@ -706,6 +711,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(FieldAccessLHNode n) {
+        return null;
+    }
+
+    @Override
     public Void visit(ListElementNode n) {
         System.out.println("such a pretty list element node");
         return null;
@@ -714,6 +724,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     @Override
     public Void visit(ListNode n) {
         System.out.println("such a pretty list node");
+        return null;
+    }
+
+    @Override
+    public Void visit(IndexAccessNode n) {
         return null;
     }
 

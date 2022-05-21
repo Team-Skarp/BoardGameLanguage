@@ -145,7 +145,7 @@ rulesDeclaration
     ;
 
 designBlock
-    : LBRACE ((INT | BOOL | STR) | ((INT | BOOL | STR) COMMA))* RBRACE // Nested Desgin Decl
+    : LBRACE ((INT | BOOL | STR) | ((INT | BOOL | STR) COMMA))* RBRACE // Nested Design Decl
     | (INT | BOOL | STR | IDENTIFIER)                                               // Normal Prim in Decl
     ;
 
@@ -187,6 +187,7 @@ listDeclaration
     | COLON listType IDENTIFIER
     ;
 
+// Allows empty lists []
 list
     : LSBRACE (listElement (COMMA listElement)*)? RSBRACE
     ;
@@ -245,10 +246,6 @@ actionCall
     : IDENTIFIER LPAREN (expression | expression (COMMA expression )+)? RPAREN
     ;
 
-fieldAccess
-    : IDENTIFIER (DOT IDENTIFIER | DOT actionCall)+
-    ;
-
 //INTDCL | BOOLDCL | STRDCL
 type
     : INTDCL
@@ -263,7 +260,33 @@ assignmentStatement
     | booleanAssigment EOL
     | stringAssigment EOL
     | dotAssignment EOL
+    | listIndexAssignment EOL
 //  | choiceAssignment
+    ;
+
+dotAssignment
+    : fieldAccessLH ASSIGN (STR|INT|BOOL|IDENTIFIER|expression)
+    ;
+
+// might never be used, deprecated by dotAssignment
+listIndexAssignment
+    : fieldAccessLH ASSIGN expression
+    ;
+
+//List element access by index, allows a.b[1][2].c[3].d.foo() on right side of =;
+fieldAccess
+    : IDENTIFIER (DOT IDENTIFIER | indexAccess)* (DOT actionCall)?
+    ;
+
+//List element access by index, allows a.b[1][2].c[3].d on left side of =;
+fieldAccessLH
+    : IDENTIFIER (DOT IDENTIFIER | indexAccess)+
+    ;
+
+//Consider allowing AEXPR and actionCall in addition to (INT | IDENTIFIER)
+indexAccess
+    //: IDENTIFIER (DOT IDENTIFIER | LSBRACE (INT | IDENTIFIER) RSBRACE)* (DOT actionCall)?
+    : (LSBRACE (INT | IDENTIFIER) RSBRACE)+
     ;
 
 intAssigment
@@ -278,9 +301,6 @@ stringAssigment
     : IDENTIFIER ASSIGN STR
     ;
 
-dotAssignment
-    : fieldAccess ASSIGN (STR|INT|BOOL|IDENTIFIER|expression)
-    ;
 /*
 choiceAssignment
     : (INT COLON)* LBRACE IDENTIFIER LPAREN (INT)* RPAREN RBRACE COMMA

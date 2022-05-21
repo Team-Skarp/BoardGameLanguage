@@ -8,10 +8,7 @@ import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class for generating C code.
@@ -262,16 +259,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DotAssignmentNode n) {
+        System.out.println("code gen for dot ass %s = %s ".formatted(n.getLeft(), n.getRight()));
         StringBuilder str = new StringBuilder();
-        for (int i = 0; i < n.fieldAccessNode.fields.size() - 1; i++) {
-            str.append(n.fieldAccessNode.fields.get(i));
-        }
-        str.deleteCharAt(str.length() - 1);
-        str.append("->").append(n.fieldAccessNode.fields.get(n.fieldAccessNode.fields.size() - 1)).
-        append(" = ").append(n.expr.accept(this)).append(EOL);
-        /*str
-                n.fieldAccessNode.accept(this)+" = "+n.expr.accept(this);
-        str = str.replace(";","").replace("\n","") + EOL;*/
+        str.append(n.fieldAccessLHNode.accept(this));
+        str.append(" = ");
+        str.append(n.getRight().accept(this));
+        str.append(EOL);
+
+
         return str.toString();
     }
 
@@ -497,7 +492,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         else {
             //System.out.println("IN LIST DECL NODE ELSE PART");
             StringBuilder rightSide = new StringBuilder();
-            rightSide.append("[");
+            rightSide.append("{");
             for (ASTNode child: n.assignedList.elements) {
                 rightSide.append(child.accept(this));
                 rightSide.append(", ");
@@ -506,8 +501,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 rightSide.deleteCharAt(rightSide.length()-1);
                 rightSide.deleteCharAt(rightSide.length()-1);
             }
-
-            rightSide.append("]");
+            System.out.println(n.name);
+            rightSide.append("}");
             return (
                     """
                             %s %s%s = %s;
@@ -546,15 +541,49 @@ public class CCodeGenerator implements ASTvisitor<String> {
         //System.out.println("IN LIST ELEMENT NODE");
         StringBuilder str = new StringBuilder();
         str.append("[");
+
         for (ASTNode elementNode: n.children) {
             str.append(elementNode);
             str.append(", ");
         }
         if (!n.children.isEmpty())
         str.deleteCharAt(str.length()-1);
+
         str.append("]");
         //str.append(EOL); // Commenting this out seemingly makes no difference... weird
         return str.toString();
+    }
+
+    @Override
+    public String visit(IndexAccessNode n) {
+
+        StringBuilder str = new StringBuilder();
+
+        //todo: remember to add [ and ] if they are removed in the AST node, %s or %d?
+        for (String child: n.childrenAsString) {
+            // append the brackets: [ or ]
+            if (Objects.equals(child, "[") || Objects.equals(child, "]")) {
+                str.append(child);
+            }
+            // find the strings containing only numbers
+            else if (child.matches("[0-9]+")) {
+                //int temp = Integer.parseInt(child);
+                // subtract 1 from index to match C indexing
+                str.append("%s".formatted(Integer.parseInt(child) - 1));
+            }
+            else {
+                // let the C compiler do the arithmetic to subtract 1 from index to match C indexing
+                str.append("(%s - 1)".formatted(child));
+            }
+
+        }
+        return str.toString();
+    }
+
+
+    @Override
+    public String visit(ListIndexAssignmentNode n) {
+        return null; // Todo: implement
     }
 
     /**
@@ -854,11 +883,36 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(FieldAccessNode n) {
         List<String> sequence = new ArrayList<>();
 
-        for (Accessable field : n.fields) {
+        for (ASTNode field : n.fields) {
             sequence.add((String)field.accept(this));
         }
 
         return String.join(".", sequence);
+    }
+
+    @Override
+    public String visit(FieldAccessLHNode n) {
+        // List<String> children = new ArrayList<>();
+        boolean oneIdNodeHasBeenAppended = false;
+
+        StringBuilder str = new StringBuilder();
+
+        for (ASTNode node : n.fields) {
+            if (node instanceof IdNode IdN) {
+                if (oneIdNodeHasBeenAppended) {
+                    str.append(".");
+                }
+                str.append(IdN.name);
+                oneIdNodeHasBeenAppended = true;
+            //children.add((String)field.accept(this));
+            }
+            else if (node instanceof IndexAccessNode) {
+
+                str.append(node.accept(this));
+            }
+        }
+
+        return str.toString();
     }
 
     @Override

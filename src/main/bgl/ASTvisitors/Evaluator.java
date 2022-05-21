@@ -197,6 +197,11 @@ public class Evaluator implements ASTvisitor<Object> {
     }
 
     @Override
+    public Object visit(ListIndexAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public Object visit(DesignDefinitionNode n) {
         return null;
     }
@@ -340,12 +345,22 @@ public class Evaluator implements ASTvisitor<Object> {
     }
 
     @Override
+    public Object visit(FieldAccessLHNode n) {
+        return null;
+    }
+
+    @Override
     public Object visit(ListElementNode n) {
         return null;
     }
 
     @Override
     public Object visit(ListNode n) {
+        return null;
+    }
+
+    @Override
+    public Object visit(IndexAccessNode n) {
         return null;
     }
 

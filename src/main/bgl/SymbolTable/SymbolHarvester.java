@@ -224,6 +224,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(ListIndexAssignmentNode n) {
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(DesignDefinitionNode n) {
 
         //Create a separate symbol table that resides in the design type
@@ -353,11 +358,15 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
         ST.enterSymbol(sym);
         return ST;
-    } //Todo: implement?
+    }
 
     @Override
     public SymbolTable visit(ListNode n) {
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(IndexAccessNode n) { return ST;
     }
 
     @Override
@@ -402,11 +411,13 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
             throw new TypeErrorException("Types in assignment did not match");
         }
 
-        ST.enterSymbol(new Symbol(
-                n.name,
-                n.type()
-        ));
+        Symbol sym = new Symbol(n.name, n.type());
 
+        if (n.value instanceof IntNode IntNode) {
+            sym.value = IntNode.value;
+        }
+
+        ST.enterSymbol(sym);
         return ST;
     }
 
@@ -596,5 +607,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         n.accept(TC);
 
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(FieldAccessLHNode n) {
+        //todo: impl
+        return null;
     }
 }

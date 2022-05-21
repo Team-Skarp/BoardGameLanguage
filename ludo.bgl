@@ -106,6 +106,35 @@ RULES {
         }
         return number;
     }
+
+    action checkWinCondition(int i): bool {
+        if (i = 1) {
+        tile tempTile = player1EndPath.tiles[6];
+        piece tempPiece = tempTile[4];
+        str tempName = tempPiece.name;
+        }
+        elseif (i = 2) {
+                    tile tempTile = player2EndPath.tiles[6];
+                    piece tempPiece = tempTile[4];
+                    str tempName = tempPiece.name;
+                    }
+                    elseif (i = 3) {
+                                tile tempTile = player3EndPath.tiles[6];
+                                piece tempPiece = tempTile[4];
+                                str tempName = tempPiece.name;
+                                }
+                                elseif (i = 4) {
+                                            tile tempTile = player4EndPath.tiles[6];
+                                            piece tempPiece = tempTile[4];
+                                            str tempName = tempPiece.name;
+                                            }
+        if (tempName != "") {
+        return true;
+        }
+        else {
+        return false;
+        }
+    }
 }
 
 GAMELOOP {
@@ -146,6 +175,11 @@ GAMELOOP {
     if (endPaths[currentPlayer].tiles[6].pieces[4].name != "") {
         print(players[currentPlayer].name, "has won. Congratulations!");
         exit;
+    }
+
+    if (checkWinCondition(currentPlayer)) {
+    print(players[currentPlayer].name, "has won. Congratulations!");
+    exit;
     }
 
     if (round == 1000) {
