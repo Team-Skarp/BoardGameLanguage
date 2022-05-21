@@ -12,9 +12,7 @@ import SymbolTable.types.*;
 import Logging.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Class which converts antlers auto-generated CST into our desired AST
@@ -351,18 +349,16 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
             }
             else {
                 accessors.add(new MethodCallNode(
-                        (ActionCallNode) ctx.actionCall(acX).accept(this),
+                        (ActionCallNode) ctx.actionCall().accept(this),
                         ctx.IDENTIFIER(idX - 1).getText())
                 );
-                acX++;
+
             }
         }
+
         List<ASTNode> returnList = new ArrayList<>();
         returnList.addAll(accessors);
         returnList.addAll(indexAccessNodes);
-
-
-        System.out.println("YOYOOOO" + returnList);
 
         return new FieldAccessNode(returnList);
     }
@@ -454,6 +450,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitIntAssigment(BoardParser.IntAssigmentContext ctx) {
 
         Expression expr = (Expression) ctx.arithmeticExpression().accept(this);
+
         if (expr.getClass() == IntNode.class) {
             System.out.println("WE have an int node");
 

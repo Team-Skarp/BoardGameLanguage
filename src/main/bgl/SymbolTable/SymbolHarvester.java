@@ -693,7 +693,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(FieldAccessNode n) {
 
-        for (Accessable field : n.fields) {
+        for (ASTNode field : n.fields) {
             field.accept(this);
         }
 
@@ -701,13 +701,19 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
 
-
         return ST;
     }
 
     @Override
     public SymbolTable visit(FieldAccessLHNode n) {
-        //todo: impl
-        return null;
+        for (ASTNode field : n.fields) {
+            field.accept(this);
+        }
+
+        //Typecheck that all fields that are accessed exists
+        TC = new TypeChecker(ST, TENV);
+        n.accept(TC);
+
+        return ST;
     }
 }

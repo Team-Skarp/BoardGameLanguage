@@ -3,7 +3,7 @@ package ASTnodes;
 import ASTvisitors.ASTvisitor;
 import java.util.List;
 
-public class FieldAccessNode implements ASTNode, Expression {
+public class FieldAccessNode implements ASTNode, Expression, ArithmeticExpression {
 
     public List<ASTNode> fields;
 

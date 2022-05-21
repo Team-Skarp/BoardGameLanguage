@@ -30,52 +30,90 @@ public class CGenerationDemo {
         */
         String bglCodeExample =
                 """
-                SETUP {
-                    int b = 5;
-                    int a = random(5);
-                    int dice = random(6);
-                    
-                    design piece {
-                str name;
-                }
-                design player {
-                list:tile tiles;
-                }
-                design tile {
-                list:piece pieces;
-                }
-                
-                list:player endPaths;
-                
-                
-                endPaths[currentPlayer].tiles[6].pieces[4].name;
-                int i = 1;
-                
-                LudoPiece p1 = {"hdhd"};
-                
-                 p1.name = "sda";
-                
-                   list:int theList = [1];
-                   
-                   theList[i] = theList[i];
-                   
-                    
-                }
-                
-                RULES {
-                    action throwDice(int start, int end):int{
-                        return random(end-start+1) +start-1;
-                    }
-                }
-                
-                GAMELOOP {
-                    a = throwDice(100,250);
-                    print(a);
-                    print(random(5));
-                    print(random(a));
-                    print(random(a+5));
-                }
-                """;
+                        SETUP {
+                            int b = 5;
+                            int a = random(5);
+                            int dice = random(6);
+                            
+                            design piece {
+                        str name;
+                        }
+                        design player {
+                        list:tile tiles;
+                        }
+                        design tile {
+                        list:piece pieces;
+                        }
+                                        
+                        list:Path endPaths;
+                                        
+                                        
+                        int i = 1;
+                                        
+                        piece p1 = {"hdhd"};
+                                        
+                         p1.name;
+                                        
+                           list:int theList = [1];
+                           
+                           theList[i] = theList[i];
+                           path player1EndPath[6];
+                            
+                        }
+                                        
+                                RULES {
+                                    action selectPiece(): int {
+                                        int number = 0;
+                                        while (number < 1 || number > 4) {
+                                            print("Select a piece number between 1 and 4");
+                                            input(number);
+                                        }
+                                        return number;
+                                    }
+                                                
+                                    action checkWinCondition(int i): bool {
+                                        tile tempTile;
+                                        if (i == 1) {
+                                        tempTile = player1EndPath.tiles[6];
+                                        piece tempPiece = tempTile[4];
+                                        str tempName = tempPiece.name;
+                                        }
+                                        elseif (i == 2) {
+                                                    tempTile = player2EndPath.tiles[6];
+                                                    piece tempPiece = tempTile[4];
+                                                    str tempName = tempPiece.name;
+                                                    }
+                                                    elseif (i == 3) {
+                                                                tempTile = player3EndPath.tiles[6];
+                                                                piece tempPiece = tempTile[4];
+                                                                str tempName = tempPiece.name;
+                                                                }
+                                                                elseif (i == 4) {
+                                                                            tempTile = player4EndPath.tiles[6];
+                                                                            piece tempPiece = tempTile[4];
+                                                                            str tempName = tempPiece.name;
+                                                                            }
+                                        if (tempName != "") {
+                                        return true;
+                                        }
+                                        else {
+                                        return false;
+                                        }
+                                    }
+                              
+                            action throwDice(int start, int end):int{
+                                return random(end-start+1) +start-1;
+                            }
+                        }
+                                        
+                        GAMELOOP {
+                            a = throwDice(100,250);
+                            print(a);
+                            print(random(5));
+                            print(random(a));
+                            print(random(a+5));
+                        }
+                        """;
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);
