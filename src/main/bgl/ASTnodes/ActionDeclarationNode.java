@@ -9,7 +9,7 @@ import java.util.List;
 public class ActionDeclarationNode implements ASTNode<Object>, Declaration {
 
     public final String name;
-    public final List<Declaration> formalParameters;
+    public List<Declaration> formalParameters;
     public final TypeDenoter returnType;
 
     public ActionDeclarationNode(String name, TypeDenoter returnType, Declaration... formalParameters) {
@@ -30,7 +30,7 @@ public class ActionDeclarationNode implements ASTNode<Object>, Declaration {
 
     @Override
     public TypeDenoter type() {
-        return new ActionType(returnType);
+        return new ActionType(returnType, formalParameters);
     }
 
 }

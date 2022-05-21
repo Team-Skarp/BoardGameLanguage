@@ -207,18 +207,21 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
 
     @Override
     public SymbolTable visit(IntegerAssignmentNode n) {
+        TC = new TypeChecker(ST, TENV);
         n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(BooleanAssignmentNode n) {
+        TC = new TypeChecker(ST, TENV);
         n.accept(TC);
         return ST;
     }
 
     @Override
     public SymbolTable visit(DotAssignmentNode n) {
+        TC = new TypeChecker(ST, TENV);
         n.accept(TC);
         return ST;
     }
@@ -234,10 +237,13 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         //Create a separate symbol table that resides in the design type
         SymbolTable fields = new SymbolTable();
 
-        //Write in all the declarations into that symbol table
+        //Write in all the declarations into the designs symbol table
         Symbol sym;
 
         for (Declaration field : n.fields) {
+            if (field instanceof ActionDeclarationNode action) {
+                injectSelfAsParam(n, action);
+            }
             sym = new Symbol(field.varName(), field.type());
             fields.enterSymbol(sym);
         }
@@ -245,16 +251,16 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         //Save design type inside type environment
         DesignType type;
 
-        if (n.parentType == null) {
+        if (n.parentDName == null) {
             type = new DesignType(
-                    n.typeDefinition.name,
+                    n.dName,
                     fields
             );
         }
         else {
             type = new DesignType(
-                    n.typeDefinition.name,
-                    n.parentType.name,
+                    n.dName,
+                    n.parentDName,
                     fields
             );
         }
@@ -290,6 +296,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
                 )
         );
 
+        //Set method flag
+        if (isMethod(n)) {
+            n.isMethodDefinition = true;
+        }
+
         //Pass down the formal parameters to the action body
         n.body.variables = formalParams;
 
@@ -300,10 +311,48 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         TC.visit(n);
 
-
-
         //Visit action body
         return ST;
+    }
+
+    /**
+     * Checks if a given action definition is actually a method definition belonging to a design
+     * @param action
+     * @return true if action exists in a design
+     */
+    private boolean isMethod(ActionDefinitionNode action) {
+
+        //Check if first formal parameter is a design declaration
+        if (!  (action.formalParameters.size() > 0 &&
+                action.formalParameters.get(0) instanceof DesignDeclarationNode)
+        ) {
+            return false;
+        }
+
+        //If action signature matches a design definitions action then its a method
+        try {
+            SymbolTable designST = TENV
+                    .receiveType(((DesignDeclarationNode) action.formalParameters.get(0)).dName)
+                    .fields;
+
+            //Check if design have the name of the action
+            Symbol sym = designST.retrieveSymbol(action.name);
+
+            //If symbol recieved is an action with the exact same formal param types, then it's a method
+            if (sym.type instanceof ActionType method && method.formalParameters.size() == action.formalParameters.size()) {
+                int pX = 0;
+                while (pX < method.formalParameters.size()) {
+                       if (action.formalParameters.get(pX).type().getClass() != method.formalParameters.get(pX).type().getClass()) {
+                           return false;
+                       }
+                       pX++;
+                }
+                return true;
+            }
+        } catch (ReferenceErrorException err) {
+            return false;
+        }
+        return false;
     }
 
     @Override
@@ -330,6 +379,32 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         );
 
         return ST;
+    }
+
+    /**
+     * Sets the first argument in an action to 'self' to point to the design its in
+     *
+     * Mutates the action declaration
+     * @param action
+     */
+    private void injectSelfAsParam(DesignDefinitionNode self, ActionDeclarationNode action) {
+
+        //Make a copy of the formal parameters and inject self parameter
+        List<Declaration> copy = new ArrayList<>(action.formalParameters);
+
+        DesignDeclarationNode selfArg = new DesignDeclarationNode(self.dName, "self");
+        copy.add(0, selfArg);
+
+        action.formalParameters = copy;
+    }
+
+    private void injectSelfMethodCall(MethodCallNode method) {
+        //Make a copy of the actual parameters and inject self parameter
+        List<Expression> copy = new ArrayList<>(method.actualParameters);
+
+        copy.add(0, new IdNode(method.calledBy));
+
+        method.actualParameters = copy;
     }
 
     @Override
@@ -375,6 +450,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(RandomNode n) {
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(ListElementNode n) {
         return ST;
     }
@@ -406,7 +486,6 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(IntegerDeclarationNode n) {
 
         TC = new TypeChecker(ST, TENV);
-
         if ((n.value != null) && (n.value.accept(TC).getClass() != IntType.class)) {
             throw new TypeErrorException("Types in assignment did not match");
         }
@@ -589,7 +668,19 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         TC.visit(n);
 
-        //Visit action body
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(MethodCallNode n) {
+
+        //Inject self as the 1. argument
+        injectSelfMethodCall(n);
+
+        //Check method call for correct amount of params & correct type of params
+        TC = new TypeChecker(ST, TENV);
+        TC.visit(n);
+
         return ST;
     }
 
@@ -602,9 +693,14 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(FieldAccessNode n) {
 
+        for (Accessable field : n.fields) {
+            field.accept(this);
+        }
+
         //Typecheck that all fields that are accessed exists
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
+
 
         return ST;
     }

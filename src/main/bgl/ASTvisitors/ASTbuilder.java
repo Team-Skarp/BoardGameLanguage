@@ -208,14 +208,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
         if (ctx.FROM() != null) {
             return new DesignDefinitionNode(
-                    new IdNode(ctx.IDENTIFIER(0).getText()),
-                    new IdNode(ctx.IDENTIFIER(1).getText()),
+                    ctx.IDENTIFIER(0).getText(),
+                    ctx.IDENTIFIER(1).getText(),
                     fields.toArray(new Declaration[0])
             );
         }
         else {
             return new DesignDefinitionNode(
-                    new IdNode(ctx.IDENTIFIER(0).getText()),
+                    ctx.IDENTIFIER(0).getText(),
                     fields.toArray(new Declaration[0])
             );
         }
@@ -303,6 +303,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitRandomCall(BoardParser.RandomCallContext ctx) {
+        if(ctx.arithmeticExpression() != null) {
+            return new RandomNode((ArithmeticExpression)  ctx.arithmeticExpression().accept(this));
+        }
+        return null;
+    }
+
+    @Override
     public ASTNode visitActionCall(BoardParser.ActionCallContext ctx) {
         List<Expression> actualParams = new ArrayList<>();
 
@@ -320,10 +328,10 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
-        //TODO: Implement
         int idX = 0;
         List<ASTNode> indexAccessNodes = new ArrayList<>();
         List<Accessable> accessors = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
             if (node instanceof TerminalNode T) {
                 if (T.equals(ctx.IDENTIFIER(idX))) {
@@ -342,11 +350,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
             }
             else {
-                System.out.println("BADNESS building FAN");
-                System.out.println(ctx.indexAccess());
-                System.out.println(node.getClass());
-                System.out.println(node.getText());
-                System.out.println(ctx.getPayload());
+                accessors.add(new MethodCallNode(
+                        (ActionCallNode) ctx.actionCall(acX).accept(this),
+                        ctx.IDENTIFIER(idX - 1).getText())
+                );
+                acX++;
             }
         }
         List<ASTNode> returnList = new ArrayList<>();
@@ -496,7 +504,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         System.out.println("building dotAss " + ctx.getChild(0).getText());
             FieldAccessLHNode fieldAccessLHNode = (FieldAccessLHNode) ctx.fieldAccessLH().accept(this);
             if (ctx.expression() != null) {
-                System.out.println("EXPRESSION IS NOT NULL");
                 return new DotAssignmentNode(
                         fieldAccessLHNode,
                         ctx.getChild(2).accept(this));
@@ -873,6 +880,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if (ctx.exitStatement() != null) {
             return ctx.exitStatement().accept(this);
         }
+        else if (ctx.randomCall() != null) {
+            return ctx.randomCall().accept(this);
+        }
 
         return null;
     }
@@ -991,7 +1001,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
 
     @Override
     public ASTNode visitArithmeticAtom(BoardParser.ArithmeticAtomContext ctx) {
-
         if (ctx.INT() != null) {
             return new IntNode(Integer.parseInt(ctx.INT().getText()));
         }
@@ -1001,11 +1010,14 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         else if(ctx.arithmeticExpression() != null){
             return ctx.arithmeticExpression().accept(this);
         }
-        else if(ctx.fieldAccess() != null){
-            return ctx.fieldAccess().accept(this);
-        }
         else if(ctx.actionCall() != null) {
             return ctx.actionCall().accept(this);
+        }
+        else if(ctx.randomCall() != null) {
+            return ctx.randomCall().accept(this);
+        }
+        else if(ctx.fieldAccess() != null){
+            return ctx.fieldAccess().accept(this);
         }
 
         return null;

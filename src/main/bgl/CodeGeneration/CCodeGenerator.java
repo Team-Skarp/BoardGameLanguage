@@ -30,6 +30,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
     private final String        TAB = "\t";
     private final String        EOL = ";\n";
 
+
+
+    /**
+     * Flags for generating correct design & action signatures
+     */
+    private DesignDefinitionNode currentDesignDefinition = null;
+    private ActionDefinitionNode currentActionDefinition = null;
+
     public CCodeGenerator(SymbolTable ST, TypeEnvironment TENV) {
         this.ST = ST;
         this.TENV = TENV;
@@ -47,13 +55,17 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         userCode =
                 """
-                int main(int argc, char *argv[]) {
-                    %s
-                    while(true) {
-                       %s
-                    }
-                }
-                """.formatted(
+                        int main(int argc, char *argv[]) {
+                           time_t t;
+                           
+                           /* Intializes random number generator */
+                           srand((unsigned) time(&t));
+                            %s
+                            while(true) {
+                               %s
+                            }
+                        }
+                        """.formatted(
                     n.setup.accept(this),
                     n.gameloop.accept(this)
                 );
@@ -233,7 +245,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return str;
     }
 
-
     @Override
     public String visit(Assignment n) {
         return null;
@@ -265,7 +276,15 @@ public class CCodeGenerator implements ASTvisitor<String> {
         str.append(" = ");
         str.append(n.getRight().accept(this));
         str.append(EOL);
-
+/*
+StringBuilder str = new StringBuilder();
+        for (int i = 0; i < n.fieldAccessNode.fields.size() - 1; i++) {
+            str.append(n.fieldAccessNode.fields.get(i).getAccessName());
+        }
+        str.deleteCharAt(str.length() - 1);
+        str.append("->").append(n.fieldAccessNode.fields.get(n.fieldAccessNode.fields.size() - 1)).
+        append(" = ").append(n.expr.accept(this)).append(EOL);
+ */
 
         return str.toString();
     }
@@ -275,41 +294,49 @@ public class CCodeGenerator implements ASTvisitor<String> {
      * Should only append to top level code
      */
     public String visit(DesignDefinitionNode n) {
+        //Design declarations should be handled differently inside a design
+        currentDesignDefinition = n;
         String designBody = "";
         indent++;
         for (Declaration field : n.fields) {
-
             designBody += TAB.repeat(indent) + field.accept(this);
         }
         indent--;
 
-        if (n.parentType != null) {
+        if (n.parentDName != null) {
             definitions +=  """
                     struct %s {
                     struct %s parent;
                     %s};
                     """.formatted(
-                    n.typeDefinition.name,
-                    n.parentType.name,
+                    n.dName,
+                    n.parentDName,
                     designBody,
-                    n.typeDefinition
+                    n.dName
             );
         } else {
             definitions +=  """
                     struct %s {
                     %s};
                     """.formatted(
-                    n.typeDefinition.name,
+                    n.dName,
                     designBody,
-                    n.typeDefinition
+                    n.dName
                     );
         }
+
+        currentDesignDefinition = null;
 
         return "";
     }
 
     @Override
     public String visit(ActionDefinitionNode n) {
+
+        String actionBody = (String) n.body.accept(this);
+
+        //Flag indicating that all design declarations should not be extended. Important its after the action signature
+        currentActionDefinition = n;
 
         //Actions definitions are put on the top of the C code. A prototype for the definition is also added
         definitions += """
@@ -318,7 +345,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCType(n.returnType),
                 n.name,
                 toCParams(n.formalParameters),
-                n.body.accept(this)
+                actionBody
         );
 
         prototypes += """
@@ -329,6 +356,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 toCParams(n.formalParameters)
         );
 
+        currentActionDefinition = null;
+
         return "";
     }
 
@@ -338,9 +367,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
-    /**
-     * Action declarations writes a prototype at the top of the file
-     */
     public String visit(ActionDeclarationNode n) {
 
         String actionDcl = "";
@@ -354,9 +380,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 n.name,
                 toCParams(n.formalParameters)
         );
-
-        //Add the action declaration as a prototype
-        //prototypes += toCPrototype(n);
 
         return actionDcl;
     }
@@ -377,6 +400,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         if (params.length() > 0) {
             params = params.substring(0, params.length() - 1);
             params = params.replaceAll(";", "");
+            params = params.replaceAll("\n", "");
         }
 
         return params;
@@ -396,6 +420,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(DesignDeclarationNode n) {
 
+        String actionMapping = "";
+
+        //Create action mappings if outside of design definition and action definitions
+        if (currentDesignDefinition == null && currentActionDefinition == null) {
+            SymbolTable initialST = TENV.receiveType(n.dName).fields;
+            actionMapping = makeActionMapping(initialST, n.name);
+        }
+
         DesignType thisType = TENV.receiveType(n.dName);
 
         if (n.value != null) {
@@ -408,28 +440,63 @@ public class CCodeGenerator implements ASTvisitor<String> {
             // Joined string for init
             String collectedString = String.join(", ", n.value);
 
-            //Create action mappings
-            SymbolTable initialST = TENV.receiveType(n.dName).fields;
-            String actionMapping = makeActionMapping(initialST, n.name);
-
-            return (
+            return removeEmptyLines(
                     """
                     struct %s %s = {%s};
                     %s
                     """.formatted(n.dName, n.name, collectedString, actionMapping)
             );
-        } else {
+        }
 
-            //Create action mappings
-            SymbolTable initialST = TENV.receiveType(n.dName).fields;
-            String actionMapping = makeActionMapping(initialST, n.name);
-            return (
+        if (hasSelfReference(n)) {
+            //Add pointer to self, if design definition contains a reference to itself to handle incomplete C struct
+            return removeEmptyLines(
                     """
-                    struct %s %s;
+                    struct %s *%s;
                     %s
                     """.formatted(n.dName, n.name, actionMapping)
             );
         }
+
+        if (currentActionDefinition != null && currentActionDefinition.isMethodDefinition) {
+            //If we are currently defining a method. The 1.st argument should be of pointer type
+            return  """
+                    struct %s *%s;
+                    """.formatted(n.dName, n.name);
+        }
+
+        return removeEmptyLines(
+                """
+                struct %s %s;
+                %s
+                """.formatted(n.dName, n.name, actionMapping)
+        );
+
+    }
+
+    /**
+     * Checks weather or not the design definition have a reference to itself
+     *
+     * Ex: design Node {
+     *     Node next; <-- References its own type
+     *     Node prev;
+     * }
+     *
+     * @param n
+     * @return
+     */
+    private boolean hasSelfReference(DesignDeclarationNode n) {
+
+        if (currentDesignDefinition == null) {
+            return false;
+        }
+
+        return n.dName.equals(currentDesignDefinition.dName);
+    }
+
+    private String removeEmptyLines(String code) {
+
+        return code.replaceAll("\n+", "\n");
     }
 
     /**
@@ -501,7 +568,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 rightSide.deleteCharAt(rightSide.length()-1);
                 rightSide.deleteCharAt(rightSide.length()-1);
             }
-            System.out.println(n.name);
             rightSide.append("}");
             return (
                     """
@@ -641,6 +707,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(IntegerDeclarationNode n) {
         //TODO Fix indent somewhere between this and sequential decl. Also fix sequential decl.
+        System.out.println(n.value);
         if (n.value != null) {
             return """
                    %s %s = %s;
@@ -649,7 +716,8 @@ public class CCodeGenerator implements ASTvisitor<String> {
                     n.name,
                     n.value.accept(this)
             );
-        } else {
+        }
+        else {
             return """
                    %s %s;
                    """.formatted(
@@ -788,8 +856,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 if(symbol.type instanceof IntType){
                     str +="%d";
                     endPart += (","+((IdNode) p).name);
-
-                }else if(symbol.type instanceof StringType){
+                } else if(symbol.type instanceof StringType){
                     if(foreachDict.get(symbol.name) == "c"){
                         str +="%c";
                         endPart += (",*"+((IdNode) p).name);
@@ -864,10 +931,30 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
         return """
                %s(%s)
-               """.formatted(
-               n.actionName, formattedParams
+               """.formatted(n.actionName, formattedParams);
+
+    }
+
+    @Override
+    public String visit(MethodCallNode n) {
+        List<String> actualParams = new ArrayList<>();
+
+        //Actual parameters contains self as the first argument
+        n.actualParameters.forEach(param ->
+                actualParams.add((String) param.accept(this))
         );
 
+        //Add address to self argument
+        String self = "&" + actualParams.get(0);
+        actualParams.remove(0);
+        actualParams.add(0, self);
+
+        //Add a delimeter between the parameters
+        String formattedParams = String.join(",", actualParams);
+
+        return """
+               %s(%s);
+               """.formatted(n.actionName, formattedParams);
     }
 
     @Override
@@ -920,5 +1007,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
         return """
                exit(EXIT_SUCCESS);
                """;
+    }
+
+    @Override
+    public String visit(RandomNode n) {
+        String str = "(rand() % ";
+        str += "%s + 1)".formatted(n.diceSize.accept(this));
+        return str;
     }
 }

@@ -25,7 +25,7 @@ public class Piece implements PredefinedDesign {
     @Override
     public DesignDefinitionNode getDesign() {
         return new DesignDefinitionNode(
-                new IdNode("Piece"),
+                "Piece",
                 new StringDeclarationNode(
                         "color"
                 ),

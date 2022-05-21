@@ -9,9 +9,11 @@ import java.util.List;
 public class ActionDefinitionNode implements ASTNode<Object>, Declaration {
 
     public final String name;
-    public final List<Declaration> formalParameters;
+    public List<Declaration> formalParameters;
     public final TypeDenoter returnType;
     public final ParameterBlock body;
+
+    public boolean isMethodDefinition = false;
 
     public ActionDefinitionNode(String name, TypeDenoter returnType, ParameterBlock body, Declaration... formalParameters) {
         this.name = name;

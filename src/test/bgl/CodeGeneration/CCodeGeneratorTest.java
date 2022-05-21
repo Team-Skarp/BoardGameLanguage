@@ -10,8 +10,6 @@ import SymbolTable.types.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Type;
-
 import static CodeGeneration.CCodeGenerator.toCType;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,7 +25,7 @@ class CCodeGeneratorTest {
         SH = new SymbolHarvester();
         TENV = new TypeEnvironment();
     }
-/*
+
     @Test
     public void canCreateCCodeFromPredefinedDesign() {
 
@@ -47,8 +45,8 @@ class CCodeGeneratorTest {
         String expected =
                 """
                 struct Tile {
-                \tstruct Tile next;
-                \tstruct Tile prev;
+                \tstruct Tile *next;
+                \tstruct Tile *prev;
                 \tstruct Piece pieces[];
                 \tbool (*isEmpty)();
                 };
@@ -56,8 +54,6 @@ class CCodeGeneratorTest {
 
         assertEquals(expected, actual);
     }
-
- */
 
     @Test
     public void convertBasicTypeDenotersToActualCTypes() {
@@ -204,6 +200,50 @@ class CCodeGeneratorTest {
                 
                 """;
 
-        assertEquals(expected, actual);
+        assertEquals(expected.strip(), actual.strip());
+    }
+
+    /**
+     * design Dog {
+     *     action bark();
+     * }
+     * action bark(Dog self) {} <-- should be classified as method of Dog design
+     */
+    @Test
+    public void correctlyIdentifiesAnActionAsMethodOfDesign() {
+
+        SH = new SymbolHarvester();
+
+        DesignDefinitionNode Dog = new DesignDefinitionNode(
+                "Dog",
+                new ActionDeclarationNode(
+                        "bark",
+                        new VoidType()
+                )
+        );
+        ActionDefinitionNode bark = new ActionDefinitionNode(
+                "bark",
+                new VoidType(),
+                new ParameterBlock(),
+                new DesignDeclarationNode(
+                        "Dog", // <-- Takes the Dog design as first argument
+                        "self"
+                )
+        );
+        NonScopeBlockNode block = new NonScopeBlockNode(
+                Dog,
+                bark
+        );
+
+        SymbolTable generatedST = SH.visit(block);
+        CCodeGenerator generator = new CCodeGenerator(generatedST, SH.TENV);
+        generator.visit(block);
+
+        String expectedDefinition =
+                """
+                void bark(struct Dog *self);
+                """;
+
+        assertEquals(expectedDefinition, generator.prototypes);
     }
 }

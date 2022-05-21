@@ -13,14 +13,27 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
+@SuppressWarnings("rawtypes")
 public class Compiler {
 
+    // Code for StreamGobbler Taken from: https://www.baeldung.com/run-shell-command-in-java
+    private record ProcessStreamGobbler(
+            InputStream inputStream,
+            Consumer<String> consumer
+    ) implements Runnable {
 
-    private static String handleFileNaming(List<String> args) {
+        @Override
+        public void run() {
+            new BufferedReader(new InputStreamReader(inputStream)).lines()
+                    .forEach(consumer);
+        }
+    }
+
+    private static String checkArgsForFileNameOrDefault(List<String> args) {
         String outputFileName;
 
         // check for "-o" flag
@@ -37,7 +50,7 @@ public class Compiler {
         return outputFileName;
     }
 
-    private static String handleFilePath(List<String> args) {
+    private static String checkArgsForFilePath(List<String> args) {
         String inputFilePath = "";
         for (String arg: args) {
             if (arg.contains(".bgl")) {
@@ -48,7 +61,7 @@ public class Compiler {
         return inputFilePath;
     }
 
-    private static ASTvisitor getCodeGenerator(List<String> args, SymbolTable ST, SymbolHarvester SH) {
+    private static ASTvisitor createCodeGeneratorBasedOnArgs(List<String> args, SymbolTable ST, SymbolHarvester SH) {
         // C code generation - specified
         if (args.contains("-c")) {
             return new CCodeGenerator(ST, SH.TENV);
@@ -63,28 +76,58 @@ public class Compiler {
         }
     }
 
-    private static void writeSTDLIB(ASTvisitor generator) {
-        try {
-            FileWriter fw = new FileWriter(
-                    "./src/main/bgl/BglFiles/Generated/bgllib.h",
-                    false
-            );
+    private static void writeSTDLIB(ASTvisitor generator) throws IOException {
+        try (FileWriter fw = new FileWriter(
+                "./src/main/bgl/BglFiles/Generated/bgllib.h",
+                false
+        )) {
             fw.write(STDLIBC.imports);
             fw.write(STDLIBC.defines);
+
             if (generator instanceof CCodeGenerator ccg) {
                 fw.write(ccg.definitions);
             }
-            fw.close();
 
             System.out.println("Compiled successfully");
         } catch (IOException ex) {
-            // Print message as exception occurred when
-            // invalid path of local machine is passed
-            System.out.print("Invalid Path");
+            throw new IOException("Could not write to file");
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    private static void writeExecutable(String outputFileName) throws IOException, InterruptedException {
+        // Locate C files.
+        File stdlibFile = new File("./src/main/bgl/BglFiles/Generated/bgllib.h");
+        File userFile = new File("./src/main/bgl/BglFiles/Generated/%s".formatted(outputFileName));
+
+        if (stdlibFile.exists() && userFile.exists()) {
+            String inputFilePath = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.c");
+            String outputFilePathWin = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.exe");
+            String outputFilePathUnix = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.exe");
+
+            // CMD command to compile with GNU compiler
+            ProcessBuilder builder = new ProcessBuilder();
+
+            // "/c" - creates a new shell, execute the provided command, and exit from the shell automatically
+            if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                builder.command("cmd.exe", "/c", "gcc", "-std=gnu11" , inputFilePath , "-o", outputFilePathWin);
+            } else {
+                builder.command("sh", "-c", "gcc", inputFilePath, "-o", outputFilePathUnix);
+            }
+
+            // Start Process and Process Stream Gobbler
+            Process process = builder.start();
+            ProcessStreamGobbler gobbler = new ProcessStreamGobbler(process.getInputStream(), System.out::println);
+            Executors.newSingleThreadExecutor().submit(gobbler);
+
+            if (process.waitFor() == 0) {
+                System.out.println(outputFileName + " compiled successfully");
+                process.destroy();
+                System.exit(0);
+            }
+        }
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         // Setup
         CharStream input;
@@ -101,7 +144,7 @@ public class Compiler {
         SymbolTable stdST = (SymbolTable) stdAST.accept(stdSH);
 
         // STDLIB Code generator
-        ASTvisitor stdGenerator = getCodeGenerator(arguments, stdST, stdSH);
+        ASTvisitor stdGenerator = createCodeGeneratorBasedOnArgs(arguments, stdST, stdSH);
 
         // STDLIB COde
         stdAST.accept(stdGenerator);
@@ -110,14 +153,13 @@ public class Compiler {
         // User code generation
         StringBuilder userCode = new StringBuilder();
 
-
-        try(BufferedReader reader = new BufferedReader(new FileReader(handleFilePath(arguments)))) {
+        try(BufferedReader reader = new BufferedReader(new FileReader(checkArgsForFilePath(arguments)))) {
             List<String> productList = reader.lines().toList();
             for (String str: productList) {
                 userCode.append(str);
             }
         } catch (IOException e) {
-            throw new IOException("No such file found: %s".formatted(handleFilePath(arguments)));
+            throw new IOException("No such file found: %s".formatted(checkArgsForFilePath(arguments)));
         }
 
         // Parse Input
@@ -135,24 +177,23 @@ public class Compiler {
         SymbolTable ST = (SymbolTable) ast.accept(SH);
 
         // Generator and file naming
-        ASTvisitor generator = getCodeGenerator(arguments, ST, SH);
-        String outputFileName = handleFileNaming(arguments);
+        ASTvisitor generator = createCodeGeneratorBasedOnArgs(arguments, ST, SH);
+        String outputFileName = checkArgsForFileNameOrDefault(arguments);
 
         // Pass generator to ast
         String code = (String) ast.accept(generator);
+        String outputPath = "./src/main/bgl/BglFiles/Generated/%s".formatted(outputFileName);
 
-        try {
-            FileWriter fw = new FileWriter(
-                    "./src/main/bgl/BglFiles/Generated/%s".formatted(outputFileName),
-                    false
-            );
+        // Write generated C-code to specified output file
+        try (FileWriter fw = new FileWriter(outputPath, false)) {
             fw.write(code);
-            System.out.println("Compiled successfully");
-            fw.close();
         } catch (IOException ex) {
-            // Print message as exception occurred when
-            // invalid path of local machine is passed
-            System.out.print("Invalid Path");
+            throw new IOException("Could not write to file");
+        }
+
+        // if output file format is C and -full flag is present compile with GCC
+        if (arguments.contains("-full") && arguments.contains("-c")) {
+            writeExecutable(outputFileName);
         }
 
     }

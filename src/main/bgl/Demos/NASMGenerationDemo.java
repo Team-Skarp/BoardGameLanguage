@@ -27,9 +27,10 @@ public class NASMGenerationDemo {
          */
         String bglCodeExample = """
                 SETUP {
-                    print(5);
+                    int a = 5;
+                    input(a);
                 }
-                
+    
                 RULES{}
                 GAMELOOP{}
                 """;

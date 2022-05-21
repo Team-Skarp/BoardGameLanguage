@@ -322,6 +322,10 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         return null;
     }
 
+    @Override
+    public TypeDenoter visit(RandomNode n) {
+        return new IntType();
+    }
 
 
     @Override
@@ -748,6 +752,48 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    //Much like the action call, except we check inside the design of the accessor
+    public TypeDenoter visit(MethodCallNode call) {
+
+        //Get the symbol table for the accessor --> a.f() here we retrieve a
+        Symbol callingSym = ST.retrieveSymbol(call.calledBy);
+        if (!(callingSym.type instanceof DesignRef)) {
+            throw new ReferenceErrorException("can not call a method on a variable that's not of design type");
+        }
+        SymbolTable accessST = TENV.receiveType(((DesignRef) callingSym.type).name).fields;
+        Symbol methodSym = accessST.retrieveSymbol(call.actionName);
+
+        ActionType method = (ActionType) methodSym.type;
+
+        //Check that the method defined in the design matches that of the method call
+        List<Declaration> formalParameters = method.formalParameters;
+        if (formalParameters.size() != call.actualParameters.size()) {
+            throw new TypeErrorException(
+                    "method '%s' takes '%d' positional arguments but '%d' were given".
+                            formatted(call.actionName, formalParameters.size(), call.actualParameters.size()));
+        }
+
+        //Check that every argument matches formal parameters
+        int arg = 0;
+        while (arg < formalParameters.size()) {
+            TypeDenoter paramType = formalParameters.get(arg).type();
+            TypeDenoter argumentType = visit(call.actualParameters.get(arg));
+
+            if (paramType.getClass() != argumentType.getClass()) {
+                throw new TypeErrorException(
+                        "expected type '%s' on argument index '%d' but recieved type '%s'".
+                                formatted(paramType, arg, argumentType)
+                );
+            }
+
+            arg++;
+        }
+
+        return method.returnType;
+
+    }
+
+    @Override
     public TypeDenoter visit(ReturnNode n) {
 
         if (isNotInAction()) {
@@ -813,7 +859,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
     @Override
     /**
-     * Field can have either an identifier or an action call as a sequence
+     * Field can have either an identifier or an method call as a sequence
      *
      * Ex. a.b.foo() in where the type of the last element in the chain is returned
      *

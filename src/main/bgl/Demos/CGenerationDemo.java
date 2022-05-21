@@ -31,8 +31,11 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP {
-                
-                design piece {
+                    int b = 5;
+                    int a = random(5);
+                    int dice = random(6);
+                    
+                    design piece {
                 str name;
                 }
                 design player {
@@ -56,15 +59,23 @@ public class CGenerationDemo {
                    
                    theList[i] = theList[i];
                    
+                    
                 }
+                
                 RULES {
-                  
+                    action throwDice(int start, int end):int{
+                        return random(end-start+1) +start-1;
+                    }
                 }
+                
                 GAMELOOP {
-                   
+                    a = throwDice(100,250);
+                    print(a);
+                    print(random(5));
+                    print(random(a));
+                    print(random(a+5));
                 }
                 """;
-
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);

@@ -67,6 +67,7 @@ IN          : 'in';
 UNI_DIR     : 'uni';
 BI_DIR      : 'bi';
 STATIC_DIR  : 'static';
+RANDOM      : 'random';
 
 PRINT       : 'print';
 INPUT       : 'input';
@@ -88,6 +89,10 @@ COMMA       : ',';
 IDENTIFIER  : [a-zA-Z][a-zA-Z0-9]*('_'+[a-zA-Z0-9]+)*;
 NEWLINE : '\n'      -> skip;
 WS      : [ \t\r\n] -> skip;    //Tells antler to skip over these characters
+
+LINE_COMMENT
+    : '//' ~[\r\n]* -> skip
+    ;
 
 game
     : setup rules gameloop
@@ -216,15 +221,10 @@ gridDeclaration
     | GRIDDCL COLON IDENTIFIER IDENTIFIER LSBRACE INT COMMA INT RSBRACE
     ;
 
-
 //Special and choice declarations should only be found in Rules block
 specialDeclaration
     : SPECIALDCL IDENTIFIER TILE_EVENT LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN rulesBlock
     ;
-
-/*choiceDeclaration
-    : CHOICEDCL IDENTIFIER LPAREN IDENTIFIER IDENTIFIER RPAREN (COLON primitiveType)? rulesBlock //Should have a special choice block
-    ;*/
 
 actionDeclaration
     : ACTIONDCL IDENTIFIER LPAREN (formalParameter | formalParameter (COMMA formalParameter)+)? RPAREN (COLON type)?
@@ -240,6 +240,10 @@ returnStatement
 
 exitStatement
     : EXIT
+    ;
+
+randomCall
+    : RANDOM LPAREN arithmeticExpression RPAREN
     ;
 
 actionCall
@@ -345,6 +349,7 @@ statement
     | expression EOL
     | returnStatement EOL
     | exitStatement EOL
+    | randomCall EOL
     ;
 
 expression
@@ -387,6 +392,7 @@ arithmeticAtom
     | actionCall
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
+    | randomCall
     | fieldAccess
     ;
 
@@ -447,7 +453,7 @@ foreach
     ;
 
 print
-    : PRINT LPAREN (STR | booleanExpression)? (COMMA (STR | booleanExpression))* RPAREN EOL
+    : PRINT LPAREN (STR | booleanExpression | randomCall)? (COMMA (STR | booleanExpression) | randomCall)* RPAREN EOL
     ;
 
 input

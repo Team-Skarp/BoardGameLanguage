@@ -3,8 +3,6 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
-
 #define foreach(item, array)                         \
     for (int keep = 1,                               \
              count = 0,                              \
@@ -20,11 +18,11 @@ struct Piece {
 };
 struct Player {
 	char* name;
-	struct Piece pieces[];
+	struct pieces *Piece;
 };
 struct Tile {
 	struct Tile *next;
 	struct Tile *prev;
+	struct Piece *pieces;
 	bool (*isEmpty)(struct Tile *self);
-	struct Piece pieces[];
 };
