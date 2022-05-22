@@ -452,7 +452,7 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         Expression expr = (Expression) ctx.arithmeticExpression().accept(this);
 
         if (expr.getClass() == IntNode.class) {
-            System.out.println("WE have an int node");
+            System.out.println("ASTb visiting IntAssignment node with IntNode.class on right side");
 
             return new IntegerAssignmentNode(
                     new IdNode(ctx.IDENTIFIER().getText(), ((IntNode) expr).value),

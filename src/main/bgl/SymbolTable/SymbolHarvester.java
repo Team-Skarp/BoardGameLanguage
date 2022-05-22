@@ -209,6 +209,10 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(IntegerAssignmentNode n) {
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
+        // Todo: in case of successful type check, should we update value of left side id in ST to match right side?
+        //  what happens in case a list to list assignment listIdL = listIdR;?
+        //  should we update the size of listIdL in ST? This is needed for proper C code gen
+
         return ST;
     }
 
@@ -426,10 +430,17 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(ListDeclarationNode n) {
         TC = new TypeChecker(ST, TENV);
         TC.visit(n);
+        int size = 0;
+        
+        if (n.assignedList != null && n.assignedList.elements != null) {
+            size = n.assignedList.elements.size();
+        }
 
         Symbol sym = new Symbol(
                 n.name,
-                new ListType(n.elementType));
+                new ListType(n.elementType),
+                size
+        );
 
         ST.enterSymbol(sym);
         return ST;

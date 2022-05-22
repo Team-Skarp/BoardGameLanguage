@@ -4,8 +4,6 @@ import ASTvisitors.ASTvisitor;
 import SymbolTable.types.ListType;
 import SymbolTable.types.TypeDenoter;
 
-import java.util.List;
-
 public class ListDeclarationNode implements ASTNode<Object>, Declaration {
 
     public String name;

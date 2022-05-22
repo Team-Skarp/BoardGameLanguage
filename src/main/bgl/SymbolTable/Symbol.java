@@ -14,8 +14,8 @@ public class Symbol {
     }
 
     /**
-     * Special constructor just for integer symbols
-     * entered with a value
+     * Special constructor just for integer and list symbols
+     * entered with a value (or list size)
      */
     public Symbol(String name, TypeDenoter type, int value) {
         this.name = name;

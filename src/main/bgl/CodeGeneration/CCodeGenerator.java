@@ -7,6 +7,7 @@ import SymbolTable.SymbolTable;
 import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
+import SymbolTable.IllegalListAssignmentException;
 
 import java.util.*;
 
@@ -260,7 +261,57 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntegerAssignmentNode n) {
-        return n.id.name+" = "+n.aexpr.accept(this)+EOL;
+        System.out.println("CCG in IntAssNode");
+        StringBuilder str = new StringBuilder();
+
+        IdNode left = n.getLeft();
+        Symbol leftSymbol = ST.retrieveSymbol(left.name);
+
+        // special logic to handle list to list assignment,
+        // as our current grammar picks int assignment for this case of assigning the value of one identifier to another
+
+        if (leftSymbol.type.getClass().equals(ListType.class)) {
+//            System.out.println("leftSymbol.type.getClass is " + leftSymbol.type.getClass());
+
+            IdNode right = (IdNode) n.getRight();
+            Symbol rightSymbol = ST.retrieveSymbol(right.name);
+
+            // the types of identifiers must match, probably already done in TC
+            if (true) {
+                // leftSymbol.type.toString().equals(rightSymbol.type.toString())
+
+                /*System.out.println("types in CCG int assignment match");
+                System.out.println("leftSymbol.type = " + leftSymbol.type);
+                System.out.println("rightSymbol.type = " + rightSymbol.type);
+                */
+
+                // check that only allows non-nested lists in here
+                if (leftSymbol.type.toString().contains("list:list") || rightSymbol.type.toString().contains("list:list")) {
+                    throw new IllegalListAssignmentException("cannot C code generate for lists of lists in assignments");
+                }
+
+                // sizes of the two lists
+                int leftSize = leftSymbol.value;
+                int rightSize = rightSymbol.value;
+
+                // only allow assignment of lists of the same size
+                if (leftSize != rightSize) {
+                    throw new IllegalListAssignmentException("List sizes in assignment not equal");
+                }
+
+                // for loop to assign values of right side list to left side list
+                // symbol harvester now records the size of lists at declaration
+                str.append("for (int i = 0; i < %d; i++) {%n".formatted(leftSize));
+                str.append("\t%s[i] = %s[i]".formatted(left, right)).append(EOL);
+                str.append("}\n");
+
+                return str.toString();
+            }
+        }
+
+        // here we don't have a list to list assignment
+        str.append(n.id.name).append(" = ").append(n.aexpr.accept(this)).append(EOL);
+        return str.toString();
     }
 
     @Override

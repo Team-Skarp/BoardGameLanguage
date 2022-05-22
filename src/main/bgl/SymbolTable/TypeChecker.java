@@ -67,12 +67,22 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
         TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
 
-        if (idType.getClass() == exprType.getClass()) {
-            System.out.println(idType.getClass() + " " + exprType.getClass()); //todo remove
-            return idType;          //Could be the expression type or the id type
-        } else {
+        // since id = id goes through here due to grammar rules, we need enhanced type check for lists
+        // if we have a list on either side
+        if (idType.toString().contains("list:") || exprType.toString().contains("list:")) {
+            // if types don't match
+            if (!Objects.equals(idType.toString(), exprType.toString())) {
+                throw new TypeErrorException("types in assignment are of different types %s and %s".formatted(idType, exprType));
+            }
+        }
+        // non-list assignment case
+        else if (idType.getClass() == exprType.getClass()) {
+            return idType;          // could return either the expression type or the id type
+        }
+        else {
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
+        return null;
     }
 
     @Override
@@ -96,6 +106,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return fieldType;          //Could be the expression type or the id type
         } else {
             System.out.println("left type: %s, right type: %s".formatted(fieldType.getClass(), exprType.getClass()));
+            // had to disable since empty list literals [] don't have a type
             System.out.println("exception thrown at type check for dotAssignment disabled");
             //throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, fieldType));
         }
@@ -154,16 +165,16 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             for (TypeDenoter actualTypeOfElementNode : actualTypesOfElementNodes) {
                 // To allow empty lists, we skip the check if their type ends with null
                 if (!actualTypeOfElementNode.toString().endsWith("null")) {
-                    System.out.println("actualTypeOfElementNode = " + actualTypeOfElementNode);
+                    // System.out.println("actualTypeOfElementNode = " + actualTypeOfElementNode);
                     if ((!Objects.equals(actualTypeOfElementNode.toString(), n.elementType.toString()))) {
                         //System.out.println("left: " + n.elementType.getClass() + " right: " + actualTypesOfElementNode.getClass());
-                        System.out.println("YIKES! " + n.elementType + " != " + actualTypeOfElementNode);
+                        //System.out.println("YIKES! " + n.elementType + " != " + actualTypeOfElementNode);
                         throw new TypeErrorException(
                                 "Element of type %s does not match list of type %s".
                                         formatted(actualTypeOfElementNode, n.elementType));
                     }
 
-                    /* didn't catch incorrectly nested lists because classes were both ListType //Todo: gardening
+                    /* didn't catch incorrectly nested lists because classes were both ListType //Todo: gardening, remove when everything works
                     if (actualTypesOfElementNode.getClass() != n.elementType.getClass()) {
                         throw new TypeErrorException(
                                 "Element of type %s does not match list of type %s".
