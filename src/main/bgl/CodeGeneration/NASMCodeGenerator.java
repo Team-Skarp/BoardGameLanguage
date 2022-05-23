@@ -202,6 +202,11 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(ListIndexAssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(DesignDefinitionNode n) {
         return null;
     }
@@ -356,12 +361,22 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(FieldAccessLHNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(ListElementNode n) {
         return null;
     }
 
     @Override
     public String visit(ListNode n) {
+        return null;
+    }
+
+    @Override
+    public String visit(IndexAccessNode n) {
         return null;
     }
 

@@ -30,20 +30,47 @@ public class CGenerationDemo {
         */
         String bglCodeExample =
                 """
-                SETUP {
-                    int b = 5;
-                    int a = random(6);
-                    int c = random(12);
-                    print(a);
-                }
-                
-                RULES {
-                }
-                
-                GAMELOOP {
-                }
-                """;
-        
+                        SETUP{
+                        
+                        
+                        
+                            int a = 1;
+                            int c = 6;
+                            a = c;
+                            a = a + c;
+                            design Tile {
+                                int ti;
+                            }
+                            Tile tile;
+                            
+                            list:list:list:int il4;
+                            list:list:list:int il5 = [];
+                            
+                            bool boo = true;
+                            
+                                                        
+                            list:list:list:int il3 = [[[1],[1]],[[2],[2]],[[3],[3]]];
+                            il3[1] = a;
+                            a = il3[1];
+                            
+                            
+                            
+                            list:int il1 = [11];
+                            list:int il2 = [22];
+                            
+                            list:bool bl1 = [true, false];
+                            
+                           
+                            
+                            il1 = il2;
+                            
+                            print(a);
+                            
+                        }
+                        RULES{}
+                        GAMELOOP{}
+                                    """;
+
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);
         lexer   = new BoardLexer(input);

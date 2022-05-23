@@ -48,6 +48,7 @@ public interface ASTvisitor<T> {
     T visit(IntegerAssignmentNode n);
     T visit(BooleanAssignmentNode n);
     T visit(DotAssignmentNode n);
+    T visit(ListIndexAssignmentNode n);
 
     //Definitions
     T visit(DesignDefinitionNode n);
@@ -85,8 +86,10 @@ public interface ASTvisitor<T> {
     T visit(ExitNode n);
     T visit(RandomNode n);
     T visit(FieldAccessNode n);
+    T visit(FieldAccessLHNode n);
     //Misc
     T visit(ReturnNode n);
     T visit(ListElementNode n);
     T visit(ListNode n);
+    T visit(IndexAccessNode n);
 }

@@ -4,11 +4,11 @@ import ASTvisitors.ASTvisitor;
 
 public class DotAssignmentNode implements ASTNode<Object>{
 
-    public FieldAccessNode fieldAccessNode;
+    public FieldAccessLHNode fieldAccessLHNode;
     public ASTNode expr;
 
-    public DotAssignmentNode(FieldAccessNode fieldAccessNode, ASTNode expr) {
-        this.fieldAccessNode = fieldAccessNode;
+    public DotAssignmentNode(FieldAccessLHNode fieldAccessLHNode, ASTNode expr) {
+        this.fieldAccessLHNode = fieldAccessLHNode;
         this.expr = expr;
     }
 
@@ -17,8 +17,8 @@ public class DotAssignmentNode implements ASTNode<Object>{
         return v.visit(this);
     }
 
-    public FieldAccessNode getLeft() {
-        return fieldAccessNode;
+    public FieldAccessLHNode getLeft() {
+        return fieldAccessLHNode;
     }
 
     public ASTNode getRight() {

@@ -209,6 +209,10 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(IntegerAssignmentNode n) {
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
+        // Todo: in case of successful type check, should we update value of left side id in ST to match right side?
+        //  what happens in case a list to list assignment listIdL = listIdR;?
+        //  should we update the size of listIdL in ST? This is needed for proper C code gen
+
         return ST;
     }
 
@@ -223,6 +227,11 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(DotAssignmentNode n) {
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(ListIndexAssignmentNode n) {
         return ST;
     }
 
@@ -421,18 +430,29 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     public SymbolTable visit(ListDeclarationNode n) {
         TC = new TypeChecker(ST, TENV);
         TC.visit(n);
+        int size = 0;
+        
+        if (n.assignedList != null && n.assignedList.elements != null) {
+            size = n.assignedList.elements.size();
+        }
 
         Symbol sym = new Symbol(
                 n.name,
-                new ListType(n.elementType));
+                new ListType(n.elementType),
+                size
+        );
 
         ST.enterSymbol(sym);
         return ST;
-    } //Todo: implement?
+    }
 
     @Override
     public SymbolTable visit(ListNode n) {
         return ST;
+    }
+
+    @Override
+    public SymbolTable visit(IndexAccessNode n) { return ST;
     }
 
     @Override
@@ -480,11 +500,14 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         if ((n.value != null) && (n.value.accept(TC).getClass() != IntType.class)) {
             throw new TypeErrorException("Types in assignment did not match");
         }
-        ST.enterSymbol(new Symbol(
-                n.name,
-                n.type()
-        ));
 
+        Symbol sym = new Symbol(n.name, n.type());
+
+        if (n.value instanceof IntNode IntNode) {
+            sym.value = IntNode.value;
+        }
+
+        ST.enterSymbol(sym);
         return ST;
     }
 
@@ -681,7 +704,7 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     @Override
     public SymbolTable visit(FieldAccessNode n) {
 
-        for (Accessable field : n.fields) {
+        for (ASTNode field : n.fields) {
             field.accept(this);
         }
 
@@ -689,6 +712,18 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
         TC = new TypeChecker(ST, TENV);
         n.accept(TC);
 
+        return ST;
+    }
+
+    @Override
+    public SymbolTable visit(FieldAccessLHNode n) {
+        for (ASTNode field : n.fields) {
+            field.accept(this);
+        }
+
+        //Typecheck that all fields that are accessed exists
+        TC = new TypeChecker(ST, TENV);
+        n.accept(TC);
 
         return ST;
     }

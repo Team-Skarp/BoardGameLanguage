@@ -1,6 +1,8 @@
 package CodeGeneration;
 
 import ASTnodes.*;
+import STDLIB.Piece;
+import STDLIB.PredefinedDesign;
 import STDLIB.Tile;
 import SymbolTable.TypeEnvironment;
 import SymbolTable.SymbolHarvester;
@@ -9,6 +11,9 @@ import SymbolTable.Symbol;
 import SymbolTable.types.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static CodeGeneration.CCodeGenerator.toCType;
 
@@ -32,6 +37,7 @@ class CCodeGeneratorTest {
         //Given Tile node and a written symbol table
         Tile tile = new Tile();
         SymbolTable symbolTable = SH.visit(tile.getDesign());
+        symbolTable.enterSymbol(new Symbol("pieces", new ListType(new Piece().getType())));
 
         //When code generator visits tile node
         generator = new CCodeGenerator(symbolTable, SH.TENV);

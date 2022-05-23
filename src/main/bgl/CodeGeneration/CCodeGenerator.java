@@ -7,11 +7,9 @@ import SymbolTable.SymbolTable;
 import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
+import SymbolTable.IllegalListAssignmentException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class for generating C code.
@@ -263,7 +261,57 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(IntegerAssignmentNode n) {
-        return n.id.name+" = "+n.aexpr.accept(this)+EOL;
+        System.out.println("CCG in IntAssNode");
+        StringBuilder str = new StringBuilder();
+
+        IdNode left = n.getLeft();
+        Symbol leftSymbol = ST.retrieveSymbol(left.name);
+
+        // special logic to handle list to list assignment,
+        // as our current grammar picks int assignment for this case of assigning the value of one identifier to another
+
+        if (leftSymbol.type.getClass().equals(ListType.class)) {
+//            System.out.println("leftSymbol.type.getClass is " + leftSymbol.type.getClass());
+
+            IdNode right = (IdNode) n.getRight();
+            Symbol rightSymbol = ST.retrieveSymbol(right.name);
+
+            // the types of identifiers must match, probably already done in TC
+            if (true) {
+                // leftSymbol.type.toString().equals(rightSymbol.type.toString())
+
+                /*System.out.println("types in CCG int assignment match");
+                System.out.println("leftSymbol.type = " + leftSymbol.type);
+                System.out.println("rightSymbol.type = " + rightSymbol.type);
+                */
+
+                // check that only allows non-nested lists in here
+                if (leftSymbol.type.toString().contains("list:list") || rightSymbol.type.toString().contains("list:list")) {
+                    throw new IllegalListAssignmentException("cannot C code generate for lists of lists in assignments");
+                }
+
+                // sizes of the two lists
+                int leftSize = leftSymbol.value;
+                int rightSize = rightSymbol.value;
+
+                // only allow assignment of lists of the same size
+                if (leftSize != rightSize) {
+                    throw new IllegalListAssignmentException("List sizes in assignment not equal");
+                }
+
+                // for loop to assign values of right side list to left side list
+                // symbol harvester now records the size of lists at declaration
+                str.append("for (int i = 0; i < %d; i++) {%n".formatted(leftSize));
+                str.append("\t%s[i] = %s[i]".formatted(left, right)).append(EOL);
+                str.append("}\n");
+
+                return str.toString();
+            }
+        }
+
+        // here we don't have a list to list assignment
+        str.append(n.id.name).append(" = ").append(n.aexpr.accept(this)).append(EOL);
+        return str.toString();
     }
 
     @Override
@@ -273,13 +321,21 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(DotAssignmentNode n) {
+        System.out.println("code gen for dot ass %s = %s ".formatted(n.getLeft(), n.getRight()));
         StringBuilder str = new StringBuilder();
+        str.append(n.fieldAccessLHNode.accept(this));
+        str.append(" = ");
+        str.append(n.getRight().accept(this));
+        str.append(EOL);
+/*
+StringBuilder str = new StringBuilder();
         for (int i = 0; i < n.fieldAccessNode.fields.size() - 1; i++) {
             str.append(n.fieldAccessNode.fields.get(i).getAccessName());
         }
         str.deleteCharAt(str.length() - 1);
         str.append("->").append(n.fieldAccessNode.fields.get(n.fieldAccessNode.fields.size() - 1)).
         append(" = ").append(n.expr.accept(this)).append(EOL);
+ */
 
         return str.toString();
     }
@@ -530,14 +586,34 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(ListDeclarationNode n) {
         //System.out.println("IN LIST DECL NODE PART 1");
-        String braces = "[]";
+        Symbol leftSymbol = ST.retrieveSymbol(n.name);
+
+        // C needs size set aside for array elements
+        String braces = "[%d]".formatted(leftSymbol.value);
         TypeDenoter finalType = n.elementType;
 
+        // prep to set size of nested arrays
+        ListNode eleTemp = null;
+        int size = 0;
+        if (n.assignedList != null && n.assignedList.elements != null && n.assignedList.elements.size() != 0 ) {
+            if (n.assignedList.elements.get(0) != null && n.assignedList.elements.get(0).getClass() == ListNode.class) {
+                eleTemp = (ListNode) n.assignedList.elements.get(0);
+                size = eleTemp.elements.size();
+            }
+        }
         //Algorithm to find the final type of a list
         while (finalType instanceof ListType) {
+            // find first element in next list element
+            if (eleTemp != null && eleTemp.elements.get(0).getClass() == ListNode.class) {
+                eleTemp = (ListNode) eleTemp.elements.get(0);
+            }
+
             ListType temp = (ListType) finalType;
             finalType = temp.elementType;
-            braces += "[]";
+            braces += "[%d]".formatted(size);
+            if (eleTemp != null) {
+                size = eleTemp.elements.size();
+            }
         }
 
         if (n.assignedList == null) {
@@ -554,7 +630,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         else {
             //System.out.println("IN LIST DECL NODE ELSE PART");
             StringBuilder rightSide = new StringBuilder();
-            rightSide.append("[");
+            rightSide.append("{");
             for (ASTNode child: n.assignedList.elements) {
                 rightSide.append(child.accept(this));
                 rightSide.append(", ");
@@ -563,8 +639,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 rightSide.deleteCharAt(rightSide.length()-1);
                 rightSide.deleteCharAt(rightSide.length()-1);
             }
-
-            rightSide.append("]");
+            rightSide.append("}");
             return (
                     """
                             %s %s%s = %s;
@@ -582,7 +657,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(ListNode n) {
         //System.out.println("IN LIST NODE");
         StringBuilder str = new StringBuilder();
-        str.append("[");
+        str.append("{");
         for (ASTNode elementNode: n.elements) {
             str.append(elementNode.accept(this));
             str.append(", ");
@@ -593,7 +668,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         }
 
 
-        str.append("]");
+        str.append("}");
 
         return str.toString();
     }
@@ -602,16 +677,50 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(ListElementNode n) {
         //System.out.println("IN LIST ELEMENT NODE");
         StringBuilder str = new StringBuilder();
-        str.append("[");
+        str.append("{");
+
         for (ASTNode elementNode: n.children) {
             str.append(elementNode);
             str.append(", ");
         }
         if (!n.children.isEmpty())
         str.deleteCharAt(str.length()-1);
-        str.append("]");
+
+        str.append("}");
         //str.append(EOL); // Commenting this out seemingly makes no difference... weird
         return str.toString();
+    }
+
+    @Override
+    public String visit(IndexAccessNode n) {
+
+        StringBuilder str = new StringBuilder();
+
+        //todo: remember to add [ and ] if they are removed in the AST node, %s or %d?
+        for (String child: n.childrenAsString) {
+            // append the brackets: [ or ]
+            if (Objects.equals(child, "[") || Objects.equals(child, "]")) {
+                str.append(child);
+            }
+            // find the strings containing only numbers
+            else if (child.matches("[0-9]+")) {
+                //int temp = Integer.parseInt(child);
+                // subtract 1 from index to match C indexing
+                str.append("%s".formatted(Integer.parseInt(child) - 1));
+            }
+            else {
+                // let the C compiler do the arithmetic to subtract 1 from index to match C indexing
+                str.append("(%s - 1)".formatted(child));
+            }
+
+        }
+        return str.toString();
+    }
+
+
+    @Override
+    public String visit(ListIndexAssignmentNode n) {
+        return null; // Todo: implement
     }
 
     /**
@@ -669,6 +778,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(IntegerDeclarationNode n) {
         //TODO Fix indent somewhere between this and sequential decl. Also fix sequential decl.
+        System.out.println(n.value);
         if (n.value != null) {
             //int a;
             return """
@@ -932,11 +1042,36 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(FieldAccessNode n) {
         List<String> sequence = new ArrayList<>();
 
-        for (Accessable field : n.fields) {
+        for (ASTNode field : n.fields) {
             sequence.add((String)field.accept(this));
         }
 
         return String.join(".", sequence);
+    }
+
+    @Override
+    public String visit(FieldAccessLHNode n) {
+        // List<String> children = new ArrayList<>();
+        boolean oneIdNodeHasBeenAppended = false;
+
+        StringBuilder str = new StringBuilder();
+
+        for (ASTNode node : n.fields) {
+            if (node instanceof IdNode IdN) {
+                if (oneIdNodeHasBeenAppended) {
+                    str.append(".");
+                }
+                str.append(IdN.name);
+                oneIdNodeHasBeenAppended = true;
+            //children.add((String)field.accept(this));
+            }
+            else if (node instanceof IndexAccessNode) {
+
+                str.append(node.accept(this));
+            }
+        }
+
+        return str.toString();
     }
 
     @Override
@@ -949,10 +1084,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(RandomNode n) {
         String str = "(rand() % ";
-
-        str += """
-               %d + 1);
-               """.formatted(n.diceSize.value);
+        str += "%s + 1)".formatted(n.diceSize.accept(this));
         return str;
     }
 }
