@@ -126,7 +126,7 @@ public class SymbolHarvesterTest {
      *
      * a and b, should be written to symbol table
      */
-    public void should_write_formal_params_into_symbol_table() {
+    public void shouldWriteFormalParamsIntoSymbolTable() {
 
         symbolHarvester = new SymbolHarvester();
 
@@ -155,7 +155,7 @@ public class SymbolHarvesterTest {
     }
 
     @Test
-    public void action_declarations_saves_first_argument_as_self() {
+    public void actionDeclarationsSavesFirstArgumentAsSelf() {
 
         symbolHarvester = new SymbolHarvester();
 
