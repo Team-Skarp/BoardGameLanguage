@@ -670,20 +670,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
     public String visit(IntegerDeclarationNode n) {
         //TODO Fix indent somewhere between this and sequential decl. Also fix sequential decl.
         if (n.value != null) {
+            //int a;
             return """
-                   %s %s = %s;
-                   """.formatted(
+                    %s %s = %s;
+                    """.formatted(
                     toCType(n.type()),
                     n.name,
                     n.value.accept(this)
             );
-        } else if(n.randomNode != null) {
-            return """
-                   %s %s = %s
-                   """.formatted(
-                    toCType(n.type()),
-                    n.name,
-                    n.randomNode.accept(this));
         }
         else {
             return """

@@ -277,7 +277,6 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     @Override
     public TypeDenoter visit(ArithmeticExpression n) {
         return (TypeDenoter) n.accept(this);
-
     }
 
     @Override
