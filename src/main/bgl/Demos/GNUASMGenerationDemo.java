@@ -31,6 +31,7 @@ public class GNUASMGenerationDemo {
                 SETUP {
                 int age = 0;
                 print(true);
+                }
                 RULES {}
                 GAMELOOP {}
                 """;
