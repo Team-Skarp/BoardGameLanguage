@@ -38,6 +38,8 @@ public class SymbolTable {
 
         Symbol sym = activeBlock.getSymbolWith(name);
 
+        System.out.println("sym = " + sym);
+
         if (sym == null) {
             Block temp_block = activeBlock;
 

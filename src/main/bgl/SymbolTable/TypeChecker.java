@@ -68,9 +68,9 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
 
         // since id = id goes through here due to grammar rules, we need enhanced type check for lists
-        // if we have a list on either side
-        if (idType.toString().contains("list:") || exprType.toString().contains("list:")) {
-            // if types don't match
+        // if we have a list on both side
+        if (idType.toString().contains("list:") && exprType.toString().contains("list:")) {
+            // if types (and nesting level) don't match
             if (!Objects.equals(idType.toString(), exprType.toString())) {
                 throw new TypeErrorException("types in assignment are of different types %s and %s".formatted(idType, exprType));
             }
@@ -79,7 +79,10 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         else if (idType.getClass() == exprType.getClass()) {
             return idType;          // could return either the expression type or the id type
         }
-        else {
+        // if one side has a list, remove occurrences of "list:" from type to just check the base type to allow assignment through indexation
+        else if (!idType.toString().replace("list:", "").equals(exprType.toString().replace("list:", ""))) {
+            System.out.println("is this a fail?");
+            System.out.println(idType.toString() + " " + exprType.toString().replace("list:", ""));
             throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
         }
         return null;
@@ -280,7 +283,7 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
 
                 System.out.println("Identifier %s has value %d".formatted(temp.name, temp.value));
 
-                if (temp.value == 0) {
+                if (temp.value < 1) {
                     throw new IndexOutOfBoundsException("BGL indexing starts from 1, unlike C which starts from 0");
                 }
                 else return temp.type;

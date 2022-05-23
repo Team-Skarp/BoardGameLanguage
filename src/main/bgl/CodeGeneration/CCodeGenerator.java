@@ -586,14 +586,34 @@ StringBuilder str = new StringBuilder();
     @Override
     public String visit(ListDeclarationNode n) {
         //System.out.println("IN LIST DECL NODE PART 1");
-        String braces = "[]";
+        Symbol leftSymbol = ST.retrieveSymbol(n.name);
+
+        // C needs size set aside for array elements
+        String braces = "[%d]".formatted(leftSymbol.value);
         TypeDenoter finalType = n.elementType;
 
+        // prep to set size of nested arrays
+        ListNode eleTemp = null;
+        int size = 0;
+        if (n.assignedList != null && n.assignedList.elements != null && n.assignedList.elements.size() != 0 ) {
+            if (n.assignedList.elements.get(0) != null && n.assignedList.elements.get(0).getClass() == ListNode.class) {
+                eleTemp = (ListNode) n.assignedList.elements.get(0);
+                size = eleTemp.elements.size();
+            }
+        }
         //Algorithm to find the final type of a list
         while (finalType instanceof ListType) {
+            // find first element in next list element
+            if (eleTemp != null && eleTemp.elements.get(0).getClass() == ListNode.class) {
+                eleTemp = (ListNode) eleTemp.elements.get(0);
+            }
+
             ListType temp = (ListType) finalType;
             finalType = temp.elementType;
-            braces += "[]";
+            braces += "[%d]".formatted(size);
+            if (eleTemp != null) {
+                size = eleTemp.elements.size();
+            }
         }
 
         if (n.assignedList == null) {
@@ -637,7 +657,7 @@ StringBuilder str = new StringBuilder();
     public String visit(ListNode n) {
         //System.out.println("IN LIST NODE");
         StringBuilder str = new StringBuilder();
-        str.append("[");
+        str.append("{");
         for (ASTNode elementNode: n.elements) {
             str.append(elementNode.accept(this));
             str.append(", ");
@@ -648,7 +668,7 @@ StringBuilder str = new StringBuilder();
         }
 
 
-        str.append("]");
+        str.append("}");
 
         return str.toString();
     }
@@ -657,7 +677,7 @@ StringBuilder str = new StringBuilder();
     public String visit(ListElementNode n) {
         //System.out.println("IN LIST ELEMENT NODE");
         StringBuilder str = new StringBuilder();
-        str.append("[");
+        str.append("{");
 
         for (ASTNode elementNode: n.children) {
             str.append(elementNode);
@@ -666,7 +686,7 @@ StringBuilder str = new StringBuilder();
         if (!n.children.isEmpty())
         str.deleteCharAt(str.length()-1);
 
-        str.append("]");
+        str.append("}");
         //str.append(EOL); // Commenting this out seemingly makes no difference... weird
         return str.toString();
     }
