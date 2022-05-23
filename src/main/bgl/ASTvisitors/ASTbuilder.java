@@ -885,6 +885,11 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitSizeof(BoardParser.SizeofContext ctx) {
+        return new SizeOfNode( ctx.IDENTIFIER().getText() );
+    }
+
+    @Override
     public ASTNode visitExpression(BoardParser.ExpressionContext ctx) {
         if (ctx.booleanExpression() != null) {
             return ctx.getChild(0).accept(this);
@@ -1006,6 +1011,9 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
         }
         else if(ctx.arithmeticExpression() != null){
             return ctx.arithmeticExpression().accept(this);
+        }
+        else if(ctx.sizeof() != null){
+            return ctx.sizeof().accept(this);
         }
         else if(ctx.actionCall() != null) {
             return ctx.actionCall().accept(this);
@@ -1236,23 +1244,21 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     @Override
     public ASTNode visitPrint(BoardParser.PrintContext ctx) {
 
-        if(ctx.PRINT() != null){
-            List<ASTNode> prints = new ArrayList<>();
+        List<ASTNode> prints = new ArrayList<>();
 
-            //TODO Fix for loop
-            for (int i = 0; i < ctx.children.size()-4; i+=2){
-                ASTNode astNode = ctx.getChild(i+2).accept(this);
-                //if astnode is null, that means its a simple string
-                if(astNode == null){
-                    prints.add(new StringNode(ctx.getChild(i+2).getText()));
-                } else {
-                    prints.add(astNode);
-                }
+        System.out.println(ctx.children);
+
+        for (ParseTree arg : ctx.children) {
+            if (arg instanceof BoardParser.BooleanExpressionContext bExpr) {
+                prints.add(bExpr.accept(this));
             }
-            return new PrintNode(prints);
+            else if (ctx.STR().contains(arg)) {
+                prints.add(new StringNode(arg.getText()));
+            }
         }
 
-        return null;
+        return new PrintNode(prints);
+
     }
 
     @Override

@@ -1100,4 +1100,9 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     public String visit(RandomNode n) {
         return null;
     }
+
+    @Override
+    public String visit(SizeOfNode n) {
+        return null;
+    }
 }

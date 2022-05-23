@@ -37,7 +37,7 @@ class CCodeGeneratorTest {
         //Given Tile node and a written symbol table
         Tile tile = new Tile();
         SymbolTable symbolTable = SH.visit(tile.getDesign());
-        symbolTable.enterSymbol(new Symbol("pieces", new ListType(new Piece().getType())));
+        //symbolTable.enterSymbol(new Symbol("pieces", new ListType(new Piece().getType())));
 
         //When code generator visits tile node
         generator = new CCodeGenerator(symbolTable, SH.TENV);
@@ -53,8 +53,8 @@ class CCodeGeneratorTest {
                 struct Tile {
                 \tstruct Tile *next;
                 \tstruct Tile *prev;
-                \tstruct Piece pieces[0];
                 \tbool (*isEmpty)();
+                \tstruct Piece pieces[0];
                 };
                 """;
 

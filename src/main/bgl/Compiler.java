@@ -18,6 +18,11 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @SuppressWarnings("rawtypes")
+/**
+ * Class used to compile an input file to either a C or ASM file format
+ *
+ * Example configuration: 'ludo.bgl -c -o ludo.c'
+ */
 public class Compiler {
 
     // Code for StreamGobbler Taken from: https://www.baeldung.com/run-shell-command-in-java

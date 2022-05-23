@@ -13,8 +13,8 @@ public class IntegerDeclarationNode implements ASTNode<Object>, Declaration {
         this.name = name;
     }
     public IntegerDeclarationNode(String name, ASTNode value) {
-        this.value = value;
         this.name = name;
+        this.value = value;
     }
 
     @Override
