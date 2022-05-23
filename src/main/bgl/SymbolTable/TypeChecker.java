@@ -341,6 +341,18 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
         return new IntType();
     }
 
+    @Override
+    public TypeDenoter visit(SizeOfNode n) {
+
+        //Check that the identifier is a list
+        Symbol identifier = ST.retrieveSymbol(n.var);
+
+        if (!(identifier.type instanceof ListType)) {
+            throw new TypeErrorException("sizeof expects a variable of type list");
+        }
+
+        return new IntType();
+    }
 
     @Override
     public TypeDenoter visit(ListElementNode n) {

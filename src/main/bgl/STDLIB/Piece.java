@@ -21,7 +21,6 @@ public class Piece implements PredefinedDesign {
      *   action move(): void;
      *   action jump(): void;
      */
-
     @Override
     public DesignDefinitionNode getDesign() {
         return new DesignDefinitionNode(
@@ -44,7 +43,7 @@ public class Piece implements PredefinedDesign {
     public List<ActionDefinitionNode> getImplementedActions() {
 
         /*
-         * action move(piece): void {
+         * action move(Piece self): void {
          *     piece.tile.next TODO: write correct code
          * }
          */

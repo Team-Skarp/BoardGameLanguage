@@ -50,7 +50,7 @@ public class Tile implements PredefinedDesign {
     public List<ActionDefinitionNode> getImplementedActions() {
         /**
          * action isEmpty(Tile self) : bool {
-         *     return self.pieces.length < 0
+         *     return self.pieces < 0;
          * }
          */
         ActionDefinitionNode isEmpty = new ActionDefinitionNode(

@@ -28,7 +28,7 @@ GRIDDCL     : 'grid';
 //Primitive types
 INT     : [0-9]+;
 BOOL    : 'true' | 'false';
-STR  : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
+STR     : '"' ('\\' ["\\] | ~["\\\r\n])* '"';
 
 //Control structures
 IF      : 'if';
@@ -39,6 +39,7 @@ FOREACH : 'foreach';
 WHILE   : 'while';
 RETURN  : 'return';
 BREAK   : 'break';
+SIZEOF  : 'sizeof';
 
 //Operators
 MOD     : '%';
@@ -343,12 +344,16 @@ statement
     | whileStatement
     | foreach
     | assignmentStatement
-    | print
-    | input
+    | print EOL
+    | input EOL
     | expression EOL
     | returnStatement EOL
     | exitStatement EOL
     | randomCall EOL
+    ;
+
+sizeof
+    : SIZEOF LPAREN IDENTIFIER RPAREN
     ;
 
 expression
@@ -388,6 +393,7 @@ unaryMinus
 
 arithmeticAtom
     : INT
+    | sizeof
     | actionCall
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
@@ -452,9 +458,9 @@ foreach
     ;
 
 print
-    : PRINT LPAREN (STR | booleanExpression | randomCall)? (COMMA (STR | booleanExpression) | randomCall)* RPAREN EOL
+    : PRINT LPAREN (STR | booleanExpression ) (COMMA (STR | booleanExpression))* RPAREN
     ;
 
 input
-    : INPUT LPAREN IDENTIFIER RPAREN EOL //TODO consider having an input type for the identifier
+    : INPUT LPAREN IDENTIFIER RPAREN //TODO consider having an input type for the identifier
     ;

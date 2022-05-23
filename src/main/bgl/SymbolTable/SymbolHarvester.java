@@ -466,6 +466,15 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(SizeOfNode n) {
+        TC = new TypeChecker(ST, TENV);
+        //Check that the identifier given for the size of node is of a list type
+        n.accept(TC);
+
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(ListElementNode n) {
         return ST;
     }

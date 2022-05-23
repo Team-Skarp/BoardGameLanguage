@@ -585,11 +585,19 @@ StringBuilder str = new StringBuilder();
 
     @Override
     public String visit(ListDeclarationNode n) {
-        //System.out.println("IN LIST DECL NODE PART 1");
-        Symbol leftSymbol = ST.retrieveSymbol(n.name);
+        Symbol leftList;
+        SymbolTable DST;
+
+        if (currentDesignDefinition != null) {
+            DST = TENV.receiveType(currentDesignDefinition.dName).fields;
+            leftList = DST.retrieveSymbol(n.name);
+        }
+        else {
+            leftList = ST.retrieveSymbol(n.name);
+        }
 
         // C needs size set aside for array elements
-        String braces = "[%d]".formatted(leftSymbol.value);
+        String braces = "[%d]".formatted(leftList.value);
         TypeDenoter finalType = n.elementType;
 
         // prep to set size of nested arrays
@@ -619,11 +627,11 @@ StringBuilder str = new StringBuilder();
         if (n.assignedList == null) {
             return (
                     """
-                            %s %s%s;
-                            """.formatted(
-                            toCType(finalType),
-                            n.name,
-                            braces
+                    %s %s%s;
+                    """.formatted(
+                    toCType(finalType),
+                    n.name,
+                    braces
                     )
             );
         }
@@ -642,12 +650,12 @@ StringBuilder str = new StringBuilder();
             rightSide.append("}");
             return (
                     """
-                            %s %s%s = %s;
-                            """.formatted(
-                            toCType(finalType),
-                            n.name,
-                            braces,
-                            rightSide.toString()
+                    %s %s%s = %s;
+                    """.formatted(
+                    toCType(finalType),
+                    n.name,
+                    braces,
+                    rightSide.toString()
                     )
             );
         }
@@ -1086,5 +1094,13 @@ StringBuilder str = new StringBuilder();
         String str = "(rand() % ";
         str += "%s + 1)".formatted(n.diceSize.accept(this));
         return str;
+    }
+
+    @Override
+    public String visit(SizeOfNode n) {
+        //Give back the number of elements found in the identifier
+        Symbol identifier = ST.retrieveSymbol(n.var);
+        return "%d".formatted(identifier.value);
+
     }
 }
