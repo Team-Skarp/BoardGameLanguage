@@ -37,6 +37,7 @@ class CCodeGeneratorTest {
         //Given Tile node and a written symbol table
         Tile tile = new Tile();
         SymbolTable symbolTable = SH.visit(tile.getDesign());
+        symbolTable.resetScopePointers();
         //symbolTable.enterSymbol(new Symbol("pieces", new ListType(new Piece().getType())));
 
         //When code generator visits tile node
@@ -49,16 +50,14 @@ class CCodeGeneratorTest {
 
         //Expect C struct that works
         String expected =
-                  """
-                  struct Tile {
-                  \tbool back_track_allowed;
-                  \tint next_free;
-                  \tstruct Tile *next;
-                  \tstruct Tile *prev;
-                  \tbool (*isEmpty)();
-                  \tstruct Piece pieces[25];
-                  };
-                  """;
+                    """
+                    struct Tile {
+                    \tbool back_track_allowed;
+                    \tint p_count;
+                    \tstruct Tile *next;
+                    \tstruct Tile *prev;
+                    };
+                    """;
 
         assertEquals(expected, actual);
     }
@@ -147,6 +146,7 @@ class CCodeGeneratorTest {
 
         SH = new SymbolHarvester();
         SymbolTable symbolTable = SH.visit(biggest);
+        symbolTable.resetScopePointers();
 
         generator = new CCodeGenerator(symbolTable, TENV);
         generator.visit(biggest);
@@ -244,6 +244,7 @@ class CCodeGeneratorTest {
         );
 
         SymbolTable generatedST = SH.visit(block);
+        generatedST.resetScopePointers();
         CCodeGenerator generator = new CCodeGenerator(generatedST, SH.TENV);
         generator.visit(block);
 

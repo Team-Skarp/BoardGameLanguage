@@ -143,6 +143,7 @@ public class SymbolHarvesterTest {
         );
 
         SymbolTable ST = symbolHarvester.visit(foo);
+        ST.resetScopePointers();
 
         //Expect that a new scope for the action body have been created
         assertEquals(1, ST.getActiveBlock().getChildren().size());

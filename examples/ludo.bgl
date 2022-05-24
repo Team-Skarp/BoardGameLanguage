@@ -1,7 +1,5 @@
 SETUP {
 
-
-
     Piece piece1Player1;
     Piece piece2Player1;
     Piece piece3Player1;
