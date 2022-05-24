@@ -17,9 +17,13 @@ class ActionDefinitionNodeTest {
     void setup() {
         fooBody = new ParameterBlock(
                 new IntegerDeclarationNode("a"),
-                new BooleanDeclarationNode("b"));
+                new BooleanDeclarationNode("b")
+        );
 
-        fooDcl = new ActionDeclarationNode("OnLand", new BoolType(), new IntegerDeclarationNode("rollTries"), new BooleanDeclarationNode("stopTurn"));
+        fooDcl = new ActionDeclarationNode("OnLand", new BoolType(),
+                new IntegerDeclarationNode("rollTries"),
+                new BooleanDeclarationNode("stopTurn")
+        );
 
     }
 

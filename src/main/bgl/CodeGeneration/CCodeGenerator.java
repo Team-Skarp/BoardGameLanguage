@@ -58,10 +58,10 @@ public class CCodeGenerator implements ASTvisitor<String> {
         userCode =
                 """
                         int main(int argc, char *argv[]) {
-                           time_t t;
+                            time_t t;
                            
-                           /* Intializes random number generator */
-                           srand((unsigned) time(&t));
+                            /* Intializes random number generator */
+                            srand((unsigned) time(&t));
                             %s
                             while(true) {
                                %s
@@ -628,7 +628,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
             );
         }
         else {
-            //System.out.println("IN LIST DECL NODE ELSE PART");
             StringBuilder rightSide = new StringBuilder();
             rightSide.append("{");
             for (ASTNode child: n.assignedList.elements) {
@@ -655,7 +654,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ListNode n) {
-        //System.out.println("IN LIST NODE");
         StringBuilder str = new StringBuilder();
         str.append("{");
         for (ASTNode elementNode: n.elements) {
@@ -675,7 +673,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(ListElementNode n) {
-        //System.out.println("IN LIST ELEMENT NODE");
         StringBuilder str = new StringBuilder();
         str.append("{");
 
@@ -765,7 +762,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
     @Override
     public String visit(IntegerDeclarationNode n) {
         //TODO Fix indent somewhere between this and sequential decl. Also fix sequential decl.
-        System.out.println(n.value);
         if (n.value != null) {
             //int a;
             return """

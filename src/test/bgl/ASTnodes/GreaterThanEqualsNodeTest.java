@@ -21,7 +21,7 @@ class GreaterThanEqualsNodeTest {
     @BeforeEach
     void setup() {
         intNodeLeft = new IntNode(50);
-        intNodeRight = new IntNode(43424);
+        intNodeRight = new IntNode(434);
         TENV = new TypeEnvironment();
     }
 
