@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface PredefinedDesign {
 
-    DesignType                  getType();
     DesignDefinitionNode        getDesign();
     List<ActionDefinitionNode>  getImplementedActions();
 

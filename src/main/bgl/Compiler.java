@@ -147,9 +147,11 @@ public class Compiler {
         // STDLIB Symbol Harvester
         SymbolHarvester stdSH= new SymbolHarvester();
         SymbolTable stdST = (SymbolTable) stdAST.accept(stdSH);
+        stdST.resetScopePointers();                             //Reset scope pointer after creation
 
         // STDLIB Code generator
         ASTvisitor stdGenerator = createCodeGeneratorBasedOnArgs(arguments, stdST, stdSH);
+        stdST.resetScopePointers();
 
         // STDLIB COde
         stdAST.accept(stdGenerator);
@@ -180,6 +182,7 @@ public class Compiler {
         // Symbol harvester
         SymbolHarvester SH = new SymbolHarvester(stdST, stdSH.TENV);
         SymbolTable ST = (SymbolTable) ast.accept(SH);
+        ST.resetScopePointers();
 
         // Generator and file naming
         ASTvisitor generator = createCodeGeneratorBasedOnArgs(arguments, ST, SH);

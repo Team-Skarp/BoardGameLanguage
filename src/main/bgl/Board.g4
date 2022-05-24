@@ -282,7 +282,7 @@ fieldAccess
     : IDENTIFIER (DOT IDENTIFIER | indexAccess)* (DOT actionCall)?
     ;
 
-//List element access by index, allows a.b[1][2].c[3].d on left side of =;
+//List element access by index, allows a.b[1][2].c[3].d on left side of =; a[].b[].c[]
 fieldAccessLH
     : IDENTIFIER (DOT IDENTIFIER | indexAccess)+
     ;

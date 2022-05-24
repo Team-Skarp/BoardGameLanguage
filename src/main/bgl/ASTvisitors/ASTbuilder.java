@@ -327,7 +327,6 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
     public ASTNode visitFieldAccess(BoardParser.FieldAccessContext ctx) {
 
         int idX = 0;
-        List<ASTNode> indexAccessNodes = new ArrayList<>();
         List<Accessable> accessors = new ArrayList<>();
 
         for (ParseTree node : ctx.children) {
@@ -338,79 +337,69 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                 }
             }
             else if (node.equals(ctx.actionCall())) {
-                System.out.println("GOODNESS building AC");
                 accessors.add((Accessable) node.accept(this));
 
             }
             else if (ctx.indexAccess().contains(node)) {
-                System.out.println("GOODNESS building IA");
-                indexAccessNodes.add(node.accept(this));
-
+                IndexAccessNode ian = (IndexAccessNode) node.accept(this);
+                ian.indexIn = ctx.IDENTIFIER(idX - 1).getText();
+                accessors.add(ian);
             }
             else {
                 accessors.add(new MethodCallNode(
                         (ActionCallNode) ctx.actionCall().accept(this),
                         ctx.IDENTIFIER(idX - 1).getText())
                 );
-
             }
         }
 
-        List<ASTNode> returnList = new ArrayList<>();
-        returnList.addAll(accessors);
-        returnList.addAll(indexAccessNodes);
-
-        return new FieldAccessNode(returnList);
+        return new FieldAccessNode(accessors);
     }
 
     @Override
     public ASTNode visitFieldAccessLH(BoardParser.FieldAccessLHContext ctx) {
-        List<String> children = new ArrayList<>();
-        int idX = 0;
 
-        List<ASTNode> astNodes = new ArrayList<>();
+        int idX = 0;
+        List<Accessable> accessors = new ArrayList<>();
+
         for (ParseTree node : ctx.children) {
-            //System.out.println("node.getText() = " + node.getText());
-            children.add(node.getText());
             if (node instanceof TerminalNode T) {
                 if (T.equals(ctx.IDENTIFIER(idX))) {
-                    astNodes.add(new IdNode(ctx.IDENTIFIER(idX).getText()));
+                    accessors.add(new IdNode(ctx.IDENTIFIER(idX).getText()));
                     idX++;
                 }
             }
-            else {
-                //System.out.println("adding to accessors");
-                astNodes.add(node.accept(this));
-                System.out.println("accessors of LH = " + astNodes);
+            else if (ctx.indexAccess().contains(node)) {
+                IndexAccessNode ian = (IndexAccessNode) node.accept(this);
+                ian.indexIn = ctx.IDENTIFIER(idX - 1).getText();
+                accessors.add(ian);
             }
         }
-        return new FieldAccessLHNode(astNodes, children);
+
+        return new FieldAccessLHNode(accessors);
     }
 
     @Override
     public ASTNode visitIndexAccess(BoardParser.IndexAccessContext ctx) {
-        List<String> childrenAsString = new ArrayList<>();
-        List<ASTNode> childrenAsAST = new ArrayList<>();
 
-        for (ParseTree child: ctx.children) {
-            // find numbers
-            if (child.getText().matches("[0-9]+")) {
-                // throw exception if number begins with 0
+        List<ASTNode> indexValues = new ArrayList<>();
+
+        for (ParseTree child : ctx.children) {
+            if (ctx.IDENTIFIER().contains(child)) {
+                indexValues.add(new IdNode(child.getText()));
+            }
+            else if (ctx.INT().contains(child)) {
                 if (child.toString().substring(0, 1).contains("0")) {
                     throw new IndexOutOfBoundsException("BGL indexing starts from 1, unlike C which starts from 0");
                 }
-                childrenAsAST.add(new IntNode(Integer.parseInt(child.getText())));
+                indexValues.add(new IntNode(
+                        Integer.parseInt(child.getText()))
+                );
             }
-            // find identifiers
-            else if (child.getText().matches("[a-zA-Z]+")) {
-                childrenAsAST.add(new IdNode(child.getText()));
-            }
-
-            // add everything to childrenAsString for easy C conversion
-            childrenAsString.add(child.getText());
         }
 
-        return new IndexAccessNode(childrenAsString, childrenAsAST);
+        return new IndexAccessNode(indexValues);
+
     }
 
     @Override

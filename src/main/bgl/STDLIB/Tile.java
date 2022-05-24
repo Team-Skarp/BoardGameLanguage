@@ -10,23 +10,23 @@ import java.util.List;
 public class Tile implements PredefinedDesign {
 
     @Override
-    public DesignType getType() {
-        //return new DesignType();
-        return null;
-    }
-
-    @Override
     public DesignDefinitionNode getDesign() {
         /**
          * design Tile {
-         *     Tile next;
-         *     Tile prev;
-         *     action isEmpty() : bool;
-         *     list:Piece pieces;
+         *     bool back_track_allowed;   //Flag for specifying if back track is allowed for pieces
+         *     int p_count                //Counter for how many pieces are on this tile
+         *     Tile next;                 //Points to the next tile in the chain
+         *     Tile prev;                 //Points to the previous tile in the chain
          * }
          */
         return new DesignDefinitionNode(
                 "Tile",
+                new BooleanDeclarationNode(
+                  "back_track_allowed"
+                ),
+                new IntegerDeclarationNode(
+                  "p_count"
+                ),
                 new DesignDeclarationNode(
                         "Tile",
                         "next"
@@ -34,43 +34,13 @@ public class Tile implements PredefinedDesign {
                 new DesignDeclarationNode(
                         "Tile",
                         "prev"
-                ),
-                new ActionDeclarationNode(
-                        "isEmpty",
-                        new BoolType()
-                ),
-                new ListDeclarationNode(
-                        "pieces",
-                        new DesignRef("Piece")
                 )
         );
     }
 
     @Override
     public List<ActionDefinitionNode> getImplementedActions() {
-        /**
-         * action isEmpty(Tile self) : bool {
-         *     return self.pieces < 0;
-         * }
-         */
-        ActionDefinitionNode isEmpty = new ActionDefinitionNode(
-                "isEmpty",
-                new BoolType(),
-                new ParameterBlock(
-                        new LessThanNode(
-                                new ReturnNode(
-                                        new FieldAccessNode(List.of(
-                                                new IdNode("self"),
-                                                new IdNode("pieces"),
-                                                new IdNode("length"))
-                                        )
-                                ),
-                                new IntNode(0)
-                        )
-                )
-        );
-
-        return List.of(isEmpty);
+        return List.of();
     }
 
 }

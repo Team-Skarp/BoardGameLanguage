@@ -49,14 +49,16 @@ class CCodeGeneratorTest {
 
         //Expect C struct that works
         String expected =
-                """
-                struct Tile {
-                \tstruct Tile *next;
-                \tstruct Tile *prev;
-                \tbool (*isEmpty)();
-                \tstruct Piece pieces[0];
-                };
-                """;
+                  """
+                  struct Tile {
+                  \tbool back_track_allowed;
+                  \tint next_free;
+                  \tstruct Tile *next;
+                  \tstruct Tile *prev;
+                  \tbool (*isEmpty)();
+                  \tstruct Piece pieces[25];
+                  };
+                  """;
 
         assertEquals(expected, actual);
     }

@@ -6,11 +6,9 @@ import java.util.List;
 
 public class FieldAccessLHNode implements ASTNode, Expression {
 
-    public List<String> children;
-    public List<ASTNode> fields;
+    public List<Accessable> fields;
 
-    public FieldAccessLHNode(List<ASTNode> fields, List<String> children) {
-        this.children = children;
+    public FieldAccessLHNode(List<Accessable> fields) {
         this.fields = fields;
     }
 

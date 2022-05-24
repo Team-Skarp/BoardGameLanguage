@@ -79,6 +79,25 @@ SETUP {
 }
 
 RULES {
+    action getPiecePosition(Piece p, List list): int {
+        int counter = 0;
+        foreach(piece in list){
+            if (piece.id = p.id){
+                return counter;
+            }
+            counter++;
+        }
+    }
+    action forceMovePiece(Piece p, List source, int sourceIndex, List dest, int destIndex){
+
+    }
+    action movePiece(Piece p, List source, int sourceIndex, List dest, int destIndex){
+        // need to be able to find a piece in a list, compare name?, pieces need something that uniquely identifies them
+        // or maybe just print each list index, can you print a struct in C?
+        int pp = getPiecePosition(p, source);
+        dest[destIndex] = source[pp];   //how do we find an empty spot? need to check if source is empty and if not,
+                                // if all pieces belong to current player
+    }
     action selectPiece(): int {
         int number = 0;
         while (number < 1 || number > 4) {

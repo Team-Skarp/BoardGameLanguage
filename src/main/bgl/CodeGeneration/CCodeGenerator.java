@@ -4,6 +4,7 @@ import ASTnodes.*;
 import ASTvisitors.ASTvisitor;
 import Logging.Logger;
 import SymbolTable.SymbolTable;
+import SymbolTable.TypeChecker;
 import SymbolTable.TypeEnvironment;
 import SymbolTable.Symbol;
 import SymbolTable.types.*;
@@ -31,7 +32,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
     private final String        TAB = "\t";
     private final String        EOL = ";\n";
 
-
+    private final int           DEFAULT_LIST_SIZE = 25;
 
     /**
      * Flags for generating correct design & action signatures
@@ -327,15 +328,6 @@ public class CCodeGenerator implements ASTvisitor<String> {
         str.append(" = ");
         str.append(n.getRight().accept(this));
         str.append(EOL);
-/*
-StringBuilder str = new StringBuilder();
-        for (int i = 0; i < n.fieldAccessNode.fields.size() - 1; i++) {
-            str.append(n.fieldAccessNode.fields.get(i).getAccessName());
-        }
-        str.deleteCharAt(str.length() - 1);
-        str.append("->").append(n.fieldAccessNode.fields.get(n.fieldAccessNode.fields.size() - 1)).
-        append(" = ").append(n.expr.accept(this)).append(EOL);
- */
 
         return str.toString();
     }
@@ -597,7 +589,7 @@ StringBuilder str = new StringBuilder();
         }
 
         // C needs size set aside for array elements
-        String braces = "[%d]".formatted(leftList.value);
+        String braces = "[%d]".formatted(leftList.value > 0 ? leftList.value : DEFAULT_LIST_SIZE );
         TypeDenoter finalType = n.elementType;
 
         // prep to set size of nested arrays
@@ -704,24 +696,11 @@ StringBuilder str = new StringBuilder();
 
         StringBuilder str = new StringBuilder();
 
-        //todo: remember to add [ and ] if they are removed in the AST node, %s or %d?
-        for (String child: n.childrenAsString) {
-            // append the brackets: [ or ]
-            if (Objects.equals(child, "[") || Objects.equals(child, "]")) {
-                str.append(child);
-            }
-            // find the strings containing only numbers
-            else if (child.matches("[0-9]+")) {
-                //int temp = Integer.parseInt(child);
-                // subtract 1 from index to match C indexing
-                str.append("%s".formatted(Integer.parseInt(child) - 1));
-            }
-            else {
-                // let the C compiler do the arithmetic to subtract 1 from index to match C indexing
-                str.append("(%s - 1)".formatted(child));
-            }
-
+        for (ASTNode child: n.value) {
+            //Subtract one as BGL is 1 indexed
+            str.append("[%s - 1]".formatted(child.accept(this)));
         }
+
         return str.toString();
     }
 
@@ -921,8 +900,6 @@ StringBuilder str = new StringBuilder();
                         n.iterable.name,
                         n.body.accept(this)
                     );
-
-
     }
 
     @Override
@@ -952,10 +929,20 @@ StringBuilder str = new StringBuilder();
                     System.out.println("Incompatible type for print");
                 }
                 //variables
-            }else if(p instanceof ArithmeticExpression ){
-                //arithmetic
-                str +="%d";
-                endPart += ","+p.accept(this);
+            }else if(p instanceof ArithmeticExpression aExpr ){
+                TypeChecker TC = new TypeChecker(ST, TENV);
+                TypeDenoter t = (TypeDenoter) aExpr.accept(TC);
+                String RHS = (String) p.accept(this);
+
+                //use correct format specifier
+                if (t instanceof IntType) {
+                    str += "%d";
+                }
+                else if (t instanceof StringType) {
+                    str += "%s";
+                }
+
+                endPart += "," + RHS;
             }else if(p instanceof BooleanExpression){
                 //boolean
                 str +="%s";
@@ -1048,13 +1035,25 @@ StringBuilder str = new StringBuilder();
 
     @Override
     public String visit(FieldAccessNode n) {
-        List<String> sequence = new ArrayList<>();
+        boolean oneIdNodeHasBeenAppended = false;
 
-        for (ASTNode field : n.fields) {
-            sequence.add((String)field.accept(this));
+        StringBuilder str = new StringBuilder();
+
+        for (ASTNode node : n.fields) {
+            if (node instanceof IdNode IdN) {
+                if (oneIdNodeHasBeenAppended) {
+                    str.append(".");
+                }
+                str.append(IdN.name);
+                oneIdNodeHasBeenAppended = true;
+
+            }
+            else if (node instanceof IndexAccessNode) {
+                str.append(node.accept(this));
+            }
         }
 
-        return String.join(".", sequence);
+        return str.toString();
     }
 
     @Override

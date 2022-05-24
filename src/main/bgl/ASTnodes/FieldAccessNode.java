@@ -5,9 +5,9 @@ import java.util.List;
 
 public class FieldAccessNode implements ASTNode, Expression, ArithmeticExpression {
 
-    public List<ASTNode> fields;
+    public List<Accessable> fields;
 
-    public FieldAccessNode(List<ASTNode> fields) {
+    public FieldAccessNode(List<Accessable> fields) {
 
         this.fields = fields;
     }

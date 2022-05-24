@@ -31,14 +31,20 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                 SETUP{
-                    int a = 5;
-                    //list:bool bl1 = [true, false];                    
-                    //int bl1Size = sizeof(bl1);
-                    print("Hej", 5);
+                    design Student {
+                        int id;
+                    }
+                    Student hans = {1};
+                    Student frederik = {2};
+                    list:Student students = [hans, frederik];
+                    
+                    print(students[1].id);  //--> 1
                 }
                 RULES{}
-                GAMELOOP{}
-                """;
+                GAMELOOP{
+                    exit;
+                }
+                        """;
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);

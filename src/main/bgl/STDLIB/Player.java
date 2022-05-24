@@ -7,13 +7,10 @@ import SymbolTable.types.DesignType;
 import java.util.List;
 
 public class Player implements PredefinedDesign {
-    @Override
-    public DesignType getType() {
-        return null;
-    }
 
-    /*
+    /**
      * design Player {
+     *     int id;
      *     str name;
      *     list:Piece pieces;
      * }
@@ -22,17 +19,21 @@ public class Player implements PredefinedDesign {
     public DesignDefinitionNode getDesign() {
         return new DesignDefinitionNode(
                 "Player",
+                new IntegerDeclarationNode(
+                  "id"
+                ),
                 new StringDeclarationNode(
                         "name"
                 ),
-                new ListDeclarationNode("pieces",
-                        new DesignRef("Piece")
+                new ListDeclarationNode(
+                  "pieces",
+                  new DesignRef("Piece")
                 )
         );
     }
 
     @Override
     public List<ActionDefinitionNode> getImplementedActions() {
-        return null;
+        return List.of();
     }
 }

@@ -39,28 +39,34 @@ public class STDLIBC {
         Tile stdTile     = new Tile();
 
         // PATH
-        // List<ASTNode> PathAST = new ArrayList<>(List.of(stdPath.getDesign()));
-        // PathAST.addAll(stdPath.getImplementedActions());
+        List<ASTNode> PathAST = new ArrayList<>();
+        PathAST.add(stdPath.getDesign());
+        PathAST.addAll(stdPath.getImplementedActions());
 
         // Piece
-        List<ASTNode> PieceAST = new ArrayList<>(List.of(stdPiece.getDesign()));
-        // PieceAST.addAll(stdPiece.getImplementedActions());
+        List<ASTNode> PieceAST = new ArrayList<>();
+        PieceAST.add(stdPiece.getDesign());
+        PieceAST.add(stdPiece.NAP());
+        PieceAST.addAll(stdPiece.getImplementedActions());
 
         // Player
-        List<ASTNode> PlayerAST = new ArrayList<>(List.of(stdPlayer.getDesign()));
-        // PlayerAST.addAll(stdPlayer.getImplementedActions());
+        List<ASTNode> PlayerAST = new ArrayList<>();
+        PlayerAST.add(stdPlayer.getDesign());
+        PlayerAST.addAll(stdPlayer.getImplementedActions());
 
         // Tile
-        List<ASTNode> TileAST = new ArrayList<>(List.of(stdTile.getDesign()));
-        // TileAST.addAll(stdTile.getImplementedActions());
+        List<ASTNode> TileAST = new ArrayList<>();
+        TileAST.add(stdTile.getDesign());
+        TileAST.addAll(stdTile.getImplementedActions());
 
         // Collected Nodes
         List<ASTNode> nodes = new ArrayList<>();
 
-        //nodes.addAll(PathAST);
+        //Order matters here, as there is dependencies between the designs
+        nodes.addAll(TileAST);
         nodes.addAll(PieceAST);
         nodes.addAll(PlayerAST);
-        nodes.addAll(TileAST);
+        nodes.addAll(PathAST);
 
         return new NonScopeBlockNode(nodes.toArray(new ASTNode[0]));
     }

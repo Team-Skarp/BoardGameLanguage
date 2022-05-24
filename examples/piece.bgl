@@ -1,0 +1,12 @@
+SETUP{
+
+    Piece p1;
+    Tile t1;
+    Player p1;
+
+
+}
+RULES{}
+GAMELOOP{
+    exit;
+}

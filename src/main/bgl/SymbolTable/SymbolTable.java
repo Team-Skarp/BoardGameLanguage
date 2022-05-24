@@ -38,8 +38,6 @@ public class SymbolTable {
 
         Symbol sym = activeBlock.getSymbolWith(name);
 
-        System.out.println("sym = " + sym);
-
         if (sym == null) {
             Block temp_block = activeBlock;
 
@@ -96,9 +94,6 @@ public class SymbolTable {
         if (activeBlock.getParent() != null) {
             activeBlock = activeBlock.getParent();
             System.out.println("Climbed to parent block");
-
-            //Reset next counter so other visitors dives correctly into the first child scope
-            activeBlock.next = 0;
         }
     }
 
@@ -115,6 +110,22 @@ public class SymbolTable {
         else {
             return false;
         }
+    }
+
+    /**
+     * Crawls down every child scope and resets its next pointer to allow other visitors to go down
+     * the scope tree properly
+     */
+    public void resetScopePointers() {
+
+        Block temp_scope = activeBlock;                 //Save the active scope before crawling into children
+        for (Block scope : activeBlock.getChildren()) {
+            scope.next = 0;                             //Reset next pointer of child n
+            activeBlock = scope;                        //Set the active block to its child block
+            resetScopePointers();                       //Recursively call our self to reset next in the childs childrens
+        }
+        activeBlock = temp_scope;                       //Set active block to initial active block
+        activeBlock.next = 0;                           //Reset next pointer of self
     }
 
     public Block getActiveBlock() {

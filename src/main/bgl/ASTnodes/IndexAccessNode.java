@@ -4,13 +4,13 @@ import ASTvisitors.ASTvisitor;
 
 import java.util.List;
 
-public class IndexAccessNode implements ASTNode, ArithmeticExpression {
-    public List<String> childrenAsString;
-    public List<ASTNode> childrenAsASTNode;
+public class IndexAccessNode implements ASTNode, ArithmeticExpression, Accessable {
 
-    public IndexAccessNode(List<String> childrenAsString, List<ASTNode> childrenAsASTNode) {
-        this.childrenAsString = childrenAsString;
-        this.childrenAsASTNode = childrenAsASTNode;
+    public String indexIn;                      //The variable to index in
+    public final List<ASTNode> value;           //The value to index a[5] or a[5][1]
+
+    public IndexAccessNode(List<ASTNode> value) {
+        this.value = value;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class IndexAccessNode implements ASTNode, ArithmeticExpression {
     }
 
     @Override
-    public String toString() {
-        return childrenAsString.toString();
+    public String getAccessName() {
+        return indexIn;
     }
 }

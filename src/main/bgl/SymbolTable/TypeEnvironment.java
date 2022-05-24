@@ -17,34 +17,6 @@ public class TypeEnvironment {
     private HashMap<String, DesignType> env = new HashMap<>();
 
     /**
-     * Initialises the type environment with all predefined types
-     * @return Initialises type environment object
-     */
-    public static TypeEnvironment init() {
-
-        //Here goes all build-in types
-        Tile tile = new Tile();
-
-        List<PredefinedDesign> predefinedDesigns = List.of(tile);
-
-        //DesignType Tile = new DesignType("Tile");
-
-//        for (DesignType type : predefinedTypes) {
-//            env.put(type.name, )
-//        }
-
-        return new TypeEnvironment();
-    }
-
-    /**
-     * Should create a design type of the given build-in type
-     * @param type to enter
-     */
-    private static DesignType initType(PredefinedDesign type) {
-
-        return null;
-    }
-    /**
      * Enters a new custom type into the type environment
      * @param type to enter
      * @throws TypeDefinitionException if parent type already exist or is already defined
@@ -60,7 +32,7 @@ public class TypeEnvironment {
             throw new TypeDefinitionException("type '%s' is already defined".formatted(type.name));
         }
 
-        System.out.printf("type '%s' entered into type env\n", type.name); //Todo: coding when you're tired %n -> \n
+        System.out.printf("type '%s' entered into type env\n", type.name);
         return this;
     }
 
@@ -93,7 +65,7 @@ public class TypeEnvironment {
             throw new TypeDefinitionException("type '%s' is not defined".formatted(name));
         }
 
-        System.out.printf("type '%s' received\n", type.name);
+        //System.out.printf("type '%s' received\n", type.name);
 
         return type;
     }
