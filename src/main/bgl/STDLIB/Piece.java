@@ -11,13 +11,13 @@ public class Piece implements PredefinedDesign {
      * 'Not a Piece' instance is an empty instance of a Tile design
      * with uninitialised values, used to fill in blanks in a piece list.
      */
-    public DesignDeclarationNode NAP() {
+    /*public DesignDeclarationNode NAP() {
         return new DesignDeclarationNode(
           "Piece",
           "_NAP",
           List.of(new IntNode(0).toString())
         );
-    }
+    }*/
     /**
      * design Piece {
      *   int id;                    //Uniquie identifier

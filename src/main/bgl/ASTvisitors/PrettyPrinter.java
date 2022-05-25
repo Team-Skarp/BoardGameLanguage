@@ -344,6 +344,11 @@ public class PrettyPrinter implements ASTvisitor<Void> {
     }
 
     @Override
+    public Void visit(AssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public Void visit(StringAssignmentNode n) {
         System.out.println(TAB.repeat(indent) + "String assign: ");
 

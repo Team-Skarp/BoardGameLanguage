@@ -46,7 +46,6 @@ public class STDLIBC {
         // Piece
         List<ASTNode> PieceAST = new ArrayList<>();
         PieceAST.add(stdPiece.getDesign());
-        PieceAST.add(stdPiece.NAP());
         PieceAST.addAll(stdPiece.getImplementedActions());
 
         // Player

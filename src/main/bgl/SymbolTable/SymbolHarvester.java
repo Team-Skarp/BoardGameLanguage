@@ -198,6 +198,14 @@ public class SymbolHarvester implements ASTvisitor<SymbolTable> {
     }
 
     @Override
+    public SymbolTable visit(AssignmentNode n) {
+        TC = new TypeChecker(ST, TENV);
+        n.accept(TC);
+
+        return ST;
+    }
+
+    @Override
     public SymbolTable visit(StringAssignmentNode n) {
         // no type check required since grammar rule enforces correct type
         // we only even get a StringAssignmentNode if right side is a string literal

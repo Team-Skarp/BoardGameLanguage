@@ -337,19 +337,15 @@ public class ASTbuilder implements BoardVisitor<ASTNode> {
                 }
             }
             else if (node.equals(ctx.actionCall())) {
-                accessors.add((Accessable) node.accept(this));
-
+                accessors.add(new MethodCallNode(
+                  (ActionCallNode) ctx.actionCall().accept(this),
+                  ctx.IDENTIFIER(idX - 1).getText())
+                );
             }
             else if (ctx.indexAccess().contains(node)) {
                 IndexAccessNode ian = (IndexAccessNode) node.accept(this);
                 ian.indexIn = ctx.IDENTIFIER(idX - 1).getText();
                 accessors.add(ian);
-            }
-            else {
-                accessors.add(new MethodCallNode(
-                        (ActionCallNode) ctx.actionCall().accept(this),
-                        ctx.IDENTIFIER(idX - 1).getText())
-                );
             }
         }
 

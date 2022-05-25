@@ -12,6 +12,10 @@ public class IndexAccessNode implements ASTNode, ArithmeticExpression, Accessabl
     public IndexAccessNode(List<ASTNode> value) {
         this.value = value;
     }
+    public IndexAccessNode(String toIndex, List<ASTNode> value) {
+        this.value = value;
+        this.indexIn = toIndex;
+    }
 
     @Override
     public Object accept(ASTvisitor v) {

@@ -394,11 +394,11 @@ unaryMinus
 arithmeticAtom
     : INT
     | sizeof
+    | fieldAccess
     | actionCall
     | IDENTIFIER
     | LPAREN arithmeticExpression RPAREN
     | randomCall
-    | fieldAccess
     ;
 
 logor

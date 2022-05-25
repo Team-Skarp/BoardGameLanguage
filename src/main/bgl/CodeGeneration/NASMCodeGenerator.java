@@ -182,6 +182,11 @@ public class NASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(AssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(StringAssignmentNode n) {
         return null;
     }

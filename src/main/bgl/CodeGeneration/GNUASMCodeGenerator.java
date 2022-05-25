@@ -553,6 +553,11 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(AssignmentNode n) {
+        return null;
+    }
+
+    @Override
     public String visit(StringAssignmentNode n) {
         dataAmount++;
         int temp = dataAmount;

@@ -51,6 +51,18 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
     }
 
     @Override
+    public TypeDenoter visit(AssignmentNode n) {
+        TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
+        TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
+
+        if (idType.getClass() == exprType.getClass()) {
+            return idType;          //Could be the expression type or the id type
+        } else {
+            throw new TypeErrorException(String.format("type '%s' cannot be assigned to type '%s'", exprType, idType));
+        }
+    }
+
+    @Override
     public TypeDenoter visit(StringAssignmentNode n) {
         TypeDenoter idType = (TypeDenoter) n.getLeft().accept(this);
         TypeDenoter exprType = (TypeDenoter) n.getRight().accept(this);
@@ -926,6 +938,10 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             }
             else if (currentSymbol.type instanceof ListType list) {
                 rt = list.elementType;
+                if (rt instanceof DesignRef design && field instanceof IndexAccessNode) {
+                    dName = design.name;
+                    temp = TENV.receiveType(dName).fields;
+                }
             }
             else {
                 if (n.fields.indexOf(field) != n.fields.size() - 1) {
@@ -968,5 +984,4 @@ public class TypeChecker implements ASTvisitor<TypeDenoter> {
             return new StringType();
         }
     }
-
 }

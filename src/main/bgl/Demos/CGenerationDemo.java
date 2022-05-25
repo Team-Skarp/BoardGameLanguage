@@ -30,21 +30,22 @@ public class CGenerationDemo {
         */
         String bglCodeExample =
                 """
-                SETUP{
-                    design Student {
-                        int id;
-                    }
-                    Student hans = {1};
-                    Student frederik = {2};
-                    list:Student students = [hans, frederik];
-                    
-                    print(students[1].id);  //--> 1
-                }
-                RULES{}
-                GAMELOOP{
-                    exit;
-                }
-                        """;
+                  SETUP{
+                      design Dog {
+                        action bark();
+                      }
+                      Dog chiwawa;
+                  }
+                  RULES{
+                        action bark(Dog self){
+                            print("Woof");
+                        }
+                  }
+                  GAMELOOP{
+                      chiwawa.bark();
+                      exit;
+                  }
+                  """;
 
         // Parse Input
         input   = CharStreams.fromString(bglCodeExample);
@@ -59,6 +60,7 @@ public class CGenerationDemo {
         // Symmbol harvester
         SymbolHarvester SH = new SymbolHarvester();
         SymbolTable ST = (SymbolTable) ast.accept(SH);
+        ST.resetScopePointers();
 
         // C - code generation
         CCodeGenerator generator = new CCodeGenerator(ST, SH.TENV);

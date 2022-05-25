@@ -105,9 +105,9 @@ public class Compiler {
         File userFile = new File("./src/main/bgl/BglFiles/Generated/%s".formatted(outputFileName));
 
         if (stdlibFile.exists() && userFile.exists()) {
-            String inputFilePath = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.c");
+            String inputFilePath = "./src/main/bgl/BglFiles/Generated/%s".formatted("ludo.c");
             String outputFilePathWin = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.exe");
-            String outputFilePathUnix = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.exe");
+            String outputFilePathUnix = "./src/main/bgl/BglFiles/Generated/%s".formatted("test.out");
 
             // CMD command to compile with GNU compiler
             ProcessBuilder builder = new ProcessBuilder();

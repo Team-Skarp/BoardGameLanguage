@@ -253,6 +253,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
     }
 
     @Override
+    public String visit(AssignmentNode n) {
+        return "%s = %s;".formatted(n.name, n.expression.accept(this));
+    }
+
+
+    @Override
     public String visit(StringAssignmentNode n) {
         String str = "";
         str += n.varName+" = (char *) realloc("+n.varName+","+n.literal.length()+")"+EOL;
@@ -391,13 +397,14 @@ public class CCodeGenerator implements ASTvisitor<String> {
                 actionBody
         );
 
-        prototypes += """
+        //Seems to create conflicting types of methods
+        /*prototypes += """
                %s %s(%s);
                """.formatted(
                 toCType(n.returnType),
                 n.name,
                 toCParams(n.formalParameters)
-        );
+        );*/
 
         currentActionDefinition = null;
 
@@ -468,7 +475,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         //Create action mappings if outside of design definition and action definitions
         if (currentDesignDefinition == null && currentActionDefinition == null) {
             SymbolTable initialST = TENV.receiveType(n.dName).fields;
-            actionMapping = makeActionMapping(initialST, n.name);
+            actionMapping = makeActionMapping(initialST, n.name, (DesignRef) n.type());
         }
 
         DesignType thisType = TENV.receiveType(n.dName);
@@ -560,19 +567,38 @@ public class CCodeGenerator implements ASTvisitor<String> {
      *
      * @return
      */
-    private String makeActionMapping(SymbolTable localST, String lastFieldName) {
+    private String makeActionMapping(SymbolTable localST, String lastFieldName, DesignRef lastFieldType) {
         String localMapping = "";
         SymbolTable next;
         for (Map.Entry<String, Symbol> entry : localST.getActiveBlock().getSymbolMapping().entrySet()) {
             if (entry.getValue().type instanceof DesignRef design) {
                 next = TENV.receiveType(design.name).fields;
-                localMapping += lastFieldName + "." + makeActionMapping(next, entry.getKey());
+
+                //If the entry references our self, then skip going into it to prevent infinite loops
+                boolean referencesSelf = Objects.equals(lastFieldType.name, design.name);
+                if (!referencesSelf) {
+                    localMapping += lastFieldName + "." + makeActionMapping(next, entry.getKey(), design);
+                }
             }
-            else if (entry.getValue().type instanceof ActionType action) {
+            else if (entry.getValue().type instanceof ActionType) {
                 localMapping += lastFieldName + "." + entry.getKey() + " = &" + entry.getKey() + ";\n";
             }
         }
         return localMapping;
+    }
+
+    /**
+     * Method to figure out if a design contains a self reference
+     *
+     * If a the symbol table contains a design declaration that matches self return true, else false
+     */
+    private boolean referencesItself(String self, SymbolTable DST) {
+        for (Map.Entry<String, Symbol> entry : DST.getActiveBlock().getSymbolMapping().entrySet()) {
+            if (entry.getValue().type instanceof DesignRef design && design.name == self) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -993,7 +1019,7 @@ public class CCodeGenerator implements ASTvisitor<String> {
         String formattedParams = String.join(",", actualParams);
 
         return """
-               %s(%s)
+               %s(%s);
                """.formatted(n.actionName, formattedParams);
 
     }
@@ -1045,6 +1071,12 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
             }
             else if (node instanceof IndexAccessNode) {
+                str.append(node.accept(this));
+            }
+            else if (node instanceof MethodCallNode) {
+                if (oneIdNodeHasBeenAppended) {
+                    str.append(".");
+                }
                 str.append(node.accept(this));
             }
         }

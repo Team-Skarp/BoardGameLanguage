@@ -63,7 +63,7 @@ public class Path implements PredefinedDesign {
          *
          *     self.head = tile;
          *     self.tail = tile;
-         *     self.tiles[1] = tile;
+         *     self.tiles[1] = tile; <--
          *
          *     int i = 2;
          *     while (i <= self.length) {
@@ -73,8 +73,8 @@ public class Path implements PredefinedDesign {
          *         self.tiles[i] = tile;
          *     }
          *     int len = self.length;
-         *     self.tiles[1].prev = self.tiles[len];
-         *     self.tiles[len].next = self.tiles[1];
+         *     self.tiles[1].prev = self.tiles[len]; <--
+         *     self.tiles[len].next = self.tiles[1]; <--
          * }
          */
         ActionDefinitionNode _pinit = new ActionDefinitionNode(
@@ -87,8 +87,9 @@ public class Path implements PredefinedDesign {
             ),
             new ConditionalNode(
               new EqualNode(new IdNode("dirType"), new IntNode(1)),
-              new BlockNode(new AssignmentNode("bta", new BooleanNode(true)))),
-              new BlockNode(new AssignmentNode("bta", new BooleanNode(false))),
+              new BlockNode(new AssignmentNode("bta", new BooleanNode(true))),
+              new BlockNode(new AssignmentNode("bta", new BooleanNode(false)))
+            ),
             new DesignDeclarationNode("Tile", "tile", List.of("bta")),
             new DotAssignmentNode(
               new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("head"))),
@@ -99,7 +100,7 @@ public class Path implements PredefinedDesign {
               new IdNode("tile")
             ),
             new DotAssignmentNode(
-              new FieldAccessLHNode(List.of(new IdNode("self"), new IndexAccessNode(List.of(new IntNode(1))), new IdNode("tiles"))),
+              new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode("tiles", List.of(new IntNode(1))))),
               new IdNode("tile")
             ),
             new IntegerDeclarationNode("i", new IntNode(2)),
@@ -119,7 +120,7 @@ public class Path implements PredefinedDesign {
                   new IdNode("tile")
                 ),
                 new DotAssignmentNode(
-                  new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode(List.of(new IdNode("i"))), new IdNode("next"))),
+                  new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode("tiles",List.of(new IdNode("i"))), new IdNode("next"))),
                   new IdNode("tile")
                 )
               )
@@ -129,12 +130,12 @@ public class Path implements PredefinedDesign {
               new FieldAccessNode(List.of(new IdNode("self"), new IdNode("length")))
             ),
             new DotAssignmentNode(
-              new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode(List.of(new IntNode(1))), new IdNode("prev"))),
-              new FieldAccessNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode(List.of(new IdNode("len")))))
+              new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode("tiles", List.of(new IntNode(1))), new IdNode("prev"))),
+              new FieldAccessNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode("tiles",List.of(new IdNode("len")))))
             ),
             new DotAssignmentNode(
-              new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode(List.of(new IdNode("len"))), new IdNode("next"))),
-              new FieldAccessNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode(List.of(new IntNode(1)))))
+              new FieldAccessLHNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode("tiles",List.of(new IdNode("len"))), new IdNode("next"))),
+              new FieldAccessNode(List.of(new IdNode("self"), new IdNode("tiles"), new IndexAccessNode("tiles",List.of(new IntNode(1)))))
             )
           ),
           new DesignDeclarationNode(

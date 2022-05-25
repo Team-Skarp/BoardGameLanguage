@@ -1,9 +1,6 @@
 package ASTnodes;
 
 import ASTvisitors.ASTvisitor;
-import SymbolTable.types.TypeDenoter;
-
-import java.util.List;
 
 public class AssignmentNode implements ASTNode<Object>, Assignment {
 

@@ -1,10 +1,10 @@
 SETUP{
 
-    Piece p1;
-    Tile t1;
-    Player p1;
+    design Dog {
+        Dog next;
+    }
 
-
+    Dog dog;
 }
 RULES{}
 GAMELOOP{
