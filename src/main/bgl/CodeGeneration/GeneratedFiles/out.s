@@ -1,8 +1,12 @@
 	.file	"out.c"
 	.text
-	.globl	throwDice
-	.type	throwDice, @function
-throwDice:
+	.section	.rodata
+.LC0:
+	.string	"%d%d%d\n"
+	.text
+	.globl	printBoard
+	.type	printBoard, @function
+printBoard:
 .LFB6:
 	.cfi_startproc
 	endbr64
@@ -11,30 +15,64 @@ throwDice:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-	subq	$16, %rsp
-	movl	%edi, -4(%rbp)
-	movl	%esi, -8(%rbp)
-	call	rand@PLT
+	subq	$64, %rsp
+	movq	%rdi, -56(%rbp)
+	movl	$1, -40(%rbp)
+	movq	-56(%rbp), %rax
+	movl	(%rax), %eax
+	movl	%eax, -36(%rbp)
+	movq	-56(%rbp), %rax
+	movl	(%rax), %eax
+	movl	%eax, -32(%rbp)
+	movq	-56(%rbp), %rax
+	movl	(%rax), %eax
+	movl	%eax, -28(%rbp)
+	movq	-56(%rbp), %rax
+	movl	4(%rax), %eax
+	movl	%eax, -24(%rbp)
+	movq	-56(%rbp), %rax
+	movl	4(%rax), %eax
+	movl	%eax, -20(%rbp)
+	movq	-56(%rbp), %rax
+	movl	4(%rax), %eax
+	movl	%eax, -16(%rbp)
+	movq	-56(%rbp), %rax
+	movl	8(%rax), %eax
+	movl	%eax, -12(%rbp)
+	movq	-56(%rbp), %rax
+	movl	8(%rax), %eax
+	movl	%eax, -8(%rbp)
+	movq	-56(%rbp), %rax
+	movl	8(%rax), %eax
+	movl	%eax, -4(%rbp)
+	movl	-28(%rbp), %ecx
+	movl	-32(%rbp), %edx
+	movl	-36(%rbp), %eax
+	movl	%eax, %esi
+	leaq	.LC0(%rip), %rdi
+	movl	$0, %eax
+	call	printf@PLT
+	movl	-16(%rbp), %ecx
+	movl	-20(%rbp), %edx
+	movl	-24(%rbp), %eax
+	movl	%eax, %esi
+	leaq	.LC0(%rip), %rdi
+	movl	$0, %eax
+	call	printf@PLT
+	movl	-4(%rbp), %ecx
 	movl	-8(%rbp), %edx
-	subl	-4(%rbp), %edx
-	leal	1(%rdx), %ecx
-	cltd
-	idivl	%ecx
-	movl	%edx, %eax
-	leal	1(%rax), %edx
-	movl	-4(%rbp), %eax
-	addl	%edx, %eax
-	subl	$1, %eax
+	movl	-12(%rbp), %eax
+	movl	%eax, %esi
+	leaq	.LC0(%rip), %rdi
+	movl	$0, %eax
+	call	printf@PLT
+	nop
 	leave
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
 .LFE6:
-	.size	throwDice, .-throwDice
-	.section	.rodata
-.LC0:
-	.string	"%d\n"
-	.text
+	.size	printBoard, .-printBoard
 	.globl	main
 	.type	main, @function
 main:
@@ -46,103 +84,27 @@ main:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-	subq	$48, %rsp
-	movl	%edi, -36(%rbp)
-	movq	%rsi, -48(%rbp)
+	subq	$80, %rsp
+	movl	%edi, -68(%rbp)
+	movq	%rsi, -80(%rbp)
 	movq	%fs:40, %rax
 	movq	%rax, -8(%rbp)
 	xorl	%eax, %eax
-	leaq	-16(%rbp), %rax
+	leaq	-56(%rbp), %rax
 	movq	%rax, %rdi
 	call	time@PLT
 	movl	%eax, %edi
 	call	srand@PLT
-	movl	$5, -28(%rbp)
-	call	rand@PLT
-	movl	%eax, %ecx
-	movslq	%ecx, %rax
-	imulq	$1717986919, %rax, %rax
-	shrq	$32, %rax
-	movl	%eax, %edx
-	sarl	%edx
-	movl	%ecx, %eax
-	sarl	$31, %eax
-	subl	%eax, %edx
-	movl	%edx, %eax
-	sall	$2, %eax
-	addl	%edx, %eax
-	subl	%eax, %ecx
-	movl	%ecx, %edx
-	leal	1(%rdx), %eax
-	movl	%eax, -24(%rbp)
-	call	rand@PLT
-	movl	%eax, %ecx
-	movslq	%ecx, %rax
-	imulq	$715827883, %rax, %rax
-	shrq	$32, %rax
-	movq	%rax, %rdx
-	movl	%ecx, %eax
-	sarl	$31, %eax
-	subl	%eax, %edx
-	movl	%edx, %eax
-	addl	%eax, %eax
-	addl	%edx, %eax
-	addl	%eax, %eax
-	subl	%eax, %ecx
-	movl	%ecx, %edx
-	leal	1(%rdx), %eax
-	movl	%eax, -20(%rbp)
-.L4:
-	movl	$250, %esi
-	movl	$100, %edi
-	call	throwDice
-	movl	%eax, -24(%rbp)
-	movl	-24(%rbp), %eax
-	movl	%eax, %esi
-	leaq	.LC0(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	call	rand@PLT
-	movl	%eax, %ecx
-	movslq	%ecx, %rax
-	imulq	$1717986919, %rax, %rax
-	shrq	$32, %rax
-	movl	%eax, %edx
-	sarl	%edx
-	movl	%ecx, %eax
-	sarl	$31, %eax
-	subl	%eax, %edx
-	movl	%edx, %eax
-	sall	$2, %eax
-	addl	%edx, %eax
-	subl	%eax, %ecx
-	movl	%ecx, %edx
-	leal	1(%rdx), %eax
-	movl	%eax, %esi
-	leaq	.LC0(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	call	rand@PLT
-	cltd
-	idivl	-24(%rbp)
-	movl	%edx, %eax
-	addl	$1, %eax
-	movl	%eax, %esi
-	leaq	.LC0(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	call	rand@PLT
-	movl	-24(%rbp), %edx
-	leal	5(%rdx), %ecx
-	cltd
-	idivl	%ecx
-	movl	%edx, %eax
-	addl	$1, %eax
-	movl	%eax, %esi
-	leaq	.LC0(%rip), %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	jmp	.L4
+	movq	$0, -48(%rbp)
+	movq	$0, -40(%rbp)
+	movq	$0, -32(%rbp)
+	movq	$0, -24(%rbp)
+	movl	$0, -16(%rbp)
+	leaq	-48(%rbp), %rax
+	movq	%rax, %rdi
+	call	printBoard
+	movl	$0, %edi
+	call	exit@PLT
 	.cfi_endproc
 .LFE7:
 	.size	main, .-main

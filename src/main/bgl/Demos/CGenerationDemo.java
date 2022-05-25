@@ -31,18 +31,43 @@ public class CGenerationDemo {
         String bglCodeExample =
                 """
                   SETUP{
-                      design Dog {
-                        action bark();
-                      }
-                      Dog chiwawa;
+                      list: list: int board = [[0,0,0],[0,0,0],[0,0,0]];
                   }
                   RULES{
-                        action bark(Dog self){
-                            print("Woof");
+                        action printBoard(list: int board){
+                            int j = 1;
+                            int i11,i21,i31,i12,i22,i32,i13,i23,i33;
+                            i11 = board[1][1];
+                            i21 = board[2][1];
+                            i31 = board[3][1];
+                            i12 = board[1][2];
+                            i22 = board[2][2];
+                            i32 = board[3][2];
+                            i13 = board[1][3];
+                            i23 = board[2][3];
+                            i33 = board[3][3];
+                            print(i11,i21,i31);
+                            print(i12,i22,i32);
+                            print(i13,i23,i33);
+                        }
+                        action playerTurn(int player){
+                            int x = 0;
+                            int y = 0;
+                            if(player == 0){
+                                print("Player Cross turn:");
+                            }else{
+                                print("Player Circle turn:");
+                            }
+                            print("please type in your x coordinate to move a piece to");
+                            input(x);
+                            print("please type in your y coordinate to move a piece to");
+                            input(y);
+                            
                         }
                   }
                   GAMELOOP{
-                      chiwawa.bark();
+                      printBoard(board);
+                      playerTurn(1);
                       exit;
                   }
                   """;
