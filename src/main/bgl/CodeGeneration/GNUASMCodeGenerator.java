@@ -609,7 +609,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override //Actions are functions
     public String visit(ActionDefinitionNode n) {
-        ST.dive();
 
         //TODO: switch depending on return type
         //TODO: insert formalparameters if they exist
@@ -664,7 +663,6 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
                 .LFE%d:                          
                 	.size	%s, .-%s        
                 """.formatted(n.name,n.name,n.name,functionCounter,formalParameters,functionBlock,functionCounter,n.name,n.name);
-        ST.climb();
 
         return "";
     }
@@ -1073,7 +1071,34 @@ public class GNUASMCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(FieldAccessNode n) {
-        return null;
+        boolean oneIdNodeHasBeenAppended = false;
+
+        StringBuilder str = new StringBuilder();
+
+        for (ASTNode node : n.fields) {
+            if (node instanceof IdNode IdN) {
+                if (oneIdNodeHasBeenAppended) {
+
+                    str.append(".");
+                }
+                Symbol symbol = ST.retrieveSymbol(IdN.name);
+                String var = "DWORD PTR -%d[rbp]".formatted(ptrTable.get(symbol.hashCode()));
+                str.append(var);
+                oneIdNodeHasBeenAppended = true;
+
+            }
+            else if (node instanceof IndexAccessNode) {
+                str.append(node.accept(this));
+            }
+            else if (node instanceof MethodCallNode) {
+                if (oneIdNodeHasBeenAppended) {
+                    str.append(".");
+                }
+                str.append(node.accept(this));
+            }
+        }
+
+        return str.toString();
     }
 
     @Override
