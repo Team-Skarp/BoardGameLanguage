@@ -10,6 +10,7 @@ import SymbolTable.Symbol;
 import SymbolTable.types.*;
 import SymbolTable.IllegalListAssignmentException;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -88,38 +89,79 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(PlusNode n) {
-        return " ( "+n.left.accept(this)+" + "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return (a+b)+"";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " + " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(MinusNode n) {
-        return " ( "+n.left.accept(this)+" - "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return (a-b)+"";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " - " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(UnaryMinusNode n) {
-        lo.g(n.operand.accept(this).toString()+" unary minus");
         return " ( -( "+n.operand.accept(this)+" ) ) ";
     }
 
     @Override
     public String visit(MultNode n) {
-        return " ( "+n.left.accept(this)+" * "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return a*b+"";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " * " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(DivNode n) {
-        return " ( "+n.left.accept(this)+" / "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return Math.round(a/b)+"";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " / " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(ModNode n) {
-        return " ( "+n.left.accept(this)+" % "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return (a%b)+"";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " % " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(PowNode n) {
-        return " ( (int)pow("+n.left.accept(this)+", "+n.right.accept(this)+") ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return Math.round(Math.pow(a,b))+"";
+        }
+        catch(NumberFormatException ex){
+            return " ( (int)pow("+n.left.accept(this)+", "+n.right.accept(this)+") ) ";
+        }
     }
 
     @Override
@@ -149,47 +191,114 @@ public class CCodeGenerator implements ASTvisitor<String> {
 
     @Override
     public String visit(EqualNode n) {
-        return " ( "+n.left.accept(this)+"=="+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return a==b ? "true" : "false";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + "==" + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(NotEqualNode n) {
-        return " ( "+n.left.accept(this)+" != "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return a!=b ? "true" : "false";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " != " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(LessThanNode n) {
-        return " ( "+n.left.accept(this)+" < "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return a<b ? "true" : "false";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " < " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(GreaterThanNode n) {
-        return " ( "+n.left.accept(this)+" > "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return a>b ? "true" : "false";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " > " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(GreaterThanEqualsNode n) {
-        return " ( "+n.left.accept(this)+" >= "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return a>=b ? "true" : "false";
+        }
+        catch(NumberFormatException ex) {
+            return " ( " + n.left.accept(this) + " >= " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(LessThanEqualsNode n) {
-        return " ( "+n.left.accept(this)+" <= "+n.right.accept(this)+" ) ";
+        try{
+            int a = Integer.parseInt((String)n.left.accept(this));
+            int b = Integer.parseInt((String)n.right.accept(this));
+            return a<=b ? "true" : "false";
+        }
+        catch(NumberFormatException ex){
+            return " ( " + n.left.accept(this) + " <= " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(NegationNode n) {
+        if(n.child.accept(this) == "true"){
+            return "false";
+        }else if(n.child.accept(this) == "false"){
+            return "true";
+        }
         return " ( !( "+n.child.accept(this)+" ) )";
     }
 
     @Override
     public String visit(OrNode n) {
-        return " ( "+n.left.accept(this)+" || "+n.right.accept(this)+" ) ";
+        if(n.left.accept(this) == "true" && n.right.accept(this) == "true"){
+            return "true";
+        }else if(n.left.accept(this) == "false" && n.right.accept(this) == "true"){
+            return "true";
+        }else if(n.left.accept(this) == "true" && n.right.accept(this) == "false"){
+            return "true";
+        }else if(n.left.accept(this) == "false" && n.right.accept(this) == "false"){
+            return "false";
+        }else {
+            return " ( " + n.left.accept(this) + " || " + n.right.accept(this) + " ) ";
+        }
     }
 
     @Override
     public String visit(AndNode n) {
-        return " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
+        if(n.left.accept(this) == "true" && n.right.accept(this) == "true"){
+            return "true";
+        }else if(n.left.accept(this) == "false" && n.right.accept(this) == "true"){
+            return "false";
+        }else if(n.left.accept(this) == "true" && n.right.accept(this) == "false"){
+            return "false";
+        }else if(n.left.accept(this) == "false" && n.right.accept(this) == "false"){
+            return "false";
+        }else{
+            return " ( "+n.left.accept(this)+" && "+n.right.accept(this)+" ) ";
+        }
     }
 
     @Override
